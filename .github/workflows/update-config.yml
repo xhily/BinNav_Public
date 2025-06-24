@@ -1,0 +1,78 @@
+name: Update Website Config
+
+on:
+  repository_dispatch:
+    types: [update_config]
+  workflow_dispatch:
+    inputs:
+      config:
+        description: 'Base64 encoded config content'
+        required: false
+        type: string
+
+jobs:
+  update-config:
+    runs-on: ubuntu-latest
+    
+    # 设置环境变量
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      REPOSITORY_NAME: ${{ secrets.REPOSITORY_NAME }}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        
+    - name: Update website configuration
+      run: |
+        # 获取配置内容
+        if [ "${{ github.event_name }}" == "repository_dispatch" ]; then
+          CONFIG_CONTENT="${{ github.event.client_payload.config }}"
+        else
+          CONFIG_CONTENT="${{ inputs.config }}"
+        fi
+        
+        # 更新配置文件
+        if [ ! -z "$CONFIG_CONTENT" ]; then
+          echo "📝 Updating websiteData.js..."
+          echo "$CONFIG_CONTENT" | base64 -d > src/websiteData.js
+          
+          # 验证文件格式
+          if node -c src/websiteData.js; then
+            echo "✅ Configuration updated successfully!"
+          else
+            echo "❌ Invalid JavaScript syntax in websiteData.js"
+            exit 1
+          fi
+        else
+          echo "⚠️  No configuration provided, skipping update..."
+          exit 0
+        fi
+    
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # 检查是否有变更
+        if ! git diff --quiet src/websiteData.js; then
+          git add src/websiteData.js
+          git commit -m "🔧 Auto-update website config via admin panel"
+          git push origin main
+          echo "✅ Configuration committed and pushed"
+        else
+          echo "ℹ️  No changes detected"
+        fi
+        
+    - name: Create summary
+      run: |
+        echo "## 🚀 配置更新完成" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **触发方式**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **更新时间**: $(date '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+        echo "- **自动部署**: EdgeOne Pages将自动检测变更并重新部署" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "🎉 网站配置已更新，EdgeOne Pages正在自动部署新版本！" >> $GITHUB_STEP_SUMMARY 
