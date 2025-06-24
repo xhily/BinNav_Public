@@ -46,10 +46,25 @@ export default defineConfig(({ command, mode }) => {
     define: {
       // 确保环境变量在生产构建中可用
       'process.env.NODE_ENV': JSON.stringify(mode),
-      // GitHub Actions环境变量映射
-      'import.meta.env.VITE_ADMIN_PASSWORD': JSON.stringify(process.env.VITE_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD),
-      'import.meta.env.VITE_GITHUB_TOKEN': JSON.stringify(process.env.VITE_GITHUB_TOKEN || process.env.PERSONAL_ACCESS_TOKEN),
-      'import.meta.env.VITE_GITHUB_REPO': JSON.stringify(process.env.VITE_GITHUB_REPO || process.env.REPOSITORY_NAME)
-    }
+      // EdgeOne Pages 和 GitHub Actions 环境变量映射
+      'import.meta.env.VITE_ADMIN_PASSWORD': JSON.stringify(
+        process.env.VITE_ADMIN_PASSWORD || 
+        process.env.ADMIN_PASSWORD || 
+        'admin123'
+      ),
+      'import.meta.env.VITE_GITHUB_TOKEN': JSON.stringify(
+        process.env.VITE_GITHUB_TOKEN || 
+        process.env.PERSONAL_ACCESS_TOKEN || 
+        ''
+      ),
+      'import.meta.env.VITE_GITHUB_REPO': JSON.stringify(
+        process.env.VITE_GITHUB_REPO || 
+        process.env.REPOSITORY_NAME || 
+        ''
+      )
+    },
+    
+    // 确保 EdgeOne Pages 能读取到环境变量
+    envPrefix: ['VITE_', 'ADMIN_', 'PERSONAL_', 'REPOSITORY_']
   }
 }) 

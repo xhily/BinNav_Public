@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { AlertCircle, CheckCircle, ExternalLink, Save, Plus, Edit3, Trash2, Download, ChevronDown, ChevronUp, Settings, GripVertical, LogOut, User, Lock } from 'lucide-react'
 import { websiteData, categories } from '../websiteData.js'
+import { CONFIG } from '../config.js'
 import {
   DndContext,
   closestCenter,
@@ -59,8 +60,8 @@ function Admin() {
     siteDescription: '精选网站导航'
   })
 
-  // 认证配置
-  const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'admin123'
+  // 认证配置 - 使用统一配置系统
+  const ADMIN_PASSWORD = CONFIG.ADMIN_PASSWORD
 
   // 检查认证状态
   useEffect(() => {
@@ -102,8 +103,8 @@ function Admin() {
       const configContent = generateConfigFile(config.websiteData, config.categories)
       
       // 触发GitHub Actions自动更新
-      const githubRepo = import.meta.env.VITE_GITHUB_REPO
-      const githubToken = import.meta.env.VITE_GITHUB_TOKEN
+      const githubRepo = CONFIG.GITHUB_REPO
+      const githubToken = CONFIG.GITHUB_TOKEN
       
       if (!githubRepo || !githubToken) {
         throw new Error('GitHub配置未设置，请检查环境变量')
@@ -1310,8 +1311,426 @@ export const siteStats = {
 
           {/* 标签页内容 */}
           <div className="p-6">
-            {/* 这里保持原有的标签页内容不变，只是加载认证后的状态 */}
-            {/* ... 原有的网站管理、分类管理、系统设置内容 ... */}
+            {activeTab === 'websites' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900">网站管理</h3>
+                  <button
+                    onClick={handleAddWebsite}
+                    className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    添加网站
+                  </button>
+                </div>
+
+                {/* 添加网站表单 */}
+                {editingWebsite === 'new' && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+                    <h4 className="text-lg font-medium text-gray-900 mb-4">添加新网站</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">网站名称</label>
+                        <input
+                          type="text"
+                          value={websiteForm.name}
+                          onChange={(e) => setWebsiteForm({...websiteForm, name: e.target.value})}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="例如：GitHub"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">网站地址</label>
+                        <input
+                          type="url"
+                          value={websiteForm.url}
+                          onChange={(e) => setWebsiteForm({...websiteForm, url: e.target.value})}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="https://github.com"
+                        />
+                      </div>
+                      
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">网站描述</label>
+                        <textarea
+                          value={websiteForm.description}
+                          onChange={(e) => setWebsiteForm({...websiteForm, description: e.target.value})}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          rows="3"
+                          placeholder="简要描述网站的功能和特色..."
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">所属分类</label>
+                        <select
+                          value={websiteForm.category}
+                          onChange={(e) => setWebsiteForm({...websiteForm, category: e.target.value})}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="recommended">常用推荐</option>
+                          <option value="design_tools">设计工具</option>
+                          <option value="developer_tools">开发工具</option>
+                          <option value="learning">学习教程</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">标签 (用逗号分隔)</label>
+                        <input
+                          type="text"
+                          value={websiteForm.tags}
+                          onChange={(e) => setWebsiteForm({...websiteForm, tags: e.target.value})}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="设计, 工具, 免费"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="flex space-x-3">
+                      <button
+                        onClick={handleSaveWebsite}
+                        className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex-1"
+                      >
+                        保存网站
+                      </button>
+                      <button
+                        onClick={() => {setEditingWebsite(null); resetWebsiteForm()}}
+                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg flex-1"
+                      >
+                        取消
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 网站列表 */}
+                <div className="space-y-4">
+                  {config.websiteData.length === 0 ? (
+                    <div className="text-center py-12 text-gray-500">
+                      <div className="text-lg mb-2">还没有添加任何网站</div>
+                      <div className="text-sm">点击上方"添加网站"按钮开始添加</div>
+                    </div>
+                  ) : (
+                    config.websiteData.map((website) => (
+                      <div key={website.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            <img 
+                              src={website.icon || '/logo.png'} 
+                              alt={website.name}
+                              className="w-12 h-12 rounded-lg"
+                              onError={(e) => { e.target.src = '/logo.png' }}
+                            />
+                            <div>
+                              <h4 className="font-medium text-gray-900">{website.name}</h4>
+                              <p className="text-sm text-gray-600">{website.description}</p>
+                              <div className="flex items-center space-x-2 mt-1">
+                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                  {getCategoryName(website.category)}
+                                </span>
+                                {website.tags && website.tags.map((tag, index) => (
+                                  <span key={index} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <a
+                              href={website.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 p-2"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                            <button
+                              onClick={() => handleEditWebsite(website)}
+                              className="text-orange-600 hover:text-orange-800 p-2"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteWebsite(website.id)}
+                              className="text-red-600 hover:text-red-800 p-2"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* 编辑表单 */}
+                        {editingWebsite === website.id && (
+                          <div className="mt-4 pt-4 border-t border-gray-200 bg-orange-50 -m-4 mt-4 p-4 rounded-b-lg">
+                            <h5 className="font-medium text-gray-900 mb-3">编辑网站信息</h5>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">网站名称</label>
+                                <input
+                                  type="text"
+                                  value={websiteForm.name}
+                                  onChange={(e) => setWebsiteForm({...websiteForm, name: e.target.value})}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                              </div>
+                              
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">网站地址</label>
+                                <input
+                                  type="url"
+                                  value={websiteForm.url}
+                                  onChange={(e) => setWebsiteForm({...websiteForm, url: e.target.value})}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                              </div>
+                              
+                              <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">网站描述</label>
+                                <textarea
+                                  value={websiteForm.description}
+                                  onChange={(e) => setWebsiteForm({...websiteForm, description: e.target.value})}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  rows="2"
+                                />
+                              </div>
+                              
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">所属分类</label>
+                                <select
+                                  value={websiteForm.category}
+                                  onChange={(e) => setWebsiteForm({...websiteForm, category: e.target.value})}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                >
+                                  <option value="recommended">常用推荐</option>
+                                  <option value="design_tools">设计工具</option>
+                                  <option value="developer_tools">开发工具</option>
+                                  <option value="learning">学习教程</option>
+                                </select>
+                              </div>
+                              
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">标签</label>
+                                <input
+                                  type="text"
+                                  value={websiteForm.tags}
+                                  onChange={(e) => setWebsiteForm({...websiteForm, tags: e.target.value})}
+                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="flex space-x-3">
+                              <button
+                                onClick={handleSaveWebsite}
+                                className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg flex-1"
+                              >
+                                保存修改
+                              </button>
+                              <button
+                                onClick={() => {setEditingWebsite(null); resetWebsiteForm()}}
+                                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex-1"
+                              >
+                                取消编辑
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'categories' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900">分类管理</h3>
+                  <button
+                    onClick={handleAddCategory}
+                    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    添加分类
+                  </button>
+                </div>
+
+                {/* 添加分类表单 */}
+                {editingCategory === 'new' && (
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-6 mb-6">
+                    <h4 className="text-lg font-medium text-gray-900 mb-4">添加新分类</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">分类名称</label>
+                        <input
+                          type="text"
+                          value={categoryForm.name}
+                          onChange={(e) => setCategoryForm({...categoryForm, name: e.target.value})}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="例如：设计工具"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">图标路径</label>
+                        <input
+                          type="text"
+                          value={categoryForm.icon}
+                          onChange={(e) => setCategoryForm({...categoryForm, icon: e.target.value})}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="/category_icon.png"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">父分类</label>
+                        <select
+                          value={categoryForm.parentId || ''}
+                          onChange={(e) => setCategoryForm({...categoryForm, parentId: e.target.value || null})}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="">-- 一级分类 --</option>
+                          {config.categories.map(cat => (
+                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center mb-4">
+                      <input
+                        type="checkbox"
+                        id="special"
+                        checked={categoryForm.special}
+                        onChange={(e) => setCategoryForm({...categoryForm, special: e.target.checked})}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor="special" className="ml-2 block text-sm text-gray-700">
+                        设为特殊分类（如：作者专栏）
+                      </label>
+                    </div>
+                    
+                    <div className="flex space-x-3">
+                      <button
+                        onClick={handleSaveCategory}
+                        className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg flex-1"
+                      >
+                        保存分类
+                      </button>
+                      <button
+                        onClick={() => {setEditingCategory(null); resetCategoryForm()}}
+                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg flex-1"
+                      >
+                        取消
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 分类列表 */}
+                <div className="space-y-4">
+                  {config.categories.length === 0 ? (
+                    <div className="text-center py-12 text-gray-500">
+                      <div className="text-lg mb-2">还没有添加任何分类</div>
+                      <div className="text-sm">点击上方"添加分类"按钮开始添加</div>
+                    </div>
+                  ) : (
+                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                      <SortableContext items={config.categories.map(cat => cat.id)} strategy={verticalListSortingStrategy}>
+                        {config.categories.map((category) => (
+                          <SortableCategoryItem key={category.id} category={category} />
+                        ))}
+                      </SortableContext>
+                    </DndContext>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'settings' && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">系统设置</h3>
+                
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
+                  <h4 className="text-base font-medium text-gray-900 mb-4">站点基本信息</h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">站点名称</label>
+                      <input
+                        type="text"
+                        value={siteSettings.siteName}
+                        onChange={(e) => setSiteSettings({...siteSettings, siteName: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="BinNav"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Logo路径</label>
+                      <input
+                        type="text"
+                        value={siteSettings.siteLogo}
+                        onChange={(e) => setSiteSettings({...siteSettings, siteLogo: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="/logo.png"
+                      />
+                    </div>
+                    
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">站点描述</label>
+                      <textarea
+                        value={siteSettings.siteDescription}
+                        onChange={(e) => setSiteSettings({...siteSettings, siteDescription: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        rows="3"
+                        placeholder="精选网站导航"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="mt-6">
+                    <button
+                      onClick={handleSaveSettings}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
+                    >
+                      保存设置
+                    </button>
+                  </div>
+                </div>
+
+                {/* 配置信息显示 */}
+                <div className="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-6">
+                  <h4 className="text-base font-medium text-gray-900 mb-4">环境配置信息</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <span className="font-medium text-gray-700">管理密码:</span>
+                      <span className={`ml-2 ${CONFIG.ADMIN_PASSWORD === 'admin123' ? 'text-red-600' : 'text-green-600'}`}>
+                        {CONFIG.ADMIN_PASSWORD === 'admin123' ? '❌ 使用默认密码' : '✅ 已自定义'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">GitHub Token:</span>
+                      <span className={`ml-2 ${CONFIG.GITHUB_TOKEN ? 'text-green-600' : 'text-red-600'}`}>
+                        {CONFIG.GITHUB_TOKEN ? '✅ 已配置' : '❌ 未配置'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">GitHub 仓库:</span>
+                      <span className={`ml-2 ${CONFIG.GITHUB_REPO ? 'text-green-600' : 'text-red-600'}`}>
+                        {CONFIG.GITHUB_REPO ? '✅ 已配置' : '❌ 未配置'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+                    <strong>提示:</strong> 如果环境变量显示未配置，请检查 EdgeOne Pages 的环境变量设置或 GitHub Secrets 配置。
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
