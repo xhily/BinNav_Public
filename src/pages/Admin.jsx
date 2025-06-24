@@ -63,6 +63,14 @@ function Admin() {
   // 认证配置 - 使用统一配置系统
   const ADMIN_PASSWORD = CONFIG.ADMIN_PASSWORD
 
+  // 拖拽传感器设置 - 必须在所有条件渲染之前
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
   // 检查认证状态
   useEffect(() => {
     const savedAuth = localStorage.getItem('admin_authenticated')
@@ -246,14 +254,6 @@ function Admin() {
         </button>
       </div>
     </div>
-  )
-
-  // 拖拽传感器设置
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
   )
 
   // 生成新的配置文件内容
@@ -1406,140 +1406,22 @@ export const siteStats = {
                 )}
 
                 {/* 网站列表 */}
-                <div className="space-y-4">
+                <div>
                   {config.websiteData.length === 0 ? (
                     <div className="text-center py-12 text-gray-500">
                       <div className="text-lg mb-2">还没有添加任何网站</div>
                       <div className="text-sm">点击上方"添加网站"按钮开始添加</div>
                     </div>
                   ) : (
-                    config.websiteData.map((website) => (
-                      <div key={website.id} className="bg-white border border-gray-200 rounded-lg p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
-                            <img 
-                              src={website.icon || '/logo.png'} 
-                              alt={website.name}
-                              className="w-12 h-12 rounded-lg"
-                              onError={(e) => { e.target.src = '/logo.png' }}
-                            />
-                            <div>
-                              <h4 className="font-medium text-gray-900">{website.name}</h4>
-                              <p className="text-sm text-gray-600">{website.description}</p>
-                              <div className="flex items-center space-x-2 mt-1">
-                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                  {getCategoryName(website.category)}
-                                </span>
-                                {website.tags && website.tags.map((tag, index) => (
-                                  <span key={index} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
-                                    {tag}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <a
-                              href={website.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 p-2"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                            </a>
-                            <button
-                              onClick={() => handleEditWebsite(website)}
-                              className="text-orange-600 hover:text-orange-800 p-2"
-                            >
-                              <Edit3 className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteWebsite(website.id)}
-                              className="text-red-600 hover:text-red-800 p-2"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
+                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                      <SortableContext items={config.websiteData.map(site => site.id)} strategy={verticalListSortingStrategy}>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                          {config.websiteData.map((website) => (
+                            <SortableWebsiteItem key={website.id} website={website} />
+                          ))}
                         </div>
-
-                        {/* 编辑表单 */}
-                        {editingWebsite === website.id && (
-                          <div className="mt-4 pt-4 border-t border-gray-200 bg-orange-50 -m-4 mt-4 p-4 rounded-b-lg">
-                            <h5 className="font-medium text-gray-900 mb-3">编辑网站信息</h5>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">网站名称</label>
-                                <input
-                                  type="text"
-                                  value={websiteForm.name}
-                                  onChange={(e) => setWebsiteForm({...websiteForm, name: e.target.value})}
-                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                              </div>
-                              
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">网站地址</label>
-                                <input
-                                  type="url"
-                                  value={websiteForm.url}
-                                  onChange={(e) => setWebsiteForm({...websiteForm, url: e.target.value})}
-                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                              </div>
-                              
-                              <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">网站描述</label>
-                                <textarea
-                                  value={websiteForm.description}
-                                  onChange={(e) => setWebsiteForm({...websiteForm, description: e.target.value})}
-                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                  rows="2"
-                                />
-                              </div>
-                              
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">所属分类</label>
-                                <select
-                                  value={websiteForm.category}
-                                  onChange={(e) => setWebsiteForm({...websiteForm, category: e.target.value})}
-                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                >
-                                  <option value="recommended">常用推荐</option>
-                                  <option value="design_tools">设计工具</option>
-                                  <option value="developer_tools">开发工具</option>
-                                  <option value="learning">学习教程</option>
-                                </select>
-                              </div>
-                              
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">标签</label>
-                                <input
-                                  type="text"
-                                  value={websiteForm.tags}
-                                  onChange={(e) => setWebsiteForm({...websiteForm, tags: e.target.value})}
-                                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                              </div>
-                            </div>
-                            
-                            <div className="flex space-x-3">
-                              <button
-                                onClick={handleSaveWebsite}
-                                className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg flex-1"
-                              >
-                                保存修改
-                              </button>
-                              <button
-                                onClick={() => {setEditingWebsite(null); resetWebsiteForm()}}
-                                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex-1"
-                              >
-                                取消编辑
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))
+                      </SortableContext>
+                    </DndContext>
                   )}
                 </div>
               </div>
