@@ -6,7 +6,7 @@ import WebsiteCard from '../components/WebsiteCard.jsx'
 import { websiteData, categories, searchEngines } from '../websiteData.js'
 
 // 导入图片
-import logoImg from '/logo.png'
+import logoImg from '../assets/logo.png'
 
 function HomePage() {
   const [searchTerm, setSearchTerm] = useState('')

@@ -1,3 +1,13 @@
+// 导入图标资源
+import devToolsIcon from './assets/dev_tools_icon.png'
+import toolsIcon from './assets/tools_icon.png'
+import networkIcon from './assets/network_icon.png'
+import socialIcon from './assets/social_icon.png'
+import innovationIcon from './assets/innovation_icon.png'
+import serverIcon from './assets/server_icon.png'
+import educationIcon from './assets/education_icon.png'
+import techBloggerAvatar from './assets/tech_blogger_avatar.png'
+
 // 网站数据 - 基于 WebStack.cc 的分类结构
 export const websiteData = [
   // 常用推荐
@@ -8,7 +18,7 @@ export const websiteData = [
     url: "https://dribbble.com",
     category: "recommended",
     tags: ["设计", "UI", "作品展示"],
-    icon: "/dev_tools_icon.png",
+    icon: devToolsIcon,
     popularity: 95
   },
   {
@@ -18,7 +28,7 @@ export const websiteData = [
     url: "https://behance.net",
     category: "recommended",
     tags: ["设计", "创意", "Adobe"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 92
   },
   {
@@ -28,7 +38,7 @@ export const websiteData = [
     url: "https://ui.cn",
     category: "recommended",
     tags: ["UI设计", "交互设计", "中文"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 88
   },
   {
@@ -38,7 +48,7 @@ export const websiteData = [
     url: "https://zcool.com.cn",
     category: "recommended",
     tags: ["设计", "创意", "中文平台"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 85
   },
   {
@@ -48,7 +58,7 @@ export const websiteData = [
     url: "https://pinterest.com",
     category: "recommended",
     tags: ["灵感", "图片", "收藏"],
-    icon: "/social_icon.png",
+    icon: socialIcon,
     popularity: 90
   },
 
@@ -60,7 +70,7 @@ export const websiteData = [
     url: "https://producthunt.com",
     category: "inspiration",
     tags: ["产品", "创新", "发现"],
-    icon: "/innovation_icon.png",
+    icon: innovationIcon,
     popularity: 92
   },
   {
@@ -70,7 +80,7 @@ export const websiteData = [
     url: "https://next.36kr.com",
     category: "inspiration",
     tags: ["产品", "创业", "36氪"],
-    icon: "/innovation_icon.png",
+    icon: innovationIcon,
     popularity: 85
   },
   {
@@ -80,7 +90,7 @@ export const websiteData = [
     url: "https://sspai.com",
     category: "inspiration",
     tags: ["数字生活", "应用", "效率"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 88
   },
 
@@ -92,7 +102,7 @@ export const websiteData = [
     url: "https://pttrns.com",
     category: "ui_inspiration",
     tags: ["移动应用", "UI模式", "界面设计"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 85
   },
   {
@@ -102,7 +112,7 @@ export const websiteData = [
     url: "https://collectui.com",
     category: "ui_inspiration",
     tags: ["UI设计", "每日灵感", "界面"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 88
   },
   {
@@ -112,7 +122,7 @@ export const websiteData = [
     url: "https://androidniceties.tumblr.com",
     category: "ui_inspiration",
     tags: ["Android", "应用界面", "移动设计"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 80
   },
 
@@ -124,7 +134,7 @@ export const websiteData = [
     url: "https://awwwards.com",
     category: "web_inspiration",
     tags: ["网页设计", "奖项", "创意"],
-    icon: "/network_icon.png",
+    icon: networkIcon,
     popularity: 95
   },
   {
@@ -134,7 +144,7 @@ export const websiteData = [
     url: "https://cssdesignawards.com",
     category: "web_inspiration",
     tags: ["CSS", "网页设计", "奖项"],
-    icon: "/network_icon.png",
+    icon: networkIcon,
     popularity: 88
   },
   {
@@ -144,7 +154,7 @@ export const websiteData = [
     url: "https://siteinspire.com",
     category: "web_inspiration",
     tags: ["网页设计", "CSS", "灵感"],
-    icon: "/network_icon.png",
+    icon: networkIcon,
     popularity: 85
   },
 
@@ -156,7 +166,7 @@ export const websiteData = [
     url: "https://iconfinder.com",
     category: "icons",
     tags: ["图标", "矢量", "免费"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 92
   },
   {
@@ -166,7 +176,7 @@ export const websiteData = [
     url: "https://iconfont.cn",
     category: "icons",
     tags: ["图标", "阿里巴巴", "中文"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 95
   },
   {
@@ -176,7 +186,7 @@ export const websiteData = [
     url: "https://iconmonstr.com",
     category: "icons",
     tags: ["免费图标", "简洁", "SVG"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 85
   },
   {
@@ -186,7 +196,7 @@ export const websiteData = [
     url: "https://flaticon.com",
     category: "icons",
     tags: ["扁平图标", "免费", "矢量"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 90
   },
 
@@ -198,7 +208,7 @@ export const websiteData = [
     url: "https://365psd.com",
     category: "design_resources",
     tags: ["PSD", "免费素材", "图形"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 80
   },
   {
@@ -208,7 +218,7 @@ export const websiteData = [
     url: "https://freepik.com",
     category: "design_resources",
     tags: ["矢量", "PSD", "照片"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 92
   },
   {
@@ -218,7 +228,7 @@ export const websiteData = [
     url: "https://unsplash.com",
     category: "design_resources",
     tags: ["摄影", "免费", "高质量"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 95
   },
   {
@@ -228,7 +238,7 @@ export const websiteData = [
     url: "https://pexels.com",
     category: "design_resources",
     tags: ["图片", "视频", "免费"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 88
   },
 
@@ -240,7 +250,7 @@ export const websiteData = [
     url: "https://figma.com",
     category: "design_tools",
     tags: ["设计工具", "协作", "原型"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 95
   },
   {
@@ -250,7 +260,7 @@ export const websiteData = [
     url: "https://sketch.com",
     category: "design_tools",
     tags: ["Mac设计", "界面设计", "专业工具"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 88
   },
   {
@@ -260,7 +270,7 @@ export const websiteData = [
     url: "https://adobe.com/products/xd.html",
     category: "design_tools",
     tags: ["Adobe", "UX设计", "原型"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 85
   },
   {
@@ -270,7 +280,7 @@ export const websiteData = [
     url: "https://invisionapp.com",
     category: "design_tools",
     tags: ["原型设计", "协作", "用户体验"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 82
   },
 
@@ -282,7 +292,7 @@ export const websiteData = [
     url: "https://coolors.co",
     category: "color_tools",
     tags: ["配色", "色彩", "生成器"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 92
   },
   {
@@ -292,7 +302,7 @@ export const websiteData = [
     url: "https://color.adobe.com",
     category: "color_tools",
     tags: ["Adobe", "色轮", "配色"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 88
   },
   {
@@ -302,7 +312,7 @@ export const websiteData = [
     url: "https://flatuicolors.com",
     category: "color_tools",
     tags: ["扁平化", "UI配色", "色彩"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 85
   },
 
@@ -314,7 +324,7 @@ export const websiteData = [
     url: "https://github.com",
     category: "dev_tools",
     tags: ["代码托管", "开源", "协作"],
-    icon: "/dev_tools_icon.png",
+    icon: devToolsIcon,
     popularity: 98
   },
   {
@@ -324,7 +334,7 @@ export const websiteData = [
     url: "https://codepen.io",
     category: "dev_tools",
     tags: ["前端", "代码分享", "在线编辑"],
-    icon: "/dev_tools_icon.png",
+    icon: devToolsIcon,
     popularity: 90
   },
   {
@@ -334,7 +344,7 @@ export const websiteData = [
     url: "https://stackoverflow.com",
     category: "dev_tools",
     tags: ["问答", "编程", "技术支持"],
-    icon: "/dev_tools_icon.png",
+    icon: devToolsIcon,
     popularity: 95
   },
   {
@@ -344,7 +354,7 @@ export const websiteData = [
     url: "https://code.visualstudio.com",
     category: "dev_tools",
     tags: ["代码编辑器", "开发工具", "微软"],
-    icon: "/dev_tools_icon.png",
+    icon: devToolsIcon,
     popularity: 93
   },
 
@@ -356,7 +366,7 @@ export const websiteData = [
     url: "https://uisdc.com",
     category: "learning",
     tags: ["设计教程", "学习", "中文"],
-    icon: "/education_icon.png",
+    icon: educationIcon,
     popularity: 88
   },
   {
@@ -366,7 +376,7 @@ export const websiteData = [
     url: "https://imooc.com",
     category: "learning",
     tags: ["编程教程", "在线学习", "技术"],
-    icon: "/education_icon.png",
+    icon: educationIcon,
     popularity: 90
   },
   {
@@ -376,7 +386,7 @@ export const websiteData = [
     url: "https://medium.com",
     category: "learning",
     tags: ["文章", "设计", "高质量"],
-    icon: "/education_icon.png",
+    icon: educationIcon,
     popularity: 85
   },
 
@@ -388,7 +398,7 @@ export const websiteData = [
     url: "https://36kr.com",
     category: "community",
     tags: ["创业", "科技新闻", "资讯"],
-    icon: "/social_icon.png",
+    icon: socialIcon,
     popularity: 88
   },
   {
@@ -398,7 +408,7 @@ export const websiteData = [
     url: "https://woshipm.com",
     category: "community",
     tags: ["产品经理", "学习", "交流"],
-    icon: "/social_icon.png",
+    icon: socialIcon,
     popularity: 85
   },
   {
@@ -408,7 +418,7 @@ export const websiteData = [
     url: "https://zhihu.com",
     category: "community",
     tags: ["问答", "知识分享", "社区"],
-    icon: "/social_icon.png",
+    icon: socialIcon,
     popularity: 92
   },
 
@@ -420,7 +430,7 @@ export const websiteData = [
     url: "https://navigator-blog.dev",
     category: "author",
     tags: ["个人博客", "前端技术", "开发心得"],
-    icon: "/tech_blogger_avatar.png",
+    icon: techBloggerAvatar,
     popularity: 95,
     featured: true
   },
@@ -431,7 +441,7 @@ export const websiteData = [
     url: "https://github.com/navigator-dev",
     category: "author",
     tags: ["开源项目", "React", "Vue", "组件库"],
-    icon: "/dev_tools_icon.png",
+    icon: devToolsIcon,
     popularity: 92,
     featured: true
   },
@@ -442,7 +452,7 @@ export const websiteData = [
     url: "https://navigator-design.com",
     category: "author",
     tags: ["作品集", "UI设计", "界面设计"],
-    icon: "/tools_icon.png",
+    icon: toolsIcon,
     popularity: 90
   },
   {
@@ -452,7 +462,7 @@ export const websiteData = [
     url: "https://mp.weixin.qq.com/navigator",
     category: "author",
     tags: ["微信公众号", "技术分享", "前端资源"],
-    icon: "/social_icon.png",
+    icon: socialIcon,
     popularity: 88
   },
   {
@@ -462,7 +472,7 @@ export const websiteData = [
     url: "https://space.bilibili.com/navigator",
     category: "author",
     tags: ["B站", "视频教程", "前端教学"],
-    icon: "/education_icon.png",
+    icon: educationIcon,
     popularity: 85
   },
   {
@@ -472,7 +482,7 @@ export const websiteData = [
     url: "https://zhuanlan.zhihu.com/navigator-dev",
     category: "author",
     tags: ["知乎专栏", "前端开发", "技术文章"],
-    icon: "/social_icon.png",
+    icon: socialIcon,
     popularity: 87
   }
 ];
@@ -482,7 +492,7 @@ export const categories = [
   { 
     id: "author", 
     name: "作者专栏", 
-    icon: "/tech_blogger_avatar.png", 
+    icon: techBloggerAvatar, 
     color: "bg-gradient-to-r from-purple-500 to-pink-500", 
     special: true,
     subcategories: []
@@ -490,59 +500,59 @@ export const categories = [
   { 
     id: "recommended", 
     name: "常用推荐", 
-    icon: "/tools_icon.png", 
+    icon: toolsIcon, 
     color: "bg-blue-500",
     subcategories: []
   },
   { 
     id: "inspiration", 
     name: "灵感采集", 
-    icon: "/innovation_icon.png", 
+    icon: innovationIcon, 
     color: "bg-purple-500",
     subcategories: [
-      { id: "inspiration", name: "发现产品", icon: "/innovation_icon.png" },
-      { id: "ui_inspiration", name: "界面灵感", icon: "/tools_icon.png" },
-      { id: "web_inspiration", name: "网页灵感", icon: "/network_icon.png" }
+      { id: "inspiration", name: "发现产品", icon: innovationIcon },
+      { id: "ui_inspiration", name: "界面灵感", icon: toolsIcon },
+      { id: "web_inspiration", name: "网页灵感", icon: networkIcon }
     ]
   },
   { 
     id: "design_resources", 
     name: "素材资源", 
-    icon: "/tools_icon.png", 
+    icon: toolsIcon, 
     color: "bg-pink-500",
     subcategories: [
-      { id: "icons", name: "图标素材", icon: "/tools_icon.png" },
-      { id: "design_resources", name: "平面素材", icon: "/tools_icon.png" }
+      { id: "icons", name: "图标素材", icon: toolsIcon },
+      { id: "design_resources", name: "平面素材", icon: toolsIcon }
     ]
   },
   { 
     id: "design_tools", 
     name: "设计工具", 
-    icon: "/tools_icon.png", 
+    icon: toolsIcon, 
     color: "bg-indigo-500",
     subcategories: [
-      { id: "design_tools", name: "界面设计", icon: "/tools_icon.png" },
-      { id: "color_tools", name: "在线配色", icon: "/tools_icon.png" }
+      { id: "design_tools", name: "界面设计", icon: toolsIcon },
+      { id: "color_tools", name: "在线配色", icon: toolsIcon }
     ]
   },
   { 
     id: "dev_tools", 
     name: "开发工具", 
-    icon: "/dev_tools_icon.png", 
+    icon: devToolsIcon, 
     color: "bg-gray-500",
     subcategories: []
   },
   { 
     id: "learning", 
     name: "学习教程", 
-    icon: "/education_icon.png", 
+    icon: educationIcon, 
     color: "bg-emerald-500",
     subcategories: []
   },
   { 
     id: "community", 
     name: "社区资讯", 
-    icon: "/social_icon.png", 
+    icon: socialIcon, 
     color: "bg-cyan-500",
     subcategories: []
   }

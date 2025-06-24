@@ -1,6 +1,6 @@
 import React from 'react'
 import { Card, CardContent } from './ui/card'
-import logoImg from '/logo.png'
+import logoImg from '../assets/logo.png'
 
 const WebsiteCard = ({ website }) => {
   return (
