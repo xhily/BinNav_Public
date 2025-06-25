@@ -1342,328 +1342,185 @@ export const siteStats = {
     )
   }
 
+  // 主要内容区域
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <div className="container mx-auto px-4 py-8">
-        <UserHeader />
-
+    <div className="min-h-screen bg-gray-50">
+      <UserHeader />
+      
       {/* 消息提示 */}
       {message.content && (
-          <div className={`mb-6 p-4 rounded-lg border ${
-            message.type === 'success' 
-              ? 'bg-green-50 border-green-200 text-green-800' 
-              : 'bg-red-50 border-red-200 text-red-800'
-          }`}>
+        <div className="fixed top-4 right-4 z-50">
+          <div
+            className={`p-4 rounded-lg shadow-lg border-l-4 ${
+              message.type === 'success' ? 'bg-green-50 text-green-700 border-green-400' :
+              message.type === 'error' ? 'bg-red-50 text-red-700 border-red-400' :
+              'bg-blue-50 text-blue-700 border-blue-400'
+            }`}
+          >
             <div className="flex items-center gap-2">
-              {message.type === 'success' ? (
-                <CheckCircle className="w-5 h-5" />
-              ) : (
-                <AlertCircle className="w-5 h-5" />
-              )}
-            {message.content}
+              {message.type === 'success' && <CheckCircle className="w-5 h-5" />}
+              {message.type === 'error' && <AlertCircle className="w-5 h-5" />}
+              {message.type === 'info' && <AlertCircle className="w-5 h-5" />}
+              <span>{message.content}</span>
+            </div>
           </div>
         </div>
       )}
-
-        {/* 主要操作按钮 */}
-        <div className="flex flex-wrap gap-4 mb-6">
-          <button
-            onClick={saveConfig}
-            disabled={isUpdating}
-            className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
-          >
-            <Save className="w-5 h-5" />
-            {isUpdating ? '保存中...' : '保存并发布'}
-          </button>
-        </div>
-
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* 标签页导航 */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
-          <div className="flex border-b border-gray-200">
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex">
+              <button
+                onClick={() => setActiveTab('websites')}
+                className={`py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'websites'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                网站管理
+              </button>
+              <button
+                onClick={() => setActiveTab('categories')}
+                className={`py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'categories'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                分类管理
+              </button>
+              <button
+                onClick={() => setActiveTab('settings')}
+                className={`py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'settings'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                系统设置
+              </button>
+            </nav>
+          </div>
+          
+          {/* 保存按钮 */}
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
             <button
-              onClick={() => setActiveTab('websites')}
-              className={`px-6 py-4 font-medium border-b-2 transition-colors ${
-                activeTab === 'websites'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              onClick={saveConfig}
+              disabled={isUpdating}
+              className={`flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors ${
+                isUpdating
+                  ? 'bg-gray-400 cursor-not-allowed text-white'
+                  : 'bg-green-600 hover:bg-green-700 text-white'
               }`}
             >
-              网站管理 ({config.websiteData.length})
+              {isUpdating ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  保存中...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  保存并发布
+                </>
+              )}
             </button>
-            <button
-              onClick={() => setActiveTab('categories')}
-              className={`px-6 py-4 font-medium border-b-2 transition-colors ${
-                activeTab === 'categories'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              分类管理 ({config.categories.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('settings')}
-              className={`px-6 py-4 font-medium border-b-2 transition-colors ${
-                activeTab === 'settings'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              系统设置
-            </button>
+          </div>
         </div>
 
-          {/* 标签页内容 */}
-          <div className="p-6">
+        {/* 网站管理内容 */}
         {activeTab === 'websites' && (
-              <div>
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900">网站管理</h3>
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">网站管理</h3>
               <button
                 onClick={handleAddWebsite}
-                    className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
               >
-                    <Plus className="w-4 h-4" />
-                    添加网站
+                <Plus className="w-4 h-4" />
+                添加网站
               </button>
             </div>
 
-                {/* 添加网站表单 */}
-            {editingWebsite === 'new' && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
-                    <h4 className="text-lg font-medium text-gray-900 mb-4">添加新网站</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">网站名称</label>
-                    <input
-                      type="text"
-                      value={websiteForm.name}
-                      onChange={(e) => setWebsiteForm({...websiteForm, name: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="例如：GitHub"
-                    />
-                  </div>
-                  
-                  <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">网站地址</label>
-                    <input
-                      type="url"
-                      value={websiteForm.url}
-                      onChange={(e) => setWebsiteForm({...websiteForm, url: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="https://github.com"
-                    />
-                  </div>
-                  
-                  <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">网站描述</label>
-                    <textarea
-                      value={websiteForm.description}
-                      onChange={(e) => setWebsiteForm({...websiteForm, description: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          rows="3"
-                          placeholder="简要描述网站的功能和特色..."
-                    />
-                  </div>
-                  
-                  <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">所属分类</label>
-                    <select
-                      value={websiteForm.category}
-                      onChange={(e) => setWebsiteForm({...websiteForm, category: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                          <option value="recommended">常用推荐</option>
-                          <option value="design_tools">设计工具</option>
-                          <option value="developer_tools">开发工具</option>
-                          <option value="learning">学习教程</option>
-                    </select>
-                  </div>
-                  
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">标签 (用逗号分隔)</label>
-                    <input
-                      type="text"
-                      value={websiteForm.tags}
-                      onChange={(e) => setWebsiteForm({...websiteForm, tags: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="设计, 工具, 免费"
-                    />
-                  </div>
-                </div>
-                
-                    <div className="flex space-x-3">
-                  <button
-                    onClick={handleSaveWebsite}
-                        className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex-1"
-                  >
-                        保存网站
-                  </button>
-                  <button
-                    onClick={() => {setEditingWebsite(null); resetWebsiteForm()}}
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg flex-1"
-                  >
-                    取消
-                  </button>
-                </div>
+            {/* 网站列表（拖拽排序） */}
+            {config.websiteData.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                <div className="text-lg mb-2">还没有添加任何网站</div>
+                <div className="text-sm">点击上方"添加网站"按钮开始添加</div>
               </div>
+            ) : (
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={config.websiteData.map(website => website.id)} strategy={verticalListSortingStrategy}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {config.websiteData.map((website) => (
+                      <SortableWebsiteItem key={website.id} website={website} />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             )}
-
-                {/* 网站列表 */}
-                <div>
-                  {config.websiteData.length === 0 ? (
-                    <div className="text-center py-12 text-gray-500">
-                      <div className="text-lg mb-2">还没有添加任何网站</div>
-                      <div className="text-sm">点击上方"添加网站"按钮开始添加</div>
-              </div>
-                  ) : (
-                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                      <SortableContext items={config.websiteData.map(site => site.id)} strategy={verticalListSortingStrategy}>
-                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                          {config.websiteData.map((website) => (
-                                  <SortableWebsiteItem key={website.id} website={website} />
-                                ))}
-                              </div>
-                            </SortableContext>
-                          </DndContext>
-                  )}
-            </div>
           </div>
         )}
 
+        {/* 分类管理内容 */}
         {activeTab === 'categories' && (
-              <div>
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900">分类管理</h3>
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">分类管理</h3>
               <button
                 onClick={handleAddCategory}
-                    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+                className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
               >
-                    <Plus className="w-4 h-4" />
-                    添加分类
+                <Plus className="w-4 h-4" />
+                添加分类
               </button>
             </div>
 
-                {/* 添加分类表单 */}
-            {editingCategory === 'new' && (
-                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-6 mb-6">
-                    <h4 className="text-lg font-medium text-gray-900 mb-4">添加新分类</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">分类名称</label>
-                    <input
-                      type="text"
-                      value={categoryForm.name}
-                      onChange={(e) => setCategoryForm({...categoryForm, name: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="例如：设计工具"
-                    />
-                  </div>
-                  
-                  <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">分类图标</label>
-                        <div className="grid grid-cols-4 gap-2">
-                          {availableIcons.map((iconOption) => (
-                            <button
-                              key={iconOption.key}
-                              type="button"
-                              onClick={() => setCategoryForm({...categoryForm, icon: iconOption.icon})}
-                              className={`p-3 border-2 rounded-lg hover:border-blue-500 transition-colors ${
-                                categoryForm.icon === iconOption.icon ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
-                              }`}
-                              title={iconOption.name}
-                            >
-                              <img src={iconOption.icon} alt={iconOption.name} className="w-8 h-8 mx-auto" />
-                            </button>
-                          ))}
-                        </div>
-                  </div>
-                  
-                  <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">父分类</label>
-                    <select
-                      value={categoryForm.parentId || ''}
-                      onChange={(e) => setCategoryForm({...categoryForm, parentId: e.target.value || null})}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="">-- 一级分类 --</option>
-                          {config.categories.map(cat => (
-                            <option key={cat.id} value={cat.id}>{cat.name}</option>
-                      ))}
-                    </select>
-                      </div>
-                  </div>
-                  
-                    <div className="flex items-center mb-4">
-                      <input
-                        type="checkbox"
-                        id="special"
-                        checked={categoryForm.special}
-                        onChange={(e) => setCategoryForm({...categoryForm, special: e.target.checked})}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <label htmlFor="special" className="ml-2 block text-sm text-gray-700">
-                        设为特殊分类（如：作者专栏）
-                    </label>
-                </div>
-                
-                    <div className="flex space-x-3">
-                  <button
-                    onClick={handleSaveCategory}
-                        className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg flex-1"
-                  >
-                        保存分类
-                  </button>
-                  <button
-                    onClick={() => {setEditingCategory(null); resetCategoryForm()}}
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg flex-1"
-                  >
-                    取消
-                  </button>
-                </div>
-              </div>
-            )}
-
             {/* 分类列表 */}
-                <div className="space-y-4">
-                  {config.categories.length === 0 ? (
-                    <div className="text-center py-12 text-gray-500">
-                      <div className="text-lg mb-2">还没有添加任何分类</div>
-                      <div className="text-sm">点击上方"添加分类"按钮开始添加</div>
+            <div className="space-y-4">
+              {config.categories.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <div className="text-lg mb-2">还没有添加任何分类</div>
+                  <div className="text-sm">点击上方"添加分类"按钮开始添加</div>
                 </div>
-                  ) : (
-                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                      <SortableContext items={config.categories.map(cat => cat.id)} strategy={verticalListSortingStrategy}>
-                      {config.categories.map((category) => (
-                        <SortableCategoryItem key={category.id} category={category} />
-                      ))}
+              ) : (
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                  <SortableContext items={config.categories.map(cat => cat.id)} strategy={verticalListSortingStrategy}>
+                    {config.categories.map((category) => (
+                      <SortableCategoryItem key={category.id} category={category} />
+                    ))}
                   </SortableContext>
                 </DndContext>
-                  )}
+              )}
             </div>
           </div>
         )}
 
+        {/* 系统设置内容 */}
         {activeTab === 'settings' && (
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">系统设置</h3>
+            
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <h4 className="text-base font-medium text-gray-900 mb-4">站点基本信息</h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">系统设置</h3>
-                
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <h4 className="text-base font-medium text-gray-900 mb-4">站点基本信息</h4>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">站点名称</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">站点名称</label>
                   <input
                     type="text"
                     value={siteSettings.siteName}
                     onChange={(e) => setSiteSettings({...siteSettings, siteName: e.target.value})}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="BinNav"
+                    placeholder="BinNav"
                   />
                 </div>
                 
                 <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Logo路径</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Logo路径</label>
                   <input
                     type="text"
                     value={siteSettings.siteLogo}
@@ -1674,21 +1531,21 @@ export const siteStats = {
                 </div>
                 
                 <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">站点描述</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">站点描述</label>
                   <textarea
                     value={siteSettings.siteDescription}
                     onChange={(e) => setSiteSettings({...siteSettings, siteDescription: e.target.value})}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        rows="3"
+                    rows="3"
                     placeholder="精选网站导航"
                   />
                 </div>
               </div>
               
-                  <div className="mt-6">
+              <div className="mt-6">
                 <button
                   onClick={handleSaveSettings}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
                 >
                   保存设置
                 </button>
@@ -1699,18 +1556,20 @@ export const siteStats = {
       </div>
       
       {/* 手动下载备份按钮 */}
-      <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-        <div className="flex items-center justify-between">
-          <div>
-            <h4 className="text-sm font-medium text-gray-900">配置备份</h4>
-            <p className="text-sm text-gray-600">下载当前配置文件作为备份</p>
+      <div className="mt-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-sm font-medium text-gray-900">配置备份</h4>
+              <p className="text-sm text-gray-600">下载当前配置文件作为备份</p>
+            </div>
+            <button
+              onClick={downloadConfig}
+              className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm"
+            >
+              下载备份
+            </button>
           </div>
-          <button
-            onClick={downloadConfig}
-            className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm"
-          >
-            下载备份
-          </button>
         </div>
       </div>
     </div>
