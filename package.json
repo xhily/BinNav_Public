@@ -1,9 +1,9 @@
 {
-  "name": "binnav",
+  "name": "webstack-navigation",
   "private": true,
-  "version": "2.0.0",
+  "version": "1.0.0",
   "type": "module",
-  "description": "现代化导航网站，支持可视化管理后台和自动部署",
+  "description": "基于 WebStack.cc 风格的现代化导航网站",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -27,11 +27,11 @@
   },
   "keywords": [
     "navigation",
-    "website",
+    "webstack",
     "react",
-    "admin-panel",
-    "auto-deploy"
+    "vite",
+    "tailwindcss"
   ],
-  "author": "BinNav Team",
+  "author": "WebStack Navigator",
   "license": "MIT"
 }
