@@ -11,7 +11,7 @@ export const websiteData = [
       "UI",
       "作品展示"
     ],
-    "icon": "/assets/dev_tools_icon-udofDsIH.png",
+    "icon": "/assets/dev_tools_icon.png",
     "popularity": 95
   },
   {
@@ -25,7 +25,7 @@ export const websiteData = [
       "创意",
       "Adobe"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/tools_icon.png",
     "popularity": 92
   },
   {
@@ -39,7 +39,7 @@ export const websiteData = [
       "交互设计",
       "中文"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/tools_icon.png",
     "popularity": 88
   },
   {
@@ -53,7 +53,7 @@ export const websiteData = [
       "创意",
       "中文平台"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/tools_icon.png",
     "popularity": 85
   },
   {
@@ -67,7 +67,7 @@ export const websiteData = [
       "图片",
       "收藏"
     ],
-    "icon": "/assets/social_icon-DTumKHkj.png",
+    "icon": "/assets/social_icon.png",
     "popularity": 90
   },
   {
@@ -81,7 +81,7 @@ export const websiteData = [
       "创新",
       "发现"
     ],
-    "icon": "/assets/innovation_icon-D9kV_fey.png",
+    "icon": "/assets/innovation_icon.png",
     "popularity": 92
   },
   {
@@ -95,7 +95,7 @@ export const websiteData = [
       "创业",
       "36氪"
     ],
-    "icon": "/assets/innovation_icon-D9kV_fey.png",
+    "icon": "/assets/innovation_icon.png",
     "popularity": 85
   },
   {
@@ -109,7 +109,7 @@ export const websiteData = [
       "应用",
       "效率"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/tools_icon.png",
     "popularity": 88
   },
   {
@@ -123,7 +123,7 @@ export const websiteData = [
       "UI模式",
       "界面设计"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/tools_icon.png",
     "popularity": 85
   },
   {
@@ -137,7 +137,7 @@ export const websiteData = [
       "每日灵感",
       "界面"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/tools_icon.png",
     "popularity": 88
   },
   {
@@ -151,7 +151,7 @@ export const websiteData = [
       "应用界面",
       "移动设计"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/tools_icon.png",
     "popularity": 80
   },
   {
@@ -165,7 +165,7 @@ export const websiteData = [
       "奖项",
       "创意"
     ],
-    "icon": "/assets/network_icon-DQqlv97_.png",
+    "icon": "/assets/network_icon.png",
     "popularity": 95
   },
   {
@@ -179,7 +179,7 @@ export const websiteData = [
       "网页设计",
       "奖项"
     ],
-    "icon": "/assets/network_icon-DQqlv97_.png",
+    "icon": "/assets/network_icon.png",
     "popularity": 88
   },
   {
@@ -193,7 +193,7 @@ export const websiteData = [
       "CSS",
       "灵感"
     ],
-    "icon": "/assets/network_icon-DQqlv97_.png",
+    "icon": "/assets/network_icon.png",
     "popularity": 85
   },
   {
@@ -207,7 +207,7 @@ export const websiteData = [
       "矢量",
       "免费"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/.png",
     "popularity": 92
   },
   {
@@ -221,7 +221,7 @@ export const websiteData = [
       "阿里巴巴",
       "中文"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/.png",
     "popularity": 95
   },
   {
@@ -235,7 +235,7 @@ export const websiteData = [
       "简洁",
       "SVG"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/.png",
     "popularity": 85
   },
   {
@@ -249,7 +249,7 @@ export const websiteData = [
       "免费",
       "矢量"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/.png",
     "popularity": 90
   },
   {
@@ -263,7 +263,7 @@ export const websiteData = [
       "免费素材",
       "图形"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/.png",
     "popularity": 80
   },
   {
@@ -277,7 +277,7 @@ export const websiteData = [
       "PSD",
       "照片"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/.png",
     "popularity": 92
   },
   {
@@ -291,7 +291,7 @@ export const websiteData = [
       "免费",
       "高质量"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/.png",
     "popularity": 95
   },
   {
@@ -305,7 +305,7 @@ export const websiteData = [
       "视频",
       "免费"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/.png",
     "popularity": 88
   },
   {
@@ -319,7 +319,7 @@ export const websiteData = [
       "协作",
       "原型"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/.png",
     "popularity": 95
   },
   {
@@ -333,7 +333,7 @@ export const websiteData = [
       "界面设计",
       "专业工具"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/.png",
     "popularity": 88
   },
   {
@@ -347,7 +347,7 @@ export const websiteData = [
       "UX设计",
       "原型"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/.png",
     "popularity": 85
   },
   {
@@ -361,7 +361,7 @@ export const websiteData = [
       "协作",
       "用户体验"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/.png",
     "popularity": 82
   },
   {
@@ -375,7 +375,7 @@ export const websiteData = [
       "色彩",
       "生成器"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/.png",
     "popularity": 92
   },
   {
@@ -389,7 +389,7 @@ export const websiteData = [
       "色轮",
       "配色"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/.png",
     "popularity": 88
   },
   {
@@ -403,7 +403,7 @@ export const websiteData = [
       "UI配色",
       "色彩"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/.png",
     "popularity": 85
   },
   {
@@ -417,7 +417,7 @@ export const websiteData = [
       "开源",
       "协作"
     ],
-    "icon": "/assets/dev_tools_icon-udofDsIH.png",
+    "icon": "/assets/.png",
     "popularity": 98
   },
   {
@@ -431,7 +431,7 @@ export const websiteData = [
       "代码分享",
       "在线编辑"
     ],
-    "icon": "/assets/dev_tools_icon-udofDsIH.png",
+    "icon": "/assets/.png",
     "popularity": 90
   },
   {
@@ -445,7 +445,7 @@ export const websiteData = [
       "编程",
       "技术支持"
     ],
-    "icon": "/assets/dev_tools_icon-udofDsIH.png",
+    "icon": "/assets/.png",
     "popularity": 95
   },
   {
@@ -459,7 +459,7 @@ export const websiteData = [
       "开发工具",
       "微软"
     ],
-    "icon": "/assets/dev_tools_icon-udofDsIH.png",
+    "icon": "/assets/.png",
     "popularity": 93
   },
   {
@@ -473,7 +473,7 @@ export const websiteData = [
       "学习",
       "中文"
     ],
-    "icon": "/assets/education_icon-BPUhFIAZ.png",
+    "icon": "/assets/.png",
     "popularity": 88
   },
   {
@@ -487,7 +487,7 @@ export const websiteData = [
       "在线学习",
       "技术"
     ],
-    "icon": "/assets/education_icon-BPUhFIAZ.png",
+    "icon": "/assets/.png",
     "popularity": 90
   },
   {
@@ -501,7 +501,7 @@ export const websiteData = [
       "设计",
       "高质量"
     ],
-    "icon": "/assets/education_icon-BPUhFIAZ.png",
+    "icon": "/assets/.png",
     "popularity": 85
   },
   {
@@ -515,7 +515,7 @@ export const websiteData = [
       "科技新闻",
       "资讯"
     ],
-    "icon": "/assets/social_icon-DTumKHkj.png",
+    "icon": "/assets/.png",
     "popularity": 88
   },
   {
@@ -529,7 +529,7 @@ export const websiteData = [
       "学习",
       "交流"
     ],
-    "icon": "/assets/social_icon-DTumKHkj.png",
+    "icon": "/assets/.png",
     "popularity": 85
   },
   {
@@ -543,7 +543,7 @@ export const websiteData = [
       "知识分享",
       "社区"
     ],
-    "icon": "/assets/social_icon-DTumKHkj.png",
+    "icon": "/assets/.png",
     "popularity": 92
   },
   {
@@ -557,7 +557,7 @@ export const websiteData = [
       "前端技术",
       "开发心得"
     ],
-    "icon": "/assets/tech_blogger_avatar-Bhx9yGna.png",
+    "icon": "/assets/tech_blogger_avatar.png",
     "popularity": 95,
     "featured": true
   },
@@ -573,7 +573,7 @@ export const websiteData = [
       "Vue",
       "组件库"
     ],
-    "icon": "/assets/dev_tools_icon-udofDsIH.png",
+    "icon": "/assets/dev_tools_icon.png",
     "popularity": 92,
     "featured": true
   },
@@ -588,7 +588,7 @@ export const websiteData = [
       "UI设计",
       "界面设计"
     ],
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/tools_icon.png",
     "popularity": 90
   },
   {
@@ -602,7 +602,7 @@ export const websiteData = [
       "技术分享",
       "前端资源"
     ],
-    "icon": "/assets/social_icon-DTumKHkj.png",
+    "icon": "/assets/social_icon.png",
     "popularity": 88
   },
   {
@@ -616,7 +616,7 @@ export const websiteData = [
       "前端开发",
       "技术文章"
     ],
-    "icon": "/assets/social_icon-DTumKHkj.png",
+    "icon": "/assets/social_icon.png",
     "popularity": 87
   }
 ];
@@ -626,7 +626,7 @@ export const categories = [
   {
     "id": "author",
     "name": "作者专栏",
-    "icon": "/assets/tech_blogger_avatar-Bhx9yGna.png",
+    "icon": "/assets/tech_blogger_avatar.png",
     "color": "bg-gradient-to-r from-purple-500 to-pink-500",
     "special": true,
     "subcategories": []
@@ -634,87 +634,87 @@ export const categories = [
   {
     "id": "recommended",
     "name": "常用推荐",
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/tools_icon.png",
     "color": "bg-blue-500",
     "subcategories": []
   },
   {
     "id": "inspiration",
     "name": "灵感采集",
-    "icon": "/assets/innovation_icon-D9kV_fey.png",
+    "icon": "/assets/innovation_icon.png",
     "color": "bg-purple-500",
     "subcategories": [
       {
         "id": "inspiration",
         "name": "发现产品",
-        "icon": "/assets/innovation_icon-D9kV_fey.png"
+        "icon": "/assets/innovation_icon.png"
       },
       {
         "id": "ui_inspiration",
         "name": "界面灵感",
-        "icon": "/assets/tools_icon-CcnTXWCx.png"
+        "icon": "/assets/tools_icon.png"
       },
       {
         "id": "web_inspiration",
         "name": "网页灵感",
-        "icon": "/assets/network_icon-DQqlv97_.png"
+        "icon": "/assets/network_icon.png"
       }
     ]
   },
   {
     "id": "design_resources",
     "name": "素材资源",
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/tools_icon.png",
     "color": "bg-pink-500",
     "subcategories": [
       {
         "id": "icons",
         "name": "图标素材",
-        "icon": "/assets/tools_icon-CcnTXWCx.png"
+        "icon": "/assets/tools_icon.png"
       },
       {
         "id": "design_resources",
         "name": "平面素材",
-        "icon": "/assets/tools_icon-CcnTXWCx.png"
+        "icon": "/assets/tools_icon.png"
       }
     ]
   },
   {
     "id": "design_tools",
     "name": "设计工具",
-    "icon": "/assets/tools_icon-CcnTXWCx.png",
+    "icon": "/assets/tools_icon.png",
     "color": "bg-indigo-500",
     "subcategories": [
       {
         "id": "design_tools",
         "name": "界面设计",
-        "icon": "/assets/tools_icon-CcnTXWCx.png"
+        "icon": "/assets/tools_icon.png"
       },
       {
         "id": "color_tools",
         "name": "在线配色",
-        "icon": "/assets/tools_icon-CcnTXWCx.png"
+        "icon": "/assets/tools_icon.png"
       }
     ]
   },
   {
     "id": "dev_tools",
     "name": "开发工具",
-    "icon": "/assets/dev_tools_icon-udofDsIH.png",
+    "icon": "/assets/dev_tools_icon.png",
     "color": "bg-gray-500",
     "subcategories": []
   },
   {
     "id": "learning",
     "name": "学习教程",
-    "icon": "/assets/education_icon-BPUhFIAZ.png",
+    "icon": "/assets/education_icon.png",
     "color": "bg-emerald-500",
     "subcategories": []
   },
   {
     "id": "community",
     "name": "社区资讯",
-    "icon": "/assets/social_icon-DTumKHkj.png",
+    "icon": "/assets/social_icon.png",
     "color": "bg-cyan-500",
     "subcategories": []
   }
