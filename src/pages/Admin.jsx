@@ -1471,7 +1471,7 @@ export const siteStats = {
                     <div className="text-center py-12 text-gray-500">
                       <div className="text-lg mb-2">还没有添加任何网站</div>
                       <div className="text-sm">点击上方"添加网站"按钮开始添加</div>
-              </div>
+                </div>
                   ) : (
                     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                       <SortableContext items={config.websiteData.map(site => site.id)} strategy={verticalListSortingStrategy}>
@@ -1645,9 +1645,12 @@ export const siteStats = {
             </div>
           </div>
         )}
+        }
+        </div>
+        </div>
       </div>
     </div>
   )
 }
 
-export default Admin 
+export default Admin
