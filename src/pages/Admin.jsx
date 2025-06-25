@@ -136,15 +136,27 @@ function Admin() {
     try {
       // 生成配置文件内容
       const configContent = generateConfigFile(config.websiteData, config.categories)
+      console.log('🚀 开始保存配置...')
       
       // 首先获取当前文件的SHA值
+      console.log('📡 获取当前配置SHA值...')
       const getResponse = await fetch('/api/get-config')
       if (!getResponse.ok) {
         throw new Error('获取当前配置失败，请刷新页面重试')
       }
       const currentData = await getResponse.json()
+      console.log('📄 当前配置获取结果:', { success: currentData.success, hasContent: !!currentData.content, hasSha: !!currentData.sha })
+      
+      if (!currentData.success) {
+        throw new Error(currentData.message || '获取当前配置失败')
+      }
+
+      if (!currentData.sha) {
+        throw new Error('未获取到文件SHA值，无法更新配置')
+      }
       
       // 调用EdgeOne Functions更新配置
+      console.log('📤 发送配置更新请求...')
       const updateResponse = await fetch('/api/update-config', {
         method: 'POST',
         headers: {
@@ -157,15 +169,16 @@ function Admin() {
       })
 
       const result = await updateResponse.json()
+      console.log('📦 更新配置响应:', { success: result.success, error: result.error, message: result.message })
       
       if (result.success) {
         showMessage('success', '✅ 配置更新成功！EdgeOne Pages正在自动重新部署，1-2分钟后生效')
         downloadConfig() // 同时提供下载备份
       } else {
-        throw new Error(result.message || '未知错误')
+        throw new Error(result.message || result.error || '未知错误')
       }
     } catch (error) {
-      console.error('保存配置失败:', error)
+      console.error('❌ 保存配置失败:', error)
       showMessage('error', `❌ 保存失败: ${error.message}`)
       
       // 失败时提供下载作为备用方案

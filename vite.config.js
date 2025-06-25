@@ -19,6 +19,10 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        test: path.resolve(__dirname, 'test-functions.html')
+      },
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],

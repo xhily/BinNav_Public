@@ -4,6 +4,21 @@
  * 用途: 更新websiteData.js文件内容，触发EdgeOne Pages重新部署
  */
 
+// Base64 编码函数（兼容EdgeOne环境）
+function base64Encode(str) {
+  try {
+    // 尝试使用标准btoa函数
+    if (typeof btoa !== 'undefined') {
+      return btoa(unescape(encodeURIComponent(str)));
+    }
+    // EdgeOne环境的后备方案
+    return Buffer.from(str, 'utf-8').toString('base64');
+  } catch (error) {
+    console.error('Base64编码失败:', error);
+    throw new Error('Base64编码失败');
+  }
+}
+
 // 处理OPTIONS请求（CORS预检）
 export async function onRequestOptions({ request }) {
   return new Response(null, {
@@ -19,13 +34,41 @@ export async function onRequestOptions({ request }) {
 
 // 处理POST请求
 export async function onRequestPost({ request, env }) {
+  console.log('🚀 POST /api/update-config 开始执行');
+
   const { GITHUB_TOKEN, GITHUB_REPO } = env;
   
-  // 检查环境变量
-  if (!GITHUB_TOKEN || !GITHUB_REPO) {
+  // 详细的环境变量检查
+  console.log('🔍 环境变量检查:', {
+    hasToken: Boolean(GITHUB_TOKEN),
+    tokenLength: GITHUB_TOKEN ? GITHUB_TOKEN.length : 0,
+    hasRepo: Boolean(GITHUB_REPO),
+    repoName: GITHUB_REPO || 'undefined'
+  });
+  
+  if (!GITHUB_TOKEN) {
+    console.error('❌ GITHUB_TOKEN未配置');
     return new Response(JSON.stringify({
-      error: 'GitHub配置未设置',
-      message: '请在EdgeOne项目中配置GITHUB_TOKEN和GITHUB_REPO环境变量'
+      success: false,
+      error: 'GITHUB_TOKEN未配置',
+      message: '请在EdgeOne项目中配置GITHUB_TOKEN环境变量',
+      debug: 'MISSING_GITHUB_TOKEN'
+    }), {
+      status: 500,
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    });
+  }
+  
+  if (!GITHUB_REPO) {
+    console.error('❌ GITHUB_REPO未配置');
+    return new Response(JSON.stringify({
+      success: false,
+      error: 'GITHUB_REPO未配置',
+      message: '请在EdgeOne项目中配置GITHUB_REPO环境变量',
+      debug: 'MISSING_GITHUB_REPO'
     }), {
       status: 500,
       headers: { 
@@ -40,6 +83,13 @@ export async function onRequestPost({ request, env }) {
     const requestData = await request.json();
     const { config, sha } = requestData;
     
+    console.log('📥 请求数据:', {
+      hasConfig: Boolean(config),
+      configLength: config ? config.length : 0,
+      hasSha: Boolean(sha),
+      shaPreview: sha ? sha.substring(0, 10) + '...' : 'undefined'
+    });
+    
     if (!config) {
       throw new Error('配置内容不能为空');
     }
@@ -48,32 +98,59 @@ export async function onRequestPost({ request, env }) {
       throw new Error('文件SHA值缺失，请先获取最新配置');
     }
 
+    // 使用兼容的base64编码
+    const encodedContent = base64Encode(config);
+    console.log('📦 内容编码成功，编码后长度:', encodedContent.length);
+
+    const apiUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents/src/websiteData.js`;
+    console.log('📡 调用GitHub API:', apiUrl);
+
     // 更新GitHub文件
-    const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/src/websiteData.js`, {
+    const response = await fetch(apiUrl, {
       method: 'PUT',
       headers: {
         'Authorization': `token ${GITHUB_TOKEN}`,
         'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json',
-        'User-Agent': 'EdgeOne-Functions'
+        'User-Agent': 'EdgeOne-Functions/1.0'
       },
       body: JSON.stringify({
         message: '🔧 Auto-update website config via EdgeOne Functions',
-        content: btoa(unescape(encodeURIComponent(config))), // 编码为base64
+        content: encodedContent,
         sha: sha // 必须提供当前文件的SHA
       })
     });
 
+    console.log('📦 GitHub API响应:', {
+      status: response.status,
+      statusText: response.statusText,
+      contentType: response.headers.get('content-type')
+    });
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`GitHub API错误: ${errorData.message || response.statusText}`);
+      const errorText = await response.text();
+      console.error('❌ GitHub API错误:', errorText);
+      
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch (e) {
+        errorData = { message: errorText };
+      }
+      
+      throw new Error(`GitHub API错误: ${response.status} ${response.statusText} - ${errorData.message || errorText}`);
     }
 
     const result = await response.json();
+    console.log('✅ 更新成功:', {
+      commitSha: result.commit.sha.substring(0, 10) + '...',
+      fileSha: result.content.sha.substring(0, 10) + '...',
+      fileSize: result.content.size
+    });
     
     return new Response(JSON.stringify({
       success: true,
-      message: '配置更新成功！EdgeOne Pages正在自动重新部署',
+      message: '配置更新成功！EdgeOne Pages正在自动重新部署，1-2分钟后生效',
       commit: {
         sha: result.commit.sha,
         url: result.commit.html_url,
@@ -83,7 +160,8 @@ export async function onRequestPost({ request, env }) {
         sha: result.content.sha,
         size: result.content.size,
         path: result.content.path
-      }
+      },
+      timestamp: new Date().toISOString()
     }), {
       headers: { 
         'Content-Type': 'application/json',
@@ -92,12 +170,17 @@ export async function onRequestPost({ request, env }) {
     });
 
   } catch (error) {
-    console.error('更新配置失败:', error);
+    console.error('❌ 更新配置失败:', error);
     
     return new Response(JSON.stringify({
+      success: false,
       error: '更新配置失败',
       message: error.message,
-      details: error.stack
+      debug: {
+        timestamp: new Date().toISOString(),
+        errorName: error.name,
+        stack: error.stack
+      }
     }), {
       status: 500,
       headers: { 
