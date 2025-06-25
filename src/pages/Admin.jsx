@@ -1,8 +1,42 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { AlertCircle, CheckCircle, ExternalLink, Save, Plus, Edit3, Trash2, Download, ChevronDown, ChevronUp, Settings, GripVertical, LogOut, User, Lock } from 'lucide-react'
 import { websiteData, categories } from '../websiteData.js'
 import { getEnvConfig, getGitHubApiConfig } from '../config/env.js'
-import ConfigDebugger from '../components/ConfigDebugger.jsx'
+
+// 导入所有可用的图标
+import devToolsIcon from '../assets/dev_tools_icon.png'
+import toolsIcon from '../assets/tools_icon.png'
+import networkIcon from '../assets/network_icon.png'
+import socialIcon from '../assets/social_icon.png'
+import innovationIcon from '../assets/innovation_icon.png'
+import serverIcon from '../assets/server_icon.png'
+import educationIcon from '../assets/education_icon.png'
+import techBloggerAvatar from '../assets/tech_blogger_avatar.png'
+
+// 图标映射对象
+const iconMap = {
+  devToolsIcon,
+  toolsIcon,
+  networkIcon,
+  socialIcon,
+  innovationIcon,
+  serverIcon,
+  educationIcon,
+  techBloggerAvatar
+}
+
+// 可选择的图标列表
+const availableIcons = [
+  { key: 'devToolsIcon', name: '开发工具', icon: devToolsIcon },
+  { key: 'toolsIcon', name: '通用工具', icon: toolsIcon },
+  { key: 'networkIcon', name: '网络/网站', icon: networkIcon },
+  { key: 'socialIcon', name: '社交/社区', icon: socialIcon },
+  { key: 'innovationIcon', name: '创新/产品', icon: innovationIcon },
+  { key: 'serverIcon', name: '服务器/云', icon: serverIcon },
+  { key: 'educationIcon', name: '教育/学习', icon: educationIcon },
+  { key: 'techBloggerAvatar', name: '个人/作者', icon: techBloggerAvatar }
+]
+
 import {
   DndContext,
   closestCenter,
@@ -185,7 +219,6 @@ function Admin() {
       
       if (result.success) {
         showMessage('success', '✅ 配置更新成功！EdgeOne Pages正在自动重新部署，1-2分钟后生效')
-        downloadConfig() // 同时提供下载备份
       } else {
         throw new Error(result.message || result.error || '未知错误')
       }
@@ -444,9 +477,9 @@ export const siteStats = {
   const resetCategoryForm = () => {
     setCategoryForm({
       name: '',
-      icon: '',
-      special: false,
-      parentId: null
+      icon: toolsIcon,
+      parentId: null,
+      special: false
     })
   }
 
@@ -1050,14 +1083,22 @@ export const siteStats = {
               </div>
               
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">图标路径</label>
-                <input
-                  type="text"
-                  value={categoryForm.icon}
-                  onChange={(e) => setCategoryForm({...categoryForm, icon: e.target.value})}
-                  className="w-full p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="/category_icon.png"
-                />
+                <label className="block text-xs font-medium text-gray-700 mb-1">分类图标</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {availableIcons.map((iconOption) => (
+                    <button
+                      key={iconOption.key}
+                      type="button"
+                      onClick={() => setCategoryForm({...categoryForm, icon: iconOption.icon})}
+                      className={`p-3 border-2 rounded-lg hover:border-blue-500 transition-colors ${
+                        categoryForm.icon === iconOption.icon ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                      }`}
+                      title={iconOption.name}
+                    >
+                      <img src={iconOption.icon} alt={iconOption.name} className="w-8 h-8 mx-auto" />
+                    </button>
+                  ))}
+                </div>
               </div>
               
               <div>
@@ -1445,7 +1486,7 @@ export const siteStats = {
                       value={websiteForm.tags}
                       onChange={(e) => setWebsiteForm({...websiteForm, tags: e.target.value})}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          placeholder="设计, 工具, 免费"
+                      placeholder="设计, 工具, 免费"
                     />
                   </div>
                 </div>
@@ -1519,14 +1560,22 @@ export const siteStats = {
                   </div>
                   
                   <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">图标路径</label>
-                    <input
-                      type="text"
-                      value={categoryForm.icon}
-                      onChange={(e) => setCategoryForm({...categoryForm, icon: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="/category_icon.png"
-                    />
+                        <label className="block text-sm font-medium text-gray-700 mb-2">分类图标</label>
+                        <div className="grid grid-cols-4 gap-2">
+                          {availableIcons.map((iconOption) => (
+                            <button
+                              key={iconOption.key}
+                              type="button"
+                              onClick={() => setCategoryForm({...categoryForm, icon: iconOption.icon})}
+                              className={`p-3 border-2 rounded-lg hover:border-blue-500 transition-colors ${
+                                categoryForm.icon === iconOption.icon ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                              }`}
+                              title={iconOption.name}
+                            >
+                              <img src={iconOption.icon} alt={iconOption.name} className="w-8 h-8 mx-auto" />
+                            </button>
+                          ))}
+                        </div>
                   </div>
                   
                   <div>
@@ -1645,40 +1694,23 @@ export const siteStats = {
                 </button>
               </div>
             </div>
-
-                {/* 配置信息显示 */}
-                <div className="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-6">
-                  <h4 className="text-base font-medium text-gray-900 mb-4">环境配置信息</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <span className="font-medium text-gray-700">管理密码:</span>
-                      <span className={`ml-2 ${envConfig.getConfigStatus().password.status === 'default' ? 'text-red-600' : 'text-green-600'}`}>
-                        {envConfig.getConfigStatus().password.message}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">GitHub Token:</span>
-                      <span className={`ml-2 ${envConfig.getConfigStatus().token.status === 'configured' ? 'text-green-600' : 'text-red-600'}`}>
-                        {envConfig.getConfigStatus().token.message}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">GitHub 仓库:</span>
-                      <span className={`ml-2 ${envConfig.getConfigStatus().repo.status === 'configured' ? 'text-green-600' : 'text-red-600'}`}>
-                        {envConfig.getConfigStatus().repo.message}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
-                    <strong>提示:</strong> 如果环境变量显示未配置，请检查 EdgeOne Pages 的环境变量设置或 GitHub Secrets 配置。
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
-          
-          {/* 配置调试器 - 仅开发环境显示 */}
-          <ConfigDebugger />
+        )}
+      </div>
+      
+      {/* 手动下载备份按钮 */}
+      <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="text-sm font-medium text-gray-900">配置备份</h4>
+            <p className="text-sm text-gray-600">下载当前配置文件作为备份</p>
+          </div>
+          <button
+            onClick={downloadConfig}
+            className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm"
+          >
+            下载备份
+          </button>
         </div>
       </div>
     </div>
