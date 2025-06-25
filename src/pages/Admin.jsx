@@ -25,6 +25,7 @@ import { CSS } from '@dnd-kit/utilities'
 function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoginLoading, setIsLoginLoading] = useState(false)
   const [password, setPassword] = useState('')
   const [config, setConfig] = useState({ 
     websiteData: websiteData || [], 
@@ -61,9 +62,8 @@ function Admin() {
     siteDescription: '精选网站导航'
   })
 
-  // 获取环境配置
+  // 获取环境配置（仅用于状态检查，密码验证通过API进行）
   const envConfig = getEnvConfig()
-  const ADMIN_PASSWORD = envConfig.ADMIN_PASSWORD
 
   // 拖拽传感器设置 - 必须在所有条件渲染之前
   const sensors = useSensors(
@@ -82,14 +82,39 @@ function Admin() {
     setIsLoading(false)
   }, [])
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true)
-      localStorage.setItem('admin_authenticated', 'true')
-      showMessage('success', '登录成功！')
-    } else {
-      showMessage('error', '密码错误！')
+    setIsLoginLoading(true)
+    
+    // 显示加载状态
+    showMessage('info', '正在验证密码...')
+    
+    try {
+      // 调用EdgeOne Functions验证密码
+      const response = await fetch('/api/verify-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          password: password
+        })
+      })
+      
+      const result = await response.json()
+      
+      if (result.success) {
+        setIsAuthenticated(true)
+        localStorage.setItem('admin_authenticated', 'true')
+        showMessage('success', '登录成功！')
+      } else {
+        showMessage('error', result.message || '密码错误！')
+      }
+    } catch (error) {
+      console.error('登录验证失败:', error)
+      showMessage('error', '登录验证失败，请检查网络连接')
+    } finally {
+      setIsLoginLoading(false)
     }
   }
 
@@ -205,10 +230,24 @@ function Admin() {
             
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+              disabled={isLoginLoading}
+              className={`w-full font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
+                isLoginLoading 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'
+              } text-white`}
             >
-              <Lock className="w-4 h-4" />
-              登录管理后台
+              {isLoginLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  验证中...
+                </>
+              ) : (
+                <>
+                  <Lock className="w-4 h-4" />
+                  登录管理后台
+                </>
+              )}
             </button>
           </form>
           
@@ -223,7 +262,7 @@ function Admin() {
           )}
           
           <p className="text-sm text-gray-500 text-center mt-4">
-            登录后您可以管理网站内容并通过GitHub Actions自动部署更新
+            登录后您可以管理网站内容并通过EdgeOne Functions自动部署更新
           </p>
         </div>
       </div>

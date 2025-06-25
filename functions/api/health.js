@@ -4,7 +4,7 @@
  * 用途: 检查EdgeOne Functions服务状态和配置
  */
 export async function onRequestGet({ request, env }) {
-  const { GITHUB_TOKEN, GITHUB_REPO } = env;
+  const { GITHUB_TOKEN, GITHUB_REPO, ADMIN_PASSWORD } = env;
   
   return new Response(JSON.stringify({
     status: 'healthy',
@@ -14,10 +14,12 @@ export async function onRequestGet({ request, env }) {
     config: {
       hasGitHubToken: Boolean(GITHUB_TOKEN),
       hasGitHubRepo: Boolean(GITHUB_REPO),
+      hasAdminPassword: Boolean(ADMIN_PASSWORD),
       repoName: GITHUB_REPO ? GITHUB_REPO : 'not configured'
     },
     endpoints: [
       '/api/health',
+      '/api/verify-password',
       '/api/get-config',
       '/api/update-config'
     ]

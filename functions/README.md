@@ -10,6 +10,7 @@
 functions/
 └── api/
     ├── health.js       # 健康检查 - GET /api/health
+    ├── verify-password.js # 密码验证 - POST /api/verify-password
     ├── get-config.js   # 获取配置 - GET /api/get-config
     └── update-config.js # 更新配置 - POST /api/update-config
 ```
@@ -21,12 +22,23 @@ functions/
 - **用途**: 检查Functions服务状态和环境变量配置
 - **响应**: 返回服务状态和配置信息
 
-### 2. 获取配置
+### 2. 密码验证
+- **端点**: `POST /api/verify-password`
+- **用途**: 验证管理后台登录密码
+- **请求体**: 
+  ```json
+  {
+    "password": "用户输入的密码"
+  }
+  ```
+- **响应**: 返回验证结果
+
+### 3. 获取配置
 - **端点**: `GET /api/get-config`  
 - **用途**: 获取当前GitHub仓库中的websiteData.js文件内容
 - **响应**: 返回文件内容和SHA值
 
-### 3. 更新配置
+### 4. 更新配置
 - **端点**: `POST /api/update-config`
 - **用途**: 更新GitHub仓库中的websiteData.js文件
 - **请求体**: 
