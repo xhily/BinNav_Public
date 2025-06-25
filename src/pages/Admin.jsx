@@ -112,31 +112,32 @@ function Admin() {
       // 生成配置文件内容
       const configContent = generateConfigFile(config.websiteData, config.categories)
       
-      // 触发GitHub Actions自动更新
-      const apiConfig = getGitHubApiConfig()
-      
-      if (!envConfig.GITHUB_REPO || !envConfig.GITHUB_TOKEN) {
-        throw new Error('GitHub配置未设置，请检查环境变量')
+      // 首先获取当前文件的SHA值
+      const getResponse = await fetch('/api/get-config')
+      if (!getResponse.ok) {
+        throw new Error('获取当前配置失败，请刷新页面重试')
       }
+      const currentData = await getResponse.json()
       
-      const response = await fetch(apiConfig.dispatchUrl, {
+      // 调用EdgeOne Functions更新配置
+      const updateResponse = await fetch('/api/update-config', {
         method: 'POST',
-        headers: apiConfig.headers,
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
-          event_type: 'update_config',
-          client_payload: {
-            config: btoa(unescape(encodeURIComponent(configContent))),
-            timestamp: new Date().toISOString()
-          }
+          config: configContent,
+          sha: currentData.sha
         })
       })
 
-      if (response.ok) {
-        showMessage('success', '✅ 配置更新成功！EdgeOne正在自动部署，1-2分钟后生效')
+      const result = await updateResponse.json()
+      
+      if (result.success) {
+        showMessage('success', '✅ 配置更新成功！EdgeOne Pages正在自动重新部署，1-2分钟后生效')
         downloadConfig() // 同时提供下载备份
       } else {
-        const errorData = await response.json()
-        throw new Error(`GitHub API错误: ${errorData.message || '未知错误'}`)
+        throw new Error(result.message || '未知错误')
       }
     } catch (error) {
       console.error('保存配置失败:', error)

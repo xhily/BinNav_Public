@@ -30,9 +30,10 @@ function ConfigDebugger() {
         GITHUB_REPO: envConfig.GITHUB_REPO || '[未设置]'
       },
       api: {
-        dispatchUrl: apiConfig.dispatchUrl,
-        repoUrl: apiConfig.repoUrl,
-        hasValidHeaders: Boolean(apiConfig.headers.Authorization && apiConfig.headers.Authorization !== 'token ')
+        repoName: apiConfig.repoName,
+        hasToken: apiConfig.hasToken,
+        hasRepo: apiConfig.hasRepo,
+        endpoints: apiConfig.endpoints
       },
       status: configStatus,
       validation: validationStatus,
@@ -96,13 +97,14 @@ function ConfigDebugger() {
             </div>
           </div>
           
-          {/* API 配置 */}
+          {/* EdgeOne Functions API */}
           <div className="mb-4">
-            <h4 className="font-medium text-gray-800 mb-2">API 配置</h4>
-            <div className="bg-gray-50 p-2 rounded text-sm space-y-1">
-              <div>调度URL: {configData.api.dispatchUrl}</div>
-              <div>仓库URL: {configData.api.repoUrl}</div>
-              <div>认证头: {configData.api.hasValidHeaders ? '✅ 有效' : '❌ 无效'}</div>
+            <h4 className="font-medium text-gray-800 mb-2">EdgeOne Functions API</h4>
+            <div className="bg-blue-50 p-2 rounded text-sm space-y-1 border border-blue-200">
+              <div>🏥 健康检查: /api/health</div>
+              <div>📥 获取配置: /api/get-config</div>
+              <div>📤 更新配置: /api/update-config</div>
+              <div>🔧 GitHub仓库: {configData.api.repoName || '[未设置]'}</div>
             </div>
           </div>
           

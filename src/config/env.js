@@ -50,19 +50,22 @@ export const getEnvConfig = () => {
 }
 
 /**
- * GitHub API 调用配置
+ * GitHub API 调用配置（仅用于状态检查，实际API调用由EdgeOne Functions处理）
+ * EdgeOne Functions会从环境变量中获取GITHUB_TOKEN和GITHUB_REPO
  */
 export const getGitHubApiConfig = () => {
   const config = getEnvConfig()
   
   return {
-    headers: {
-      'Authorization': `token ${config.GITHUB_TOKEN}`,
-      'Accept': 'application/vnd.github.v3+json',
-      'Content-Type': 'application/json'
-    },
-    repoUrl: `https://api.github.com/repos/${config.GITHUB_REPO}`,
-    dispatchUrl: `https://api.github.com/repos/${config.GITHUB_REPO}/dispatches`
+    // 这些配置主要用于前端状态检查，实际API调用由EdgeOne Functions处理
+    hasToken: Boolean(config.GITHUB_TOKEN),
+    hasRepo: Boolean(config.GITHUB_REPO),
+    repoName: config.GITHUB_REPO,
+    // EdgeOne Functions API端点
+    endpoints: {
+      getConfig: '/api/get-config',
+      updateConfig: '/api/update-config'
+    }
   }
 }
 
