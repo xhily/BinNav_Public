@@ -4,18 +4,70 @@
  * 用途: 获取当前websiteData.js文件内容，用于管理后台编辑
  */
 
-// Base64 解码函数（兼容EdgeOne环境）
+// Base64 解码函数（纯JavaScript实现，兼容所有环境）
 function base64Decode(str) {
   try {
     // 尝试使用标准atob函数
     if (typeof atob !== 'undefined') {
+      console.log('💡 使用标准atob函数');
       return atob(str);
     }
-    // EdgeOne环境的后备方案
-    return Buffer.from(str, 'base64').toString('utf-8');
+    
+    // 尝试使用Node.js Buffer
+    if (typeof Buffer !== 'undefined') {
+      console.log('💡 使用Node.js Buffer');
+      return Buffer.from(str, 'base64').toString('utf-8');
+    }
+    
+    // 纯JavaScript实现的Base64解码
+    console.log('💡 使用纯JavaScript实现');
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+    const lookup = {};
+    for (let i = 0; i < chars.length; i++) {
+      lookup[chars[i]] = i;
+    }
+    
+    let bufferLength = str.length * 0.75;
+    if (str[str.length - 1] === '=') {
+      bufferLength--;
+      if (str[str.length - 2] === '=') {
+        bufferLength--;
+      }
+    }
+    
+    const bytes = new Array(bufferLength);
+    let p = 0;
+    
+    for (let i = 0; i < str.length; i += 4) {
+      const encoded1 = lookup[str[i]];
+      const encoded2 = lookup[str[i + 1]];
+      const encoded3 = lookup[str[i + 2]];
+      const encoded4 = lookup[str[i + 3]];
+      
+      bytes[p++] = (encoded1 << 2) | (encoded2 >> 4);
+      bytes[p++] = ((encoded2 & 15) << 4) | (encoded3 >> 2);
+      bytes[p++] = ((encoded3 & 3) << 6) | (encoded4 & 63);
+    }
+    
+    // 转换为UTF-8字符串
+    let result = '';
+    for (let i = 0; i < bytes.length; i++) {
+      if (bytes[i] !== undefined) {
+        result += String.fromCharCode(bytes[i]);
+      }
+    }
+    
+    // 处理UTF-8编码
+    try {
+      return decodeURIComponent(escape(result));
+    } catch (e) {
+      return result;
+    }
+    
   } catch (error) {
-    console.error('Base64解码失败:', error);
-    throw new Error('Base64解码失败');
+    console.error('❌ Base64解码失败:', error);
+    console.error('输入内容预览:', str.substring(0, 100) + '...');
+    throw new Error(`Base64解码失败: ${error.message}`);
   }
 }
 

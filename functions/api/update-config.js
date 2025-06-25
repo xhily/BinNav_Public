@@ -4,18 +4,57 @@
  * 用途: 更新websiteData.js文件内容，触发EdgeOne Pages重新部署
  */
 
-// Base64 编码函数（兼容EdgeOne环境）
+// Base64 编码函数（纯JavaScript实现，兼容所有环境）
 function base64Encode(str) {
   try {
     // 尝试使用标准btoa函数
     if (typeof btoa !== 'undefined') {
+      console.log('💡 使用标准btoa函数');
       return btoa(unescape(encodeURIComponent(str)));
     }
-    // EdgeOne环境的后备方案
-    return Buffer.from(str, 'utf-8').toString('base64');
+    
+    // 尝试使用Node.js Buffer
+    if (typeof Buffer !== 'undefined') {
+      console.log('💡 使用Node.js Buffer');
+      return Buffer.from(str, 'utf-8').toString('base64');
+    }
+    
+    // 纯JavaScript实现的Base64编码
+    console.log('💡 使用纯JavaScript实现');
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+    
+    // 先处理UTF-8编码
+    const utf8Str = unescape(encodeURIComponent(str));
+    let result = '';
+    let i = 0;
+    
+    while (i < utf8Str.length) {
+      const a = utf8Str.charCodeAt(i++);
+      const b = i < utf8Str.length ? utf8Str.charCodeAt(i++) : 0;
+      const c = i < utf8Str.length ? utf8Str.charCodeAt(i++) : 0;
+      
+      const bitmap = (a << 16) | (b << 8) | c;
+      
+      result += chars.charAt((bitmap >> 18) & 63);
+      result += chars.charAt((bitmap >> 12) & 63);
+      result += chars.charAt((bitmap >> 6) & 63);
+      result += chars.charAt(bitmap & 63);
+    }
+    
+    // 添加填充
+    const padLength = str.length % 3;
+    if (padLength === 1) {
+      result = result.slice(0, -2) + '==';
+    } else if (padLength === 2) {
+      result = result.slice(0, -1) + '=';
+    }
+    
+    return result;
+    
   } catch (error) {
-    console.error('Base64编码失败:', error);
-    throw new Error('Base64编码失败');
+    console.error('❌ Base64编码失败:', error);
+    console.error('输入内容预览:', str.substring(0, 100) + '...');
+    throw new Error(`Base64编码失败: ${error.message}`);
   }
 }
 
