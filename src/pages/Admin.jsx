@@ -145,7 +145,13 @@ function Admin() {
         throw new Error('获取当前配置失败，请刷新页面重试')
       }
       const currentData = await getResponse.json()
-      console.log('📄 当前配置获取结果:', { success: currentData.success, hasContent: !!currentData.content, hasSha: !!currentData.sha })
+      console.log('📄 当前配置获取结果:', { 
+        success: currentData.success, 
+        hasContent: !!currentData.content, 
+        hasSha: !!currentData.sha,
+        contentType: currentData.contentType,
+        warning: currentData.warning
+      })
       
       if (!currentData.success) {
         throw new Error(currentData.message || '获取当前配置失败')
@@ -153,6 +159,12 @@ function Admin() {
 
       if (!currentData.sha) {
         throw new Error('未获取到文件SHA值，无法更新配置')
+      }
+      
+      // 如果返回的是base64内容，给用户一个提示
+      if (currentData.contentType === 'base64') {
+        console.log('⚠️ 注意：获取到的是base64格式内容，EdgeOne Functions解码可能有问题')
+        showMessage('info', '⚠️ 注意：配置获取可能存在编码问题，但仍可正常保存')
       }
       
       // 调用EdgeOne Functions更新配置
