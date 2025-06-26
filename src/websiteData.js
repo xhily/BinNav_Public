@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/6/25 15:39:07
+// 网站数据 - 通过管理后台更新于 2025/6/25 16:41:05
 export const websiteData = [
   {
     "id": 1,
@@ -576,20 +576,6 @@ export const websiteData = [
     "icon": "/assets/dev_tools_icon.png",
     "popularity": 92,
     "featured": true
-  },
-  {
-    "id": 42,
-    "name": "设计作品集",
-    "description": "UI设计作品展示 | 现代化界面设计",
-    "url": "https://navigator-design.com",
-    "category": "author",
-    "tags": [
-      "作品集",
-      "UI设计",
-      "界面设计"
-    ],
-    "icon": "/assets/tools_icon.png",
-    "popularity": 90
   },
   {
     "id": 43,
