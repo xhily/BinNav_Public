@@ -9,18 +9,15 @@ function base64Encode(str) {
   try {
     // 尝试使用标准btoa函数
     if (typeof btoa !== 'undefined') {
-      console.log('💡 使用标准btoa函数');
       return btoa(unescape(encodeURIComponent(str)));
     }
     
     // 尝试使用Node.js Buffer
     if (typeof Buffer !== 'undefined') {
-      console.log('💡 使用Node.js Buffer');
       return Buffer.from(str, 'utf-8').toString('base64');
     }
     
     // 纯JavaScript实现的Base64编码
-    console.log('💡 使用纯JavaScript实现');
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
     
     // 先处理UTF-8编码
@@ -52,8 +49,6 @@ function base64Encode(str) {
     return result;
     
   } catch (error) {
-    console.error('❌ Base64编码失败:', error);
-    console.error('输入内容预览:', str.substring(0, 100) + '...');
     throw new Error(`Base64编码失败: ${error.message}`);
   }
 }
@@ -73,25 +68,13 @@ export async function onRequestOptions({ request }) {
 
 // 处理POST请求
 export async function onRequestPost({ request, env }) {
-  console.log('🚀 POST /api/update-config 开始执行');
-
   const { GITHUB_TOKEN, GITHUB_REPO } = env;
   
-  // 详细的环境变量检查
-  console.log('🔍 环境变量检查:', {
-    hasToken: Boolean(GITHUB_TOKEN),
-    tokenLength: GITHUB_TOKEN ? GITHUB_TOKEN.length : 0,
-    hasRepo: Boolean(GITHUB_REPO),
-    repoName: GITHUB_REPO || 'undefined'
-  });
-  
   if (!GITHUB_TOKEN) {
-    console.error('❌ GITHUB_TOKEN未配置');
     return new Response(JSON.stringify({
       success: false,
       error: 'GITHUB_TOKEN未配置',
-      message: '请在EdgeOne项目中配置GITHUB_TOKEN环境变量',
-      debug: 'MISSING_GITHUB_TOKEN'
+      message: '请在EdgeOne项目中配置GITHUB_TOKEN环境变量'
     }), {
       status: 500,
       headers: { 
@@ -102,12 +85,10 @@ export async function onRequestPost({ request, env }) {
   }
   
   if (!GITHUB_REPO) {
-    console.error('❌ GITHUB_REPO未配置');
     return new Response(JSON.stringify({
       success: false,
       error: 'GITHUB_REPO未配置',
-      message: '请在EdgeOne项目中配置GITHUB_REPO环境变量',
-      debug: 'MISSING_GITHUB_REPO'
+      message: '请在EdgeOne项目中配置GITHUB_REPO环境变量'
     }), {
       status: 500,
       headers: { 
@@ -122,13 +103,6 @@ export async function onRequestPost({ request, env }) {
     const requestData = await request.json();
     const { config, sha } = requestData;
     
-    console.log('📥 请求数据:', {
-      hasConfig: Boolean(config),
-      configLength: config ? config.length : 0,
-      hasSha: Boolean(sha),
-      shaPreview: sha ? sha.substring(0, 10) + '...' : 'undefined'
-    });
-    
     if (!config) {
       throw new Error('配置内容不能为空');
     }
@@ -139,10 +113,8 @@ export async function onRequestPost({ request, env }) {
 
     // 使用兼容的base64编码
     const encodedContent = base64Encode(config);
-    console.log('📦 内容编码成功，编码后长度:', encodedContent.length);
 
     const apiUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents/src/websiteData.js`;
-    console.log('📡 调用GitHub API:', apiUrl);
 
     // 更新GitHub文件
     const response = await fetch(apiUrl, {
@@ -160,15 +132,8 @@ export async function onRequestPost({ request, env }) {
       })
     });
 
-    console.log('📦 GitHub API响应:', {
-      status: response.status,
-      statusText: response.statusText,
-      contentType: response.headers.get('content-type')
-    });
-
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ GitHub API错误:', errorText);
       
       let errorData;
       try {
@@ -181,11 +146,6 @@ export async function onRequestPost({ request, env }) {
     }
 
     const result = await response.json();
-    console.log('✅ 更新成功:', {
-      commitSha: result.commit.sha.substring(0, 10) + '...',
-      fileSha: result.content.sha.substring(0, 10) + '...',
-      fileSize: result.content.size
-    });
     
     return new Response(JSON.stringify({
       success: true,
@@ -209,8 +169,6 @@ export async function onRequestPost({ request, env }) {
     });
 
   } catch (error) {
-    console.error('❌ 更新配置失败:', error);
-    
     return new Response(JSON.stringify({
       success: false,
       error: '更新配置失败',

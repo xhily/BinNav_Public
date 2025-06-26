@@ -6,51 +6,23 @@
 
 // 简化的Base64解码函数
 function base64Decode(str) {
-  console.log('🔍 开始Base64解码，输入长度:', str.length);
-  console.log('🔍 输入内容前50字符:', str.substring(0, 50));
-  
   try {
-    // 检查环境支持
-    console.log('🔍 环境检查:', {
-      hasAtob: typeof atob !== 'undefined',
-      hasBuffer: typeof Buffer !== 'undefined',
-      hasTextDecoder: typeof TextDecoder !== 'undefined'
-    });
-    
     // 方法1：标准 atob
     if (typeof atob !== 'undefined') {
-      console.log('💡 使用标准atob函数');
-      const result = atob(str);
-      console.log('✅ atob解码成功，长度:', result.length);
-      return result;
+      return atob(str);
     }
     
     // 方法2：Node.js Buffer
     if (typeof Buffer !== 'undefined') {
-      console.log('💡 使用Node.js Buffer');
-      const result = Buffer.from(str, 'base64').toString('utf-8');
-      console.log('✅ Buffer解码成功，长度:', result.length);
-      return result;
+      return Buffer.from(str, 'base64').toString('utf-8');
     }
     
-    // 方法3：使用 TextDecoder（如果可用）
-    if (typeof TextDecoder !== 'undefined') {
-      console.log('💡 尝试使用TextDecoder');
-      const decoder = new TextDecoder('utf-8');
-      // 这里需要先将base64转换为Uint8Array
-      // 但这需要手动实现，所以跳过
-    }
-    
-    // 方法4：最简单的纯JS实现
-    console.log('💡 使用简化的纯JavaScript实现');
-    
-    // Base64字符表
+    // 方法3：最简单的纯JS实现
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
     let result = '';
     
     // 移除换行和空格
     const cleanStr = str.replace(/[\r\n\s]/g, '');
-    console.log('🔍 清理后长度:', cleanStr.length);
     
     // 简单的4字符->3字节转换
     for (let i = 0; i < cleanStr.length; i += 4) {
@@ -73,39 +45,21 @@ function base64Decode(str) {
       if (chunk[3] !== '=') result += String.fromCharCode(bitmap & 255);
     }
     
-    console.log('✅ 纯JS解码完成，长度:', result.length);
     return result;
     
   } catch (error) {
-    console.error('❌ Base64解码失败:', error);
-    console.error('❌ 错误类型:', error.name);
-    console.error('❌ 错误消息:', error.message);
-    
-    // 提供更多调试信息
     return null; // 返回null而不是抛出异常，让调用者处理
   }
 }
 
 export async function onRequestGet({ request, env }) {
-  console.log('🚀 GET /api/get-config 开始执行');
-  
   const { GITHUB_TOKEN, GITHUB_REPO } = env;
   
-  // 详细的环境变量检查  
-  console.log('🔍 环境变量检查:', {
-    hasToken: Boolean(GITHUB_TOKEN),
-    tokenLength: GITHUB_TOKEN ? GITHUB_TOKEN.length : 0,
-    hasRepo: Boolean(GITHUB_REPO),
-    repoName: GITHUB_REPO || 'undefined'
-  });
-  
   if (!GITHUB_TOKEN) {
-    console.error('❌ GITHUB_TOKEN未配置');
     return new Response(JSON.stringify({
       success: false,
       error: 'GITHUB_TOKEN未配置',
-      message: '请在EdgeOne项目中配置GITHUB_TOKEN环境变量',
-      debug: 'MISSING_GITHUB_TOKEN'
+      message: '请在EdgeOne项目中配置GITHUB_TOKEN环境变量'
     }), {
       status: 500,
       headers: { 
@@ -116,12 +70,10 @@ export async function onRequestGet({ request, env }) {
   }
   
   if (!GITHUB_REPO) {
-    console.error('❌ GITHUB_REPO未配置');
     return new Response(JSON.stringify({
       success: false,
       error: 'GITHUB_REPO未配置', 
-      message: '请在EdgeOne项目中配置GITHUB_REPO环境变量',
-      debug: 'MISSING_GITHUB_REPO'
+      message: '请在EdgeOne项目中配置GITHUB_REPO环境变量'
     }), {
       status: 500,
       headers: { 
@@ -133,7 +85,6 @@ export async function onRequestGet({ request, env }) {
 
   try {
     const apiUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents/src/websiteData.js`;
-    console.log('📡 调用GitHub API:', apiUrl);
     
     // 获取文件内容
     const response = await fetch(apiUrl, {
@@ -144,34 +95,18 @@ export async function onRequestGet({ request, env }) {
       }
     });
 
-    console.log('📦 GitHub API响应:', {
-      status: response.status,
-      statusText: response.statusText,
-      contentType: response.headers.get('content-type')
-    });
-
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ GitHub API错误:', errorText);
-      
       throw new Error(`GitHub API错误: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('📄 GitHub文件信息:', {
-      path: data.path,
-      size: data.size,
-      sha: data.sha ? data.sha.substring(0, 10) + '...' : 'undefined',
-      hasContent: Boolean(data.content),
-      contentLength: data.content ? data.content.length : 0
-    });
     
     // 尝试Base64解码
     const decodedContent = base64Decode(data.content);
     
     if (decodedContent === null) {
       // 解码失败，但不影响功能，返回原始内容让前端处理
-      console.log('⚠️ Base64解码失败，返回原始base64内容');
       return new Response(JSON.stringify({
         success: true,
         content: data.content, // 返回原始base64内容
@@ -191,8 +126,6 @@ export async function onRequestGet({ request, env }) {
       });
     }
     
-    console.log('✅ 配置文件解码成功，长度:', decodedContent.length);
-    
     return new Response(JSON.stringify({
       success: true,
       content: decodedContent,
@@ -211,8 +144,6 @@ export async function onRequestGet({ request, env }) {
     });
 
   } catch (error) {
-    console.error('❌ 获取配置失败:', error);
-    
     return new Response(JSON.stringify({
       success: false,
       error: '获取配置失败',

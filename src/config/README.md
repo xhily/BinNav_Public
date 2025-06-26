@@ -87,33 +87,6 @@ fetch(apiConfig.dispatchUrl, {
 })
 ```
 
-## 调试工具
-
-### ConfigDebugger 组件
-
-在开发环境下，页面右下角会显示一个配置调试器按钮：
-
-- 🔧 点击齿轮图标打开调试面板
-- 📊 查看环境变量、API 配置、验证状态
-- ⚠️ 仅在开发环境下显示，生产环境自动隐藏
-
-### 使用方法
-
-```javascript
-import ConfigDebugger from '../components/ConfigDebugger.jsx'
-
-function MyComponent() {
-  return (
-    <div>
-      {/* 你的组件内容 */}
-      
-      {/* 添加配置调试器 */}
-      <ConfigDebugger />
-    </div>
-  )
-}
-```
-
 ## EdgeOne Pages 部署
 
 ### 核心优势
@@ -186,7 +159,6 @@ Vite 构建过程 (VITE_ 前缀)
    - 定期更新访问令牌
 
 2. **开发效率**
-   - 使用配置调试器快速诊断问题
    - 本地开发使用 `.env` 文件
    - 配置变更后及时测试
 

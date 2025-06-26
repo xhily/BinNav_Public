@@ -3,6 +3,8 @@ import { Search, Menu, X, Globe, ChevronDown, ChevronRight } from 'lucide-react'
 import { Button } from '../components/ui/button.jsx'
 import { Input } from '../components/ui/input.jsx'
 import WebsiteCard from '../components/WebsiteCard.jsx'
+import SubmitWebsiteForm from '../components/SubmitWebsiteForm.jsx'
+import FriendLinks from '../components/FriendLinks.jsx'
 import { websiteData, categories, searchEngines } from '../websiteData.js'
 
 // 导入图片
@@ -14,6 +16,7 @@ function HomePage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [selectedSearchEngine, setSelectedSearchEngine] = useState('internal')
   const [expandedCategories, setExpandedCategories] = useState({})
+  const [showSubmitForm, setShowSubmitForm] = useState(false)
   const mainContentRef = useRef(null)
   const sectionRefs = useRef({})
 
@@ -254,34 +257,41 @@ function HomePage() {
                   站点服务
                 </h3>
                 <div className="space-y-3">
-                  <a 
-                    href="#" 
-                    className="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
+                  <button 
+                    onClick={() => setShowSubmitForm(true)}
+                    className="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group w-full"
                   >
                     <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
                       <span className="text-green-600 text-sm">📝</span>
                     </div>
-                    <div>
+                    <div className="text-left">
                       <div className="text-sm font-medium text-gray-900 group-hover:text-green-600">站点提交</div>
                       <div className="text-xs text-gray-500">推荐优质网站</div>
                     </div>
-                  </a>
+                  </button>
                   
-                  <a 
-                    href="#" 
-                    className="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
+                  <button 
+                    onClick={() => {
+                      const friendLinksSection = document.querySelector('#friend-links')
+                      if (friendLinksSection) {
+                        friendLinksSection.scrollIntoView({ behavior: 'smooth' })
+                      }
+                    }}
+                    className="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group w-full"
                   >
                     <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
                       <span className="text-purple-600 text-sm">🔗</span>
                     </div>
-                    <div>
+                    <div className="text-left">
                       <div className="text-sm font-medium text-gray-900 group-hover:text-purple-600">友情链接</div>
                       <div className="text-xs text-gray-500">合作交换链接</div>
                     </div>
-                  </a>
+                  </button>
                   
                   <a 
-                    href="#" 
+                    href="https://github.com/your-username/binnav" 
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
                   >
                     <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
@@ -370,9 +380,21 @@ function HomePage() {
                 }
               })}
             </div>
+
+            {/* 友情链接 */}
+            <div id="friend-links">
+              <FriendLinks />
+            </div>
           </main>
         </div>
       </div>
+
+      {/* 站点提交表单 */}
+      <SubmitWebsiteForm 
+        isOpen={showSubmitForm} 
+        onClose={() => setShowSubmitForm(false)}
+        categories={categories}
+      />
 
       {/* 页脚 */}
       <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200 mt-12">

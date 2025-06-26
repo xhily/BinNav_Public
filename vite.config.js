@@ -20,8 +20,7 @@ export default defineConfig({
     assetsDir: 'assets',
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, 'index.html'),
-        test: path.resolve(__dirname, 'test-functions.html')
+        main: path.resolve(__dirname, 'index.html')
       },
       output: {
         manualChunks: {
