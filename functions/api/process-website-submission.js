@@ -52,16 +52,14 @@ export async function onRequestPost({ request, env }) {
       });
     }
 
-    // 从KV存储获取待审核站点列表
-    const pendingWebsitesKey = 'pending_websites';
-    const pendingData = await env.BINNAV_KV.get(pendingWebsitesKey);
-    
-    if (!pendingData) {
+    // 通过GitHub API获取待审核站点列表
+    const { VITE_GITHUB_TOKEN, VITE_GITHUB_REPO } = env;
+    if (!VITE_GITHUB_TOKEN || !VITE_GITHUB_REPO) {
       return new Response(JSON.stringify({
         success: false,
-        message: '未找到待审核站点列表'
+        message: 'GitHub配置未完成'
       }), {
-        status: 404,
+        status: 500,
         headers: { 
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
@@ -70,8 +68,32 @@ export async function onRequestPost({ request, env }) {
     }
 
     let pendingWebsites = [];
+    let pendingFileSha = null;
+
     try {
-      pendingWebsites = JSON.parse(pendingData);
+      const fileResponse = await fetch(`https://api.github.com/repos/${VITE_GITHUB_REPO}/contents/pending-websites.json`, {
+        headers: {
+          'Authorization': `token ${VITE_GITHUB_TOKEN}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+
+      if (!fileResponse.ok) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: '未找到待审核站点列表'
+        }), {
+          status: 404,
+          headers: { 
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      }
+
+      const fileData = await fileResponse.json();
+      pendingFileSha = fileData.sha;
+      pendingWebsites = JSON.parse(atob(fileData.content));
     } catch (error) {
       return new Response(JSON.stringify({
         success: false,
@@ -105,20 +127,35 @@ export async function onRequestPost({ request, env }) {
     if (action === 'approve') {
       // 通过审核 - 添加到正式网站列表
       try {
-        // 获取现有配置
-        const configData = await env.BINNAV_KV.get('website_config');
-        let config = { websiteData: [], categories: [] };
+        // 通过GitHub API获取现有配置
+        const configResponse = await fetch(`https://api.github.com/repos/${VITE_GITHUB_REPO}/contents/src/websiteData.js`, {
+          headers: {
+            'Authorization': `token ${VITE_GITHUB_TOKEN}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        });
+
+        if (!configResponse.ok) {
+          throw new Error('获取配置文件失败');
+        }
+
+        const configFile = await configResponse.json();
+        const configContent = atob(configFile.content);
         
-        if (configData) {
+        // 解析当前配置
+        const websiteDataMatch = configContent.match(/export const websiteData = (\[[\s\S]*?\]);/);
+        let websiteData = [];
+        
+        if (websiteDataMatch) {
           try {
-            config = JSON.parse(configData);
+            websiteData = JSON.parse(websiteDataMatch[1]);
           } catch (error) {
-            console.error('解析配置失败:', error);
+            console.error('解析网站数据失败:', error);
           }
         }
 
         // 生成新的网站ID
-        const newWebsiteId = Math.max(...(config.websiteData.map(w => w.id) || [0])) + 1;
+        const newWebsiteId = Math.max(...(websiteData.map(w => w.id) || [0])) + 1;
 
         // 构建新网站数据
         const newWebsite = {
@@ -128,15 +165,37 @@ export async function onRequestPost({ request, env }) {
           url: website.url,
           category: website.category,
           tags: website.tags ? website.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
-          icon: '/assets/tools_icon.png', // 默认图标
-          popularity: 50 // 默认受欢迎度
+          icon: '/assets/tools_icon.png',
+          popularity: 50
         };
 
         // 添加到网站列表
-        config.websiteData.push(newWebsite);
+        websiteData.push(newWebsite);
 
-        // 保存更新后的配置
-        await env.BINNAV_KV.put('website_config', JSON.stringify(config));
+        // 重新构建配置文件内容
+        const updatedContent = configContent.replace(
+          /export const websiteData = \[[\s\S]*?\];/,
+          `export const websiteData = ${JSON.stringify(websiteData, null, 2)};`
+        );
+
+        // 保存更新后的配置到GitHub
+        const updateResponse = await fetch(`https://api.github.com/repos/${VITE_GITHUB_REPO}/contents/src/websiteData.js`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${VITE_GITHUB_TOKEN}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: `审核通过: 添加站点 ${website.name}`,
+            content: btoa(updatedContent),
+            sha: configFile.sha
+          })
+        });
+
+        if (!updateResponse.ok) {
+          throw new Error('更新配置文件失败');
+        }
 
         // 更新网站状态
         website.status = 'approved';
@@ -165,8 +224,26 @@ export async function onRequestPost({ request, env }) {
     // 从待审核列表中移除
     pendingWebsites.splice(websiteIndex, 1);
 
-    // 保存更新后的待审核列表
-    await env.BINNAV_KV.put(pendingWebsitesKey, JSON.stringify(pendingWebsites));
+    // 通过GitHub API保存更新后的待审核列表
+    const updatedPendingContent = btoa(JSON.stringify(pendingWebsites, null, 2));
+    
+    const pendingUpdateResponse = await fetch(`https://api.github.com/repos/${VITE_GITHUB_REPO}/contents/pending-websites.json`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${VITE_GITHUB_TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `处理站点审核: ${website.name} (${action})`,
+        content: updatedPendingContent,
+        sha: pendingFileSha
+      })
+    });
+
+    if (!pendingUpdateResponse.ok) {
+      throw new Error('更新待审核列表失败');
+    }
 
     // 发送邮件通知提交者
     if (RESEND_API_KEY && website.contactEmail) {

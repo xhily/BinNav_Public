@@ -9,7 +9,7 @@ import WebsiteManager from '../components/admin/WebsiteManager'
 import CategoryManager from '../components/admin/CategoryManager'
 import LogoUploader from '../components/admin/LogoUploader'
 import PendingWebsiteManager from '../components/admin/PendingWebsiteManager'
-import FriendLinksManager from '../components/admin/FriendLinksManager'
+
 
 function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -269,11 +269,7 @@ function Admin() {
               />
         )}
 
-        {activeTab === 'friends' && (
-              <FriendLinksManager
-                showMessage={showMessage}
-              />
-        )}
+
 
         {activeTab === 'settings' && (
                 <div>

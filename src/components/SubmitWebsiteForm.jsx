@@ -18,10 +18,20 @@ function SubmitWebsiteForm({ isOpen, onClose, categories }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
+    
+    // 如果是URL字段，自动补全协议
+    if (name === 'url' && value.trim() && !value.startsWith('http://') && !value.startsWith('https://')) {
+      const processedValue = 'https://' + value.trim()
+      setFormData(prev => ({
+        ...prev,
+        [name]: processedValue
+      }))
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }))
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -157,16 +167,16 @@ function SubmitWebsiteForm({ isOpen, onClose, categories }) {
                 <option value="">请选择分类</option>
                 {categories?.map((category) => (
                   <optgroup key={category.id} label={category.name}>
-                    {category.subcategories ? 
-                      category.subcategories.map((subcat) => (
-                        <option key={subcat.id} value={subcat.id}>
-                          {subcat.name}
-                        </option>
-                      )) : 
-                      <option value={category.id}>
-                        {category.name}
+                    {/* 一级分类选项 */}
+                    <option value={category.id}>
+                      {category.name}
+                    </option>
+                    {/* 二级分类选项 */}
+                    {category.subcategories?.map((subcat) => (
+                      <option key={subcat.id} value={subcat.id}>
+                        　　{subcat.name}
                       </option>
-                    }
+                    ))}
                   </optgroup>
                 ))}
               </select>

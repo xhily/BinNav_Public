@@ -1,5 +1,5 @@
 import React from 'react'
-import { Globe, Tag, Settings, Clock, Heart } from 'lucide-react'
+import { Globe, Tag, Settings, Clock } from 'lucide-react'
 
 /**
  * 标签页导航组件
@@ -9,7 +9,6 @@ const TabNavigation = ({ activeTab, onTabChange }) => {
     { id: 'websites', name: '网站管理', icon: Globe },
     { id: 'pending', name: '待审核站点', icon: Clock },
     { id: 'categories', name: '分类管理', icon: Tag },
-    { id: 'friends', name: '友情链接', icon: Heart },
     { id: 'settings', name: '系统设置', icon: Settings }
   ]
 

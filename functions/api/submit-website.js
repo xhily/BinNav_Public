@@ -40,9 +40,14 @@ export async function onRequestPost({ request, env }) {
       });
     }
 
-    // 验证URL格式
+    // 自动补全URL协议并验证格式
+    let processedUrl = url.trim();
+    if (!processedUrl.startsWith('http://') && !processedUrl.startsWith('https://')) {
+      processedUrl = 'https://' + processedUrl;
+    }
+    
     try {
-      new URL(url);
+      new URL(processedUrl);
     } catch {
       return new Response(JSON.stringify({
         success: false,
@@ -79,7 +84,7 @@ export async function onRequestPost({ request, env }) {
     const pendingWebsite = {
       id: submissionId,
       name: name.trim(),
-      url: url.trim(),
+      url: processedUrl,
       description: description.trim(),
       category: category.trim(),
       tags: tags ? tags.trim() : '',
@@ -89,15 +94,38 @@ export async function onRequestPost({ request, env }) {
       submittedAt: currentTime
     };
 
-    // 从KV存储获取现有的待审核站点列表
-    const existingPendingKey = 'pending_websites';
+    // 通过GitHub API获取现有的待审核站点列表
+    const { VITE_GITHUB_TOKEN, VITE_GITHUB_REPO } = env;
+    if (!VITE_GITHUB_TOKEN || !VITE_GITHUB_REPO) {
+      return new Response(JSON.stringify({
+        success: false,
+        message: 'GitHub配置未完成，请联系管理员'
+      }), {
+        status: 500,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    }
+
     let pendingWebsites = [];
-    
+    let fileSha = null;
+
     try {
-      const existingData = await env.BINNAV_KV.get(existingPendingKey);
-      if (existingData) {
-        const parsed = JSON.parse(existingData);
-        pendingWebsites = Array.isArray(parsed) ? parsed : [];
+      // 尝试获取现有的待审核文件
+      const fileResponse = await fetch(`https://api.github.com/repos/${VITE_GITHUB_REPO}/contents/pending-websites.json`, {
+        headers: {
+          'Authorization': `token ${VITE_GITHUB_TOKEN}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+
+      if (fileResponse.ok) {
+        const fileData = await fileResponse.json();
+        fileSha = fileData.sha;
+        const content = atob(fileData.content);
+        pendingWebsites = JSON.parse(content);
       }
     } catch (error) {
       console.log('获取现有待审核列表失败，使用空列表:', error);
@@ -105,7 +133,7 @@ export async function onRequestPost({ request, env }) {
 
     // 检查是否重复提交
     const existingSubmission = pendingWebsites.find(site => 
-      site.url.toLowerCase() === url.toLowerCase().trim() ||
+      site.url.toLowerCase() === processedUrl.toLowerCase() ||
       (site.name.toLowerCase() === name.toLowerCase().trim() && site.contactEmail === contactEmail.trim())
     );
 
@@ -125,8 +153,26 @@ export async function onRequestPost({ request, env }) {
     // 添加新提交到列表
     pendingWebsites.push(pendingWebsite);
 
-    // 保存更新后的待审核列表到KV存储
-    await env.BINNAV_KV.put(existingPendingKey, JSON.stringify(pendingWebsites));
+    // 通过GitHub API保存更新后的待审核列表
+    const updatedContent = btoa(JSON.stringify(pendingWebsites, null, 2));
+    
+    const commitResponse = await fetch(`https://api.github.com/repos/${VITE_GITHUB_REPO}/contents/pending-websites.json`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${VITE_GITHUB_TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `新站点提交: ${name}`,
+        content: updatedContent,
+        sha: fileSha
+      })
+    });
+
+    if (!commitResponse.ok) {
+      throw new Error('GitHub更新失败');
+    }
 
     // 发送邮件通知管理员（使用Resend）
     if (RESEND_API_KEY && ADMIN_EMAIL) {

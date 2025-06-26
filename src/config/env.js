@@ -11,7 +11,7 @@ export const getEnvConfig = () => {
   
   // GitHub API 配置
   const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN || ''
-  const GITHUB_REPO = import.meta.env.VITE_GITHUB_REPO || ''
+  const GITHUB_REPO = import.meta.env.VITE_GITHUB_REPO || (isDevelopment() ? 'demo-user/binnav' : '')
   
   return {
     ADMIN_PASSWORD,

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Clock, Check, X, Eye, Mail, Calendar, Tag, Globe } from 'lucide-react'
 import { Button } from '../ui/button.jsx'
+import { getEnvConfig } from '../../config/env.js'
 
 function PendingWebsiteManager({ showMessage }) {
   const [pendingWebsites, setPendingWebsites] = useState([])
@@ -14,16 +15,39 @@ function PendingWebsiteManager({ showMessage }) {
 
   const fetchPendingWebsites = async () => {
     try {
-      const response = await fetch('/api/get-pending-websites')
-      const result = await response.json()
+      const config = getEnvConfig()
+      const githubRepo = config.GITHUB_REPO
       
-      if (result.success) {
-        setPendingWebsites(result.data || [])
+      if (!githubRepo) {
+        showMessage('error', 'GitHub仓库配置未完成')
+        setIsLoading(false)
+        return
+      }
+
+      // 开发环境提示
+      if (import.meta.env.DEV && githubRepo === 'demo-user/binnav') {
+        console.log('开发环境：使用演示仓库配置')
+        showMessage('warning', '开发环境：请在.env文件中配置VITE_GITHUB_REPO')
+      }
+      
+      // 直接从GitHub raw文件读取
+      const response = await fetch(`https://raw.githubusercontent.com/${githubRepo}/main/pending-websites.json`)
+      
+      if (response.ok) {
+        const data = await response.json()
+        setPendingWebsites(Array.isArray(data) ? data : [])
       } else {
-        showMessage('error', '获取待审核站点失败')
+        console.log('pending-websites.json文件不存在或为空，初始化为空列表')
+        setPendingWebsites([])
       }
     } catch (error) {
-      showMessage('error', '网络错误，请重试')
+      console.error('获取待审核站点失败:', error)
+      // 如果是开发环境，显示友好提示
+      if (import.meta.env.DEV) {
+        showMessage('info', '开发环境：pending-websites.json文件不存在，这是正常的')
+      }
+      // 如果文件不存在，初始化为空列表而不是显示错误
+      setPendingWebsites([])
     } finally {
       setIsLoading(false)
     }

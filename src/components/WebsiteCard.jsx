@@ -1,8 +1,34 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Card, CardContent } from './ui/card'
 import logoImg from '../assets/logo.png'
 
 const WebsiteCard = ({ website }) => {
+  const [iconError, setIconError] = useState(false)
+  const [iconSrc, setIconSrc] = useState(() => {
+    // 首先尝试使用Google favicon服务
+    try {
+      return `https://www.google.com/s2/favicons?domain=${new URL(website.url).hostname}&sz=32`
+    } catch {
+      return logoImg
+    }
+  })
+
+  const handleIconError = () => {
+    if (!iconError) {
+      setIconError(true)
+      // 第二次尝试：使用网站自己的favicon
+      try {
+        const domain = new URL(website.url).origin
+        setIconSrc(`${domain}/favicon.ico`)
+      } catch {
+        setIconSrc(logoImg)
+      }
+    } else {
+      // 最终回退：使用默认logo
+      setIconSrc(logoImg)
+    }
+  }
+
   return (
     <Card 
       className="bg-white/80 backdrop-blur-sm border-white/20 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 cursor-pointer group hover:-translate-y-1 overflow-hidden h-24 hover:h-auto w-full"
@@ -12,16 +38,10 @@ const WebsiteCard = ({ website }) => {
         <div className="flex items-center space-x-3 w-full">
           <div className="flex-shrink-0">
             <img 
-              src={`https://www.google.com/s2/favicons?domain=${new URL(website.url).hostname}&sz=64`}
+              src={iconSrc}
               alt={website.name}
               className="w-8 h-8 rounded-md shadow-sm bg-gray-100 p-0.5"
-              onError={(e) => {
-                const domain = new URL(website.url).origin;
-                e.target.src = `${domain}/favicon.ico`;
-                e.target.onerror = () => {
-                  e.target.src = logoImg;
-                };
-              }}
+              onError={handleIconError}
             />
           </div>
           <div className="flex-1 min-w-0 flex flex-col justify-center">

@@ -604,6 +604,76 @@ export const websiteData = [
     ],
     "icon": "/assets/social_icon.png",
     "popularity": 87
+  },
+  {
+    "id": 46,
+    "name": "Nbvil's Blog",
+    "description": "技术分享与编程心得",
+    "url": "https://blog.nbvil.com",
+    "category": "friend_links",
+    "tags": [
+      "个人博客",
+      "技术分享",
+      "编程"
+    ],
+    "icon": "/assets/tech_blogger_avatar.png",
+    "popularity": 85
+  },
+  {
+    "id": 47,
+    "name": "GitHub",
+    "description": "全球最大的代码托管平台",
+    "url": "https://github.com",
+    "category": "friend_links",
+    "tags": [
+      "代码托管",
+      "开源",
+      "协作"
+    ],
+    "icon": "/assets/dev_tools_icon.png",
+    "popularity": 95
+  },
+  {
+    "id": 48,
+    "name": "MDN Web Docs",
+    "description": "权威的Web开发文档",
+    "url": "https://developer.mozilla.org",
+    "category": "friend_links",
+    "tags": [
+      "文档",
+      "Web开发",
+      "学习"
+    ],
+    "icon": "/assets/education_icon.png",
+    "popularity": 90
+  },
+  {
+    "id": 49,
+    "name": "Unsplash",
+    "description": "免费高质量图片素材",
+    "url": "https://unsplash.com",
+    "category": "friend_links",
+    "tags": [
+      "图片",
+      "素材",
+      "免费"
+    ],
+    "icon": "/assets/tools_icon.png",
+    "popularity": 88
+  },
+  {
+    "id": 50,
+    "name": "Vue.js",
+    "description": "渐进式JavaScript框架",
+    "url": "https://vuejs.org",
+    "category": "friend_links",
+    "tags": [
+      "JavaScript",
+      "框架",
+      "前端"
+    ],
+    "icon": "/assets/dev_tools_icon.png",
+    "popularity": 92
   }
 ];
 
@@ -702,6 +772,13 @@ export const categories = [
     "name": "社区资讯",
     "icon": "/assets/social_icon.png",
     "color": "bg-cyan-500",
+    "subcategories": []
+  },
+  {
+    "id": "friend_links",
+    "name": "友情链接",
+    "icon": "/assets/network_icon.png",
+    "color": "bg-pink-500",
     "subcategories": []
   }
 ];

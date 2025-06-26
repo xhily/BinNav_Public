@@ -4,7 +4,6 @@ import { Button } from '../components/ui/button.jsx'
 import { Input } from '../components/ui/input.jsx'
 import WebsiteCard from '../components/WebsiteCard.jsx'
 import SubmitWebsiteForm from '../components/SubmitWebsiteForm.jsx'
-import FriendLinks from '../components/FriendLinks.jsx'
 import { websiteData, categories, searchEngines } from '../websiteData.js'
 
 // 导入图片
@@ -270,23 +269,7 @@ function HomePage() {
                     </div>
                   </button>
                   
-                  <button 
-                    onClick={() => {
-                      const friendLinksSection = document.querySelector('#friend-links')
-                      if (friendLinksSection) {
-                        friendLinksSection.scrollIntoView({ behavior: 'smooth' })
-                      }
-                    }}
-                    className="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group w-full"
-                  >
-                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                      <span className="text-purple-600 text-sm">🔗</span>
-                    </div>
-                    <div className="text-left">
-                      <div className="text-sm font-medium text-gray-900 group-hover:text-purple-600">友情链接</div>
-                      <div className="text-xs text-gray-500">合作交换链接</div>
-                    </div>
-                  </button>
+
                   
                   <a 
                     href="https://github.com/your-username/binnav" 
@@ -381,10 +364,7 @@ function HomePage() {
               })}
             </div>
 
-            {/* 友情链接 */}
-            <div id="friend-links">
-              <FriendLinks />
-            </div>
+
           </main>
         </div>
       </div>
@@ -395,6 +375,8 @@ function HomePage() {
         onClose={() => setShowSubmitForm(false)}
         categories={categories}
       />
+
+
 
       {/* 页脚 */}
       <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200 mt-12">
