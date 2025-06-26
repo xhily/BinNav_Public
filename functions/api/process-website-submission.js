@@ -53,8 +53,8 @@ export async function onRequestPost({ request, env }) {
     }
 
     // 通过GitHub API获取待审核站点列表
-    const { VITE_GITHUB_TOKEN, VITE_GITHUB_REPO } = env;
-    if (!VITE_GITHUB_TOKEN || !VITE_GITHUB_REPO) {
+    const { GITHUB_TOKEN, GITHUB_REPO } = env;
+    if (!GITHUB_TOKEN || !GITHUB_REPO) {
       return new Response(JSON.stringify({
         success: false,
         message: 'GitHub配置未完成'
@@ -71,9 +71,9 @@ export async function onRequestPost({ request, env }) {
     let pendingFileSha = null;
 
     try {
-      const fileResponse = await fetch(`https://api.github.com/repos/${VITE_GITHUB_REPO}/contents/pending-websites.json`, {
+      const fileResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/pending-websites.json`, {
         headers: {
-          'Authorization': `token ${VITE_GITHUB_TOKEN}`,
+          'Authorization': `token ${GITHUB_TOKEN}`,
           'Accept': 'application/vnd.github.v3+json'
         }
       });
@@ -128,9 +128,9 @@ export async function onRequestPost({ request, env }) {
       // 通过审核 - 添加到正式网站列表
       try {
         // 通过GitHub API获取现有配置
-        const configResponse = await fetch(`https://api.github.com/repos/${VITE_GITHUB_REPO}/contents/src/websiteData.js`, {
+        const configResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/src/websiteData.js`, {
           headers: {
-            'Authorization': `token ${VITE_GITHUB_TOKEN}`,
+            'Authorization': `token ${GITHUB_TOKEN}`,
             'Accept': 'application/vnd.github.v3+json'
           }
         });
@@ -179,10 +179,10 @@ export async function onRequestPost({ request, env }) {
         );
 
         // 保存更新后的配置到GitHub
-        const updateResponse = await fetch(`https://api.github.com/repos/${VITE_GITHUB_REPO}/contents/src/websiteData.js`, {
+        const updateResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/src/websiteData.js`, {
           method: 'PUT',
           headers: {
-            'Authorization': `token ${VITE_GITHUB_TOKEN}`,
+            'Authorization': `token ${GITHUB_TOKEN}`,
             'Accept': 'application/vnd.github.v3+json',
             'Content-Type': 'application/json'
           },
@@ -227,10 +227,10 @@ export async function onRequestPost({ request, env }) {
     // 通过GitHub API保存更新后的待审核列表
     const updatedPendingContent = btoa(JSON.stringify(pendingWebsites, null, 2));
     
-    const pendingUpdateResponse = await fetch(`https://api.github.com/repos/${VITE_GITHUB_REPO}/contents/pending-websites.json`, {
+    const pendingUpdateResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/pending-websites.json`, {
       method: 'PUT',
       headers: {
-        'Authorization': `token ${VITE_GITHUB_TOKEN}`,
+        'Authorization': `token ${GITHUB_TOKEN}`,
         'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json'
       },

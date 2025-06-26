@@ -95,8 +95,8 @@ export async function onRequestPost({ request, env }) {
     };
 
     // 通过GitHub API获取现有的待审核站点列表
-    const { VITE_GITHUB_TOKEN, VITE_GITHUB_REPO } = env;
-    if (!VITE_GITHUB_TOKEN || !VITE_GITHUB_REPO) {
+    const { GITHUB_TOKEN, GITHUB_REPO } = env;
+    if (!GITHUB_TOKEN || !GITHUB_REPO) {
       return new Response(JSON.stringify({
         success: false,
         message: 'GitHub配置未完成，请联系管理员'
@@ -114,9 +114,9 @@ export async function onRequestPost({ request, env }) {
 
     try {
       // 尝试获取现有的待审核文件
-      const fileResponse = await fetch(`https://api.github.com/repos/${VITE_GITHUB_REPO}/contents/pending-websites.json`, {
+      const fileResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/pending-websites.json`, {
         headers: {
-          'Authorization': `token ${VITE_GITHUB_TOKEN}`,
+          'Authorization': `token ${GITHUB_TOKEN}`,
           'Accept': 'application/vnd.github.v3+json'
         }
       });
@@ -156,10 +156,10 @@ export async function onRequestPost({ request, env }) {
     // 通过GitHub API保存更新后的待审核列表
     const updatedContent = btoa(JSON.stringify(pendingWebsites, null, 2));
     
-    const commitResponse = await fetch(`https://api.github.com/repos/${VITE_GITHUB_REPO}/contents/pending-websites.json`, {
+    const commitResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/pending-websites.json`, {
       method: 'PUT',
       headers: {
-        'Authorization': `token ${VITE_GITHUB_TOKEN}`,
+        'Authorization': `token ${GITHUB_TOKEN}`,
         'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json'
       },
