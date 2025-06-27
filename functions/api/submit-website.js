@@ -5,7 +5,7 @@
  */
 
 // 处理OPTIONS请求（CORS预检）
-export async function onRequestOptions(context) {
+export async function onRequestOptions({ request }) {
   return new Response(null, {
     status: 200,
     headers: {
@@ -18,7 +18,7 @@ export async function onRequestOptions(context) {
 }
 
 // 处理POST请求
-export async function onRequestPost(context) {
+export async function onRequestPost({ request, env }) {
   // 顶层错误处理，确保总是返回JSON
   const createErrorResponse = (message, status = 500, debug = null) => {
     return new Response(JSON.stringify({
@@ -36,53 +36,22 @@ export async function onRequestPost(context) {
   };
 
   try {
-    const { request, env } = context;
-  
-  // EdgeOne Functions 环境变量获取（尝试多种方式）
-  const GITHUB_TOKEN = env?.GITHUB_TOKEN || env?.VITE_GITHUB_TOKEN || env?.PERSONAL_ACCESS_TOKEN || process.env.GITHUB_TOKEN || process.env.VITE_GITHUB_TOKEN;
-  const GITHUB_REPO = env?.GITHUB_REPO || env?.VITE_GITHUB_REPO || env?.REPOSITORY_NAME || process.env.GITHUB_REPO || process.env.VITE_GITHUB_REPO;
-  const RESEND_API_KEY = env?.RESEND_API_KEY || process.env.RESEND_API_KEY;
-  const ADMIN_EMAIL = env?.ADMIN_EMAIL || process.env.ADMIN_EMAIL;
+    console.log('接收到站点提交请求');
+    
+    // 获取环境变量
+    const { GITHUB_TOKEN, GITHUB_REPO } = env;
+    const RESEND_API_KEY = env.RESEND_API_KEY;
+    const ADMIN_EMAIL = env.ADMIN_EMAIL;
 
-  console.log('接收到站点提交请求');
-  console.log('Context 结构:', { 
-    hasRequest: !!request, 
-    hasEnv: !!env,
-    envType: typeof env,
-    contextKeys: Object.keys(context || {})
-  });
-  
-  console.log('环境变量检查:', { 
-    hasGithubToken: !!GITHUB_TOKEN, 
-    hasGithubRepo: !!GITHUB_REPO,
-    hasResendKey: !!RESEND_API_KEY,
-    hasAdminEmail: !!ADMIN_EMAIL
-  });
-  
-  console.log('环境变量详情:', {
-    githubTokenPrefix: GITHUB_TOKEN ? GITHUB_TOKEN.substring(0, 4) + '...' : 'undefined',
-    githubRepo: GITHUB_REPO || 'undefined',
-    adminEmail: ADMIN_EMAIL || 'undefined'
-  });
-  
-  // 调试：显示所有环境变量键（不显示值，仅显示键名）
-  if (env && typeof env === 'object') {
-    console.log('env 对象的键:', Object.keys(env));
-  } else {
-    console.log('env 不是对象或为空:', env);
-  }
-  
-  // 也检查 process.env
-  console.log('process.env 中的相关键:', Object.keys(process.env || {}).filter(key => 
-    key.includes('GITHUB') || key.includes('RESEND') || key.includes('ADMIN')
-  ));
+    console.log('环境变量检查:', {
+      hasGithubToken: !!GITHUB_TOKEN,
+      hasGithubRepo: !!GITHUB_REPO,
+      hasResendKey: !!RESEND_API_KEY,
+      hasAdminEmail: !!ADMIN_EMAIL
+    });
 
-
-
-  try {
     // 解析请求数据
     const submissionData = await request.json();
-    console.log('提交数据:', { name: submissionData.name, url: submissionData.url });
     const { name, url, description, category, tags, contactEmail, submitterName } = submissionData;
 
     // 验证必填字段
@@ -327,19 +296,4 @@ export async function onRequestPost(context) {
       stack: error.stack
     });
   }
-} catch (criticalError) {
-  // 最外层错误处理，防止函数完全崩溃
-  console.error('严重错误:', criticalError);
-  return new Response(JSON.stringify({
-    success: false,
-    message: '服务器发生严重错误，请联系管理员',
-    timestamp: new Date().toISOString()
-  }), {
-    status: 500,
-    headers: { 
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    }
-  });
-}
 } 
