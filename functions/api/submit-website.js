@@ -205,7 +205,7 @@ export async function onRequestPost({ request, env }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'BinNav <noreply@binnav.top>',
+            from: 'onboarding@resend.dev',
             to: [ADMIN_EMAIL],
             subject: `[BinNav] 新站点提交 - ${name}`,
             html: `
