@@ -19,7 +19,24 @@ export async function onRequestOptions(context) {
 
 // 处理POST请求
 export async function onRequestPost(context) {
-  const { request, env } = context;
+  // 顶层错误处理，确保总是返回JSON
+  const createErrorResponse = (message, status = 500, debug = null) => {
+    return new Response(JSON.stringify({
+      success: false,
+      message,
+      debug,
+      timestamp: new Date().toISOString()
+    }), {
+      status,
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    });
+  };
+
+  try {
+    const { request, env } = context;
   
   // EdgeOne Functions 环境变量获取（尝试多种方式）
   const GITHUB_TOKEN = env?.GITHUB_TOKEN || env?.VITE_GITHUB_TOKEN || env?.PERSONAL_ACCESS_TOKEN || process.env.GITHUB_TOKEN || process.env.VITE_GITHUB_TOKEN;
@@ -60,6 +77,8 @@ export async function onRequestPost(context) {
     key.includes('GITHUB') || key.includes('RESEND') || key.includes('ADMIN')
   ));
 
+
+
   try {
     // 解析请求数据
     const submissionData = await request.json();
@@ -68,16 +87,7 @@ export async function onRequestPost(context) {
 
     // 验证必填字段
     if (!name || !url || !description || !category || !contactEmail) {
-      return new Response(JSON.stringify({
-        success: false,
-        message: '请填写所有必填字段'
-      }), {
-        status: 400,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
+      return createErrorResponse('请填写所有必填字段', 400);
     }
 
     // 自动补全URL协议并验证格式
@@ -89,31 +99,13 @@ export async function onRequestPost(context) {
     try {
       new URL(processedUrl);
     } catch {
-      return new Response(JSON.stringify({
-        success: false,
-        message: '请输入有效的网站链接'
-      }), {
-        status: 400,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
+      return createErrorResponse('请输入有效的网站链接', 400);
     }
 
     // 验证邮箱格式
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(contactEmail)) {
-      return new Response(JSON.stringify({
-        success: false,
-        message: '请输入有效的邮箱地址'
-      }), {
-        status: 400,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
+      return createErrorResponse('请输入有效的邮箱地址', 400);
     }
 
     // 生成提交ID和时间戳
@@ -147,20 +139,11 @@ export async function onRequestPost(context) {
         availableKeys: Object.keys(env)
       });
       
-      return new Response(JSON.stringify({
-        success: false,
-        message: `GitHub配置未完成，缺少环境变量: ${missingVars.join(', ')}。请在EdgeOne控制台配置这些变量。`,
-        debug: process.env.NODE_ENV === 'development' ? { 
-          missingVars, 
-          availableKeys: Object.keys(env) 
-        } : undefined
-      }), {
-        status: 500,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
+      return createErrorResponse(
+        `GitHub配置未完成，缺少环境变量: ${missingVars.join(', ')}。请在EdgeOne控制台配置这些变量。`,
+        500,
+        { missingVars, availableKeys: Object.keys(env || {}) }
+      );
     }
 
     let pendingWebsites = [];
@@ -193,16 +176,7 @@ export async function onRequestPost(context) {
     );
 
     if (existingSubmission) {
-      return new Response(JSON.stringify({
-        success: false,
-        message: '该网站或邮箱已经提交过，请等待审核结果'
-      }), {
-        status: 400,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
+      return createErrorResponse('该网站或邮箱已经提交过，请等待审核结果', 400);
     }
 
     // 添加新提交到列表
@@ -347,16 +321,25 @@ export async function onRequestPost(context) {
       }
     }
     
-    return new Response(JSON.stringify({
-      success: false,
-      message: errorMessage,
-      debug: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    }), {
-      status: 500,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
+    return createErrorResponse(errorMessage, 500, {
+      errorType: error.name,
+      errorMessage: error.message,
+      stack: error.stack
     });
   }
+} catch (criticalError) {
+  // 最外层错误处理，防止函数完全崩溃
+  console.error('严重错误:', criticalError);
+  return new Response(JSON.stringify({
+    success: false,
+    message: '服务器发生严重错误，请联系管理员',
+    timestamp: new Date().toISOString()
+  }), {
+    status: 500,
+    headers: { 
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    }
+  });
+}
 } 

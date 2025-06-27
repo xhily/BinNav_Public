@@ -39,6 +39,19 @@ const SubmitWebsiteForm = ({ isOpen, onClose }) => {
         body: JSON.stringify(formData)
       })
 
+      // 检查响应是否成功
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      // 检查响应内容类型
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        const textResponse = await response.text()
+        console.error('服务器返回非JSON响应:', textResponse)
+        throw new Error('服务器响应格式错误，请联系管理员')
+      }
+
       const result = await response.json()
 
       if (result.success) {
@@ -59,10 +72,28 @@ const SubmitWebsiteForm = ({ isOpen, onClose }) => {
         }, 3000)
       } else {
         setMessage({ type: 'error', content: result.message })
+        // 如果有调试信息，也记录到控制台
+        if (result.debug) {
+          console.error('API调试信息:', result.debug)
+        }
       }
     } catch (error) {
       console.error('提交失败:', error)
-      setMessage({ type: 'error', content: '提交失败，请检查网络连接或稍后重试' })
+      
+      // 提供更具体的错误信息
+      let errorMessage = '提交失败，请稍后重试'
+      
+      if (error.message.includes('HTTP 500')) {
+        errorMessage = '服务器内部错误，请联系管理员'
+      } else if (error.message.includes('网络') || error.message.includes('fetch')) {
+        errorMessage = '网络连接失败，请检查网络后重试'
+      } else if (error.message.includes('JSON')) {
+        errorMessage = '服务器响应格式错误，请联系管理员'
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
+      setMessage({ type: 'error', content: errorMessage })
     } finally {
       setIsSubmitting(false)
     }
