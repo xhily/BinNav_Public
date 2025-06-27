@@ -1,7 +1,6 @@
 /**
- * EdgeOne Functions - 站点提交
+ * EdgeOne Functions - 站点提交 (简化调试版本)
  * 路由: /api/submit-website
- * 用途: 接收用户提交的站点，保存到待审核列表并发送邮件通知
  */
 
 // 处理OPTIONS请求（CORS预检）
@@ -19,252 +18,96 @@ export async function onRequestOptions({ request }) {
 
 // 处理POST请求
 export async function onRequestPost({ request, env }) {
-  // 顶层错误处理，确保总是返回JSON
-  const createErrorResponse = (message, status = 500, debug = null) => {
-    return new Response(JSON.stringify({
-      success: false,
-      message,
-      debug,
-      timestamp: new Date().toISOString()
-    }), {
-      status,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
-  };
-
   try {
-    console.log('接收到站点提交请求');
+    // 第一步：测试基础响应
+    console.log('Step 1: API调用成功');
     
-    // 获取环境变量
-    const { GITHUB_TOKEN, GITHUB_REPO } = env;
-    const RESEND_API_KEY = env.RESEND_API_KEY;
-    const ADMIN_EMAIL = env.ADMIN_EMAIL;
-
-    console.log('环境变量检查:', {
-      hasGithubToken: !!GITHUB_TOKEN,
-      hasGithubRepo: !!GITHUB_REPO,
-      hasResendKey: !!RESEND_API_KEY,
-      hasAdminEmail: !!ADMIN_EMAIL
+    // 第二步：测试环境变量
+    const GITHUB_TOKEN = env?.GITHUB_TOKEN;
+    const GITHUB_REPO = env?.GITHUB_REPO;
+    console.log('Step 2: 环境变量检查', { 
+      hasToken: !!GITHUB_TOKEN, 
+      hasRepo: !!GITHUB_REPO 
     });
-
-    // 解析请求数据
-    const submissionData = await request.json();
-    const { name, url, description, category, tags, contactEmail, submitterName } = submissionData;
-
-    // 验证必填字段
+    
+    // 第三步：测试请求解析
+    let requestData = {};
+    try {
+      requestData = await request.json();
+      console.log('Step 3: 请求解析成功', Object.keys(requestData));
+    } catch (parseError) {
+      console.log('Step 3: 请求解析失败', parseError.message);
+      return new Response(JSON.stringify({
+        success: false,
+        message: '请求数据解析失败',
+        step: 3,
+        error: parseError.message
+      }), {
+        status: 400,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    }
+    
+    // 第四步：检查必填字段
+    const { name, url, description, category, contactEmail } = requestData;
     if (!name || !url || !description || !category || !contactEmail) {
-      return createErrorResponse('请填写所有必填字段', 400);
+      console.log('Step 4: 必填字段检查失败');
+      return new Response(JSON.stringify({
+        success: false,
+        message: '请填写所有必填字段',
+        step: 4,
+        receivedFields: Object.keys(requestData)
+      }), {
+        status: 400,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
     }
-
-    // 自动补全URL协议并验证格式
-    let processedUrl = url.trim();
-    if (!processedUrl.startsWith('http://') && !processedUrl.startsWith('https://')) {
-      processedUrl = 'https://' + processedUrl;
-    }
+    console.log('Step 4: 必填字段检查通过');
     
-    try {
-      new URL(processedUrl);
-    } catch {
-      return createErrorResponse('请输入有效的网站链接', 400);
-    }
-
-    // 验证邮箱格式
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(contactEmail)) {
-      return createErrorResponse('请输入有效的邮箱地址', 400);
-    }
-
-    // 生成提交ID和时间戳
-    const submissionId = Date.now().toString();
-    const currentTime = new Date().toISOString();
-
-    // 构建待审核站点数据
-    const pendingWebsite = {
-      id: submissionId,
-      name: name.trim(),
-      url: processedUrl,
-      description: description.trim(),
-      category: category.trim(),
-      tags: tags ? tags.trim() : '',
-      contactEmail: contactEmail.trim(),
-      submitterName: submitterName ? submitterName.trim() : '',
-      status: 'pending',
-      submittedAt: currentTime
-    };
-
-    // 检查GitHub配置
+    // 第五步：检查GitHub配置
     if (!GITHUB_TOKEN || !GITHUB_REPO) {
-      const missingVars = [];
-      if (!GITHUB_TOKEN) missingVars.push('GITHUB_TOKEN');
-      if (!GITHUB_REPO) missingVars.push('GITHUB_REPO');
-      
-      console.error('GitHub配置缺失:', { 
-        hasToken: !!GITHUB_TOKEN, 
-        hasRepo: !!GITHUB_REPO,
-        missingVars,
-        availableKeys: Object.keys(env)
-      });
-      
-      return createErrorResponse(
-        `GitHub配置未完成，缺少环境变量: ${missingVars.join(', ')}。请在EdgeOne控制台配置这些变量。`,
-        500,
-        { missingVars, availableKeys: Object.keys(env || {}) }
-      );
-    }
-
-    let pendingWebsites = [];
-    let fileSha = null;
-
-    try {
-      // 尝试获取现有的待审核文件
-      const fileResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/public/pending-websites.json`, {
-        headers: {
-          'Authorization': `token ${GITHUB_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json'
+      console.log('Step 5: GitHub配置检查失败');
+      return new Response(JSON.stringify({
+        success: false,
+        message: 'GitHub配置未完成',
+        step: 5,
+        hasToken: !!GITHUB_TOKEN,
+        hasRepo: !!GITHUB_REPO
+      }), {
+        status: 500,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
         }
       });
-
-      if (fileResponse.ok) {
-        const fileData = await fileResponse.json();
-        fileSha = fileData.sha;
-        // 修复中文字符问题：先base64解码，再转换为UTF-8
-        const content = decodeURIComponent(escape(atob(fileData.content)));
-        pendingWebsites = JSON.parse(content);
-      }
-    } catch (error) {
-      console.log('获取现有待审核列表失败，使用空列表:', error);
     }
-
-    // 检查是否重复提交
-    const existingSubmission = pendingWebsites.find(site => 
-      site.url.toLowerCase() === processedUrl.toLowerCase() ||
-      (site.name.toLowerCase() === name.toLowerCase().trim() && site.contactEmail === contactEmail.trim())
-    );
-
-    if (existingSubmission) {
-      return createErrorResponse('该网站或邮箱已经提交过，请等待审核结果', 400);
-    }
-
-    // 添加新提交到列表
-    pendingWebsites.push(pendingWebsite);
-
-    // 通过GitHub API保存更新后的待审核列表
-    // 修复中文字符问题：先转换为UTF-8，再进行base64编码
-    const jsonString = JSON.stringify(pendingWebsites, null, 2);
-    const updatedContent = btoa(unescape(encodeURIComponent(jsonString)));
+    console.log('Step 5: GitHub配置检查通过');
     
-    const commitResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/public/pending-websites.json`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `token ${GITHUB_TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        message: `新站点提交: ${name}`,
-        content: updatedContent,
-        sha: fileSha
-      })
-    });
-
-    if (!commitResponse.ok) {
-      throw new Error('GitHub更新失败');
-    }
-
-    // 发送邮件通知管理员（使用Resend）
-    if (RESEND_API_KEY && ADMIN_EMAIL) {
-      try {
-        const emailResponse = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${RESEND_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            from: 'BinNav <noreply@binnav.top>',
-            to: [ADMIN_EMAIL],
-            subject: `[BinNav] 新站点提交 - ${name}`,
-            html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #2563eb; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
-                  新站点提交通知
-                </h2>
-                
-                <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                  <h3 style="margin-top: 0; color: #374151;">站点信息</h3>
-                  <table style="width: 100%; border-collapse: collapse;">
-                    <tr>
-                      <td style="padding: 8px 0; font-weight: bold; color: #6b7280; width: 100px;">网站名称:</td>
-                      <td style="padding: 8px 0;">${name}</td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">网站链接:</td>
-                      <td style="padding: 8px 0;"><a href="${url}" target="_blank" style="color: #2563eb;">${url}</a></td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">描述:</td>
-                      <td style="padding: 8px 0;">${description}</td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">分类:</td>
-                      <td style="padding: 8px 0;">${category}</td>
-                    </tr>
-                    ${tags ? `
-                    <tr>
-                      <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">标签:</td>
-                      <td style="padding: 8px 0;">${tags}</td>
-                    </tr>
-                    ` : ''}
-                    <tr>
-                      <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">联系邮箱:</td>
-                      <td style="padding: 8px 0;">${contactEmail}</td>
-                    </tr>
-                    ${submitterName ? `
-                    <tr>
-                      <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">提交者:</td>
-                      <td style="padding: 8px 0;">${submitterName}</td>
-                    </tr>
-                    ` : ''}
-                    <tr>
-                      <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">提交时间:</td>
-                      <td style="padding: 8px 0;">${new Date(currentTime).toLocaleString('zh-CN')}</td>
-                    </tr>
-                  </table>
-                </div>
-                
-                <div style="text-align: center; margin: 30px 0;">
-                  <p style="color: #6b7280; margin-bottom: 15px;">请登录管理后台进行审核</p>
-                  <a href="${request.headers.get('origin') || 'https://binnav.top'}/admin" 
-                     style="display: inline-block; background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                    前往管理后台
-                  </a>
-                </div>
-                
-                <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-                <p style="color: #9ca3af; font-size: 12px; text-align: center;">
-                  此邮件由 BinNav 系统自动发送，请勿回复。
-                </p>
-              </div>
-            `
-          })
-        });
-
-        if (!emailResponse.ok) {
-          console.error('发送邮件失败:', await emailResponse.text());
-        }
-      } catch (emailError) {
-        console.error('邮件发送失败:', emailError);
-        // 邮件发送失败不影响提交成功
-      }
-    }
-
+    // 暂时跳过GitHub API调用，直接返回成功
+    console.log('Step 6: 暂时跳过GitHub调用，返回成功');
+    
     return new Response(JSON.stringify({
       success: true,
-      message: '站点提交成功！我们将在1-3个工作日内审核您的提交。',
-      submissionId: submissionId
+      message: '测试提交成功（暂未实际保存）',
+      debug: {
+        step: 6,
+        receivedData: {
+          name,
+          url,
+          description,
+          category,
+          contactEmail
+        },
+        hasGithubToken: !!GITHUB_TOKEN,
+        hasGithubRepo: !!GITHUB_REPO,
+        timestamp: new Date().toISOString()
+      }
     }), {
       status: 200,
       headers: { 
@@ -272,28 +115,25 @@ export async function onRequestPost({ request, env }) {
         'Access-Control-Allow-Origin': '*'
       }
     });
-
+    
   } catch (error) {
-    console.error('站点提交失败:', error);
+    console.error('严重错误:', error);
     
-    // 提供更详细的错误信息
-    let errorMessage = '提交失败，请稍后重试';
-    
-    if (error.message) {
-      // 根据错误类型提供更具体的错误信息
-      if (error.message.includes('GitHub')) {
-        errorMessage = 'GitHub配置错误，请联系管理员';
-      } else if (error.message.includes('fetch')) {
-        errorMessage = '网络连接失败，请检查网络后重试';
-      } else {
-        errorMessage = `提交失败: ${error.message}`;
+    return new Response(JSON.stringify({
+      success: false,
+      message: '服务器内部错误',
+      error: {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      },
+      timestamp: new Date().toISOString()
+    }), {
+      status: 500,
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
       }
-    }
-    
-    return createErrorResponse(errorMessage, 500, {
-      errorType: error.name,
-      errorMessage: error.message,
-      stack: error.stack
     });
   }
 } 
