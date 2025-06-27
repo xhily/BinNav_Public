@@ -1,6 +1,7 @@
 /**
- * EdgeOne Functions - 站点提交 (简化调试版本)
+ * EdgeOne Functions - 站点提交
  * 路由: /api/submit-website
+ * 用途: 接收用户提交的站点，保存到待审核列表并发送邮件通知
  */
 
 // 处理OPTIONS请求（CORS预检）
@@ -18,20 +19,49 @@ export async function onRequestOptions({ request }) {
 
 // 处理POST请求
 export async function onRequestPost({ request, env }) {
+  const { GITHUB_TOKEN, GITHUB_REPO } = env;
+  const RESEND_API_KEY = env.RESEND_API_KEY;
+  const ADMIN_EMAIL = env.ADMIN_EMAIL;
+
+  // 检查GitHub配置
+  if (!GITHUB_TOKEN) {
+    return new Response(JSON.stringify({
+      success: false,
+      error: 'GITHUB_TOKEN未配置',
+      message: '请在EdgeOne项目中配置GITHUB_TOKEN环境变量'
+    }), {
+      status: 500,
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    });
+  }
+
+  if (!GITHUB_REPO) {
+    return new Response(JSON.stringify({
+      success: false,
+      error: 'GITHUB_REPO未配置',
+      message: '请在EdgeOne项目中配置GITHUB_REPO环境变量'
+    }), {
+      status: 500,
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    });
+  }
+
   try {
-    console.log('API调用开始');
-    
-    // 测试请求数据解析
-    let requestData = {};
-    try {
-      requestData = await request.json();
-      console.log('请求解析成功，字段数量:', Object.keys(requestData).length);
-    } catch (parseError) {
-      console.log('请求解析失败:', parseError.message);
+    // 解析请求数据
+    const submissionData = await request.json();
+    const { name, url, description, category, tags, contactEmail, submitterName } = submissionData;
+
+    // 验证必填字段
+    if (!name || !url || !description || !category || !contactEmail) {
       return new Response(JSON.stringify({
         success: false,
-        message: '请求数据解析失败: ' + parseError.message,
-        step: 'parse_request'
+        message: '请填写所有必填字段'
       }), {
         status: 400,
         headers: { 
@@ -40,15 +70,164 @@ export async function onRequestPost({ request, env }) {
         }
       });
     }
+
+    // 自动补全URL协议并验证格式
+    let processedUrl = url.trim();
+    if (!processedUrl.startsWith('http://') && !processedUrl.startsWith('https://')) {
+      processedUrl = 'https://' + processedUrl;
+    }
     
+    try {
+      new URL(processedUrl);
+    } catch {
+      return new Response(JSON.stringify({
+        success: false,
+        message: '请输入有效的网站链接'
+      }), {
+        status: 400,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    }
+
+    // 验证邮箱格式
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(contactEmail)) {
+      return new Response(JSON.stringify({
+        success: false,
+        message: '请输入有效的邮箱地址'
+      }), {
+        status: 400,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    }
+
+    // 生成提交ID和时间戳
+    const submissionId = Date.now().toString();
+    const currentTime = new Date().toISOString();
+
+    // 构建待审核站点数据
+    const pendingWebsite = {
+      id: submissionId,
+      name: name.trim(),
+      url: processedUrl,
+      description: description.trim(),
+      category: category.trim(),
+      tags: tags ? tags.trim() : '',
+      contactEmail: contactEmail.trim(),
+      submitterName: submitterName ? submitterName.trim() : '',
+      status: 'pending',
+      submittedAt: currentTime
+    };
+
+    // 获取现有的待审核文件
+    let pendingWebsites = [];
+    let fileSha = null;
+
+    try {
+      const fileResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/public/pending-websites.json`, {
+        headers: {
+          'Authorization': `token ${GITHUB_TOKEN}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+
+      if (fileResponse.ok) {
+        const fileData = await fileResponse.json();
+        fileSha = fileData.sha;
+        const content = decodeURIComponent(escape(atob(fileData.content)));
+        pendingWebsites = JSON.parse(content);
+      }
+    } catch (error) {
+      console.log('获取现有待审核列表失败，使用空列表:', error);
+    }
+
+    // 检查是否重复提交
+    const existingSubmission = pendingWebsites.find(site => 
+      site.url.toLowerCase() === processedUrl.toLowerCase() ||
+      (site.name.toLowerCase() === name.toLowerCase().trim() && site.contactEmail === contactEmail.trim())
+    );
+
+    if (existingSubmission) {
+      return new Response(JSON.stringify({
+        success: false,
+        message: '该网站或邮箱已经提交过，请等待审核结果'
+      }), {
+        status: 400,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    }
+
+    // 添加新提交到列表
+    pendingWebsites.push(pendingWebsite);
+
+    // 保存更新后的待审核列表
+    const jsonString = JSON.stringify(pendingWebsites, null, 2);
+    const updatedContent = btoa(unescape(encodeURIComponent(jsonString)));
+    
+    const commitResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/public/pending-websites.json`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${GITHUB_TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `新站点提交: ${name}`,
+        content: updatedContent,
+        sha: fileSha
+      })
+    });
+
+    if (!commitResponse.ok) {
+      const errorText = await commitResponse.text();
+      throw new Error(`GitHub更新失败: ${commitResponse.status} ${commitResponse.statusText} - ${errorText}`);
+    }
+
+    // 发送邮件通知（如果配置了）
+    if (RESEND_API_KEY && ADMIN_EMAIL) {
+      try {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: 'BinNav <noreply@binnav.top>',
+            to: [ADMIN_EMAIL],
+            subject: `[BinNav] 新站点提交 - ${name}`,
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #2563eb;">新站点提交通知</h2>
+                <p><strong>网站名称:</strong> ${name}</p>
+                <p><strong>网站链接:</strong> <a href="${processedUrl}">${processedUrl}</a></p>
+                <p><strong>描述:</strong> ${description}</p>
+                <p><strong>分类:</strong> ${category}</p>
+                <p><strong>联系邮箱:</strong> ${contactEmail}</p>
+                <p><strong>提交时间:</strong> ${new Date(currentTime).toLocaleString('zh-CN')}</p>
+              </div>
+            `
+          })
+        });
+      } catch (emailError) {
+        console.error('邮件发送失败:', emailError);
+        // 邮件发送失败不影响提交成功
+      }
+    }
+
     return new Response(JSON.stringify({
       success: true,
-      message: '请求解析成功',
-      debug: {
-        receivedFields: Object.keys(requestData),
-        fieldCount: Object.keys(requestData).length,
-        timestamp: new Date().toISOString()
-      }
+      message: '站点提交成功！我们将在1-3个工作日内审核您的提交。',
+      submissionId: submissionId
     }), {
       status: 200,
       headers: { 
@@ -56,19 +235,17 @@ export async function onRequestPost({ request, env }) {
         'Access-Control-Allow-Origin': '*'
       }
     });
-    
+
   } catch (error) {
-    console.error('严重错误:', error);
+    console.error('站点提交失败:', error);
     
     return new Response(JSON.stringify({
       success: false,
-      message: '服务器内部错误',
+      message: '提交失败: ' + error.message,
       error: {
         name: error.name,
-        message: error.message,
-        stack: error.stack
-      },
-      timestamp: new Date().toISOString()
+        message: error.message
+      }
     }), {
       status: 500,
       headers: { 
