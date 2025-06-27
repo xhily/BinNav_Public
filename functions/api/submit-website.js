@@ -19,7 +19,11 @@ export async function onRequestOptions({ request }) {
 
 // 处理POST请求
 export async function onRequestPost({ request, env }) {
-  const { RESEND_API_KEY, ADMIN_EMAIL, GITHUB_TOKEN, GITHUB_REPO } = env;
+  // EdgeOne Functions 环境变量获取（尝试多种命名方式）
+  const GITHUB_TOKEN = env.GITHUB_TOKEN || env.VITE_GITHUB_TOKEN || env.PERSONAL_ACCESS_TOKEN;
+  const GITHUB_REPO = env.GITHUB_REPO || env.VITE_GITHUB_REPO || env.REPOSITORY_NAME;
+  const RESEND_API_KEY = env.RESEND_API_KEY;
+  const ADMIN_EMAIL = env.ADMIN_EMAIL;
 
   console.log('接收到站点提交请求');
   console.log('环境变量检查:', { 
@@ -28,6 +32,14 @@ export async function onRequestPost({ request, env }) {
     hasResendKey: !!RESEND_API_KEY,
     hasAdminEmail: !!ADMIN_EMAIL
   });
+  console.log('环境变量详情:', {
+    githubTokenPrefix: GITHUB_TOKEN ? GITHUB_TOKEN.substring(0, 4) + '...' : 'undefined',
+    githubRepo: GITHUB_REPO || 'undefined',
+    adminEmail: ADMIN_EMAIL || 'undefined'
+  });
+  
+  // 调试：显示所有环境变量键（不显示值，仅显示键名）
+  console.log('可用的环境变量键:', Object.keys(env));
 
   try {
     // 解析请求数据
@@ -105,10 +117,24 @@ export async function onRequestPost({ request, env }) {
 
     // 检查GitHub配置
     if (!GITHUB_TOKEN || !GITHUB_REPO) {
-      console.error('GitHub配置缺失:', { hasToken: !!GITHUB_TOKEN, hasRepo: !!GITHUB_REPO });
+      const missingVars = [];
+      if (!GITHUB_TOKEN) missingVars.push('GITHUB_TOKEN');
+      if (!GITHUB_REPO) missingVars.push('GITHUB_REPO');
+      
+      console.error('GitHub配置缺失:', { 
+        hasToken: !!GITHUB_TOKEN, 
+        hasRepo: !!GITHUB_REPO,
+        missingVars,
+        availableKeys: Object.keys(env)
+      });
+      
       return new Response(JSON.stringify({
         success: false,
-        message: 'GitHub配置未完成，请联系管理员'
+        message: `GitHub配置未完成，缺少环境变量: ${missingVars.join(', ')}。请在EdgeOne控制台配置这些变量。`,
+        debug: process.env.NODE_ENV === 'development' ? { 
+          missingVars, 
+          availableKeys: Object.keys(env) 
+        } : undefined
       }), {
         status: 500,
         headers: { 
