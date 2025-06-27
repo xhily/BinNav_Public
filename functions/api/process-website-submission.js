@@ -71,7 +71,7 @@ export async function onRequestPost({ request, env }) {
     let pendingFileSha = null;
 
     try {
-      const fileResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/pending-websites.json`, {
+      const fileResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/public/pending-websites.json`, {
         headers: {
           'Authorization': `token ${GITHUB_TOKEN}`,
           'Accept': 'application/vnd.github.v3+json',
@@ -94,11 +94,17 @@ export async function onRequestPost({ request, env }) {
 
       const fileData = await fileResponse.json();
       pendingFileSha = fileData.sha;
-      pendingWebsites = JSON.parse(atob(fileData.content));
+      const content = decodeURIComponent(escape(atob(fileData.content)));
+      pendingWebsites = JSON.parse(content);
     } catch (error) {
+      console.error('解析待审核数据失败:', error);
       return new Response(JSON.stringify({
         success: false,
-        message: '数据格式错误'
+        message: '数据格式错误: ' + error.message,
+        debug: {
+          error: error.name,
+          message: error.message
+        }
       }), {
         status: 500,
         headers: { 
@@ -109,11 +115,19 @@ export async function onRequestPost({ request, env }) {
     }
 
     // 查找目标网站
-    const websiteIndex = pendingWebsites.findIndex(site => site.id === websiteId);
+    console.log('查找网站ID:', websiteId, '类型:', typeof websiteId);
+    console.log('待审核网站列表:', pendingWebsites.map(site => ({ id: site.id, name: site.name, idType: typeof site.id })));
+    
+    const websiteIndex = pendingWebsites.findIndex(site => site.id == websiteId); // 使用宽松比较
     if (websiteIndex === -1) {
       return new Response(JSON.stringify({
         success: false,
-        message: '未找到指定的站点'
+        message: `未找到指定的站点 (ID: ${websiteId})`,
+        debug: {
+          searchId: websiteId,
+          searchIdType: typeof websiteId,
+          availableIds: pendingWebsites.map(site => ({ id: site.id, type: typeof site.id, name: site.name }))
+        }
       }), {
         status: 404,
         headers: { 
@@ -142,7 +156,7 @@ export async function onRequestPost({ request, env }) {
         }
 
         const configFile = await configResponse.json();
-        const configContent = atob(configFile.content);
+        const configContent = decodeURIComponent(escape(atob(configFile.content)));
         
         // 解析当前配置
         const websiteDataMatch = configContent.match(/export const websiteData = (\[[\s\S]*?\]);/);
@@ -191,7 +205,7 @@ export async function onRequestPost({ request, env }) {
           },
           body: JSON.stringify({
             message: `审核通过: 添加站点 ${website.name}`,
-            content: btoa(updatedContent),
+            content: btoa(unescape(encodeURIComponent(updatedContent))),
             sha: configFile.sha
           })
         });
@@ -217,20 +231,33 @@ export async function onRequestPost({ request, env }) {
           }
         });
       }
-    } else {
+    } else if (action === 'reject') {
       // 拒绝审核
       website.status = 'rejected';
       website.rejectReason = rejectReason || '不符合收录标准';
       website.processedAt = new Date().toISOString();
+    } else if (action === 'delete') {
+      // 直接删除，不需要修改状态
+    } else {
+      return new Response(JSON.stringify({
+        success: false,
+        message: '无效的操作类型'
+      }), {
+        status: 400,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
     }
 
     // 从待审核列表中移除
     pendingWebsites.splice(websiteIndex, 1);
 
     // 通过GitHub API保存更新后的待审核列表
-    const updatedPendingContent = btoa(JSON.stringify(pendingWebsites, null, 2));
+    const updatedPendingContent = btoa(unescape(encodeURIComponent(JSON.stringify(pendingWebsites, null, 2))));
     
-    const pendingUpdateResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/pending-websites.json`, {
+    const pendingUpdateResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/public/pending-websites.json`, {
       method: 'PUT',
       headers: {
         'Authorization': `token ${GITHUB_TOKEN}`,
@@ -249,8 +276,8 @@ export async function onRequestPost({ request, env }) {
       throw new Error('更新待审核列表失败');
     }
 
-    // 发送邮件通知提交者
-    if (RESEND_API_KEY && website.contactEmail) {
+    // 发送邮件通知提交者（删除操作不发送邮件）
+    if (RESEND_API_KEY && website.contactEmail && action !== 'delete') {
       try {
         const isApproved = action === 'approve';
         const emailSubject = isApproved 
@@ -362,7 +389,7 @@ export async function onRequestPost({ request, env }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'BinNav <noreply@binnav.top>',
+            from: 'onboarding@resend.dev',
             to: [website.contactEmail],
             subject: emailSubject,
             html: emailHtml
