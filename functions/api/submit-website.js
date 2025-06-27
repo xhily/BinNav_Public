@@ -133,7 +133,8 @@ export async function onRequestPost({ request, env }) {
       if (fileResponse.ok) {
         const fileData = await fileResponse.json();
         fileSha = fileData.sha;
-        const content = atob(fileData.content);
+        // 修复中文字符问题：先base64解码，再转换为UTF-8
+        const content = decodeURIComponent(escape(atob(fileData.content)));
         pendingWebsites = JSON.parse(content);
       }
     } catch (error) {
@@ -163,7 +164,9 @@ export async function onRequestPost({ request, env }) {
     pendingWebsites.push(pendingWebsite);
 
     // 通过GitHub API保存更新后的待审核列表
-    const updatedContent = btoa(JSON.stringify(pendingWebsites, null, 2));
+    // 修复中文字符问题：先转换为UTF-8，再进行base64编码
+    const jsonString = JSON.stringify(pendingWebsites, null, 2);
+    const updatedContent = btoa(unescape(encodeURIComponent(jsonString)));
     
     const commitResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/public/pending-websites.json`, {
       method: 'PUT',
