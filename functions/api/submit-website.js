@@ -133,7 +133,8 @@ export async function onRequestPost({ request, env }) {
       const fileResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/public/pending-websites.json`, {
         headers: {
           'Authorization': `token ${GITHUB_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json'
+          'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'BinNav-EdgeOne-Functions'
         }
       });
 
@@ -178,7 +179,8 @@ export async function onRequestPost({ request, env }) {
       headers: {
         'Authorization': `token ${GITHUB_TOKEN}`,
         'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'User-Agent': 'BinNav-EdgeOne-Functions'
       },
       body: JSON.stringify({
         message: `新站点提交: ${name}`,
