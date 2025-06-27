@@ -5,7 +5,7 @@
  */
 
 // 处理OPTIONS请求（CORS预检）
-export async function onRequestOptions({ request }) {
+export async function onRequestOptions(context) {
   return new Response(null, {
     status: 200,
     headers: {
@@ -18,20 +18,30 @@ export async function onRequestOptions({ request }) {
 }
 
 // 处理POST请求
-export async function onRequestPost({ request, env }) {
-  // EdgeOne Functions 环境变量获取（尝试多种命名方式）
-  const GITHUB_TOKEN = env.GITHUB_TOKEN || env.VITE_GITHUB_TOKEN || env.PERSONAL_ACCESS_TOKEN;
-  const GITHUB_REPO = env.GITHUB_REPO || env.VITE_GITHUB_REPO || env.REPOSITORY_NAME;
-  const RESEND_API_KEY = env.RESEND_API_KEY;
-  const ADMIN_EMAIL = env.ADMIN_EMAIL;
+export async function onRequestPost(context) {
+  const { request, env } = context;
+  
+  // EdgeOne Functions 环境变量获取（尝试多种方式）
+  const GITHUB_TOKEN = env?.GITHUB_TOKEN || env?.VITE_GITHUB_TOKEN || env?.PERSONAL_ACCESS_TOKEN || process.env.GITHUB_TOKEN || process.env.VITE_GITHUB_TOKEN;
+  const GITHUB_REPO = env?.GITHUB_REPO || env?.VITE_GITHUB_REPO || env?.REPOSITORY_NAME || process.env.GITHUB_REPO || process.env.VITE_GITHUB_REPO;
+  const RESEND_API_KEY = env?.RESEND_API_KEY || process.env.RESEND_API_KEY;
+  const ADMIN_EMAIL = env?.ADMIN_EMAIL || process.env.ADMIN_EMAIL;
 
   console.log('接收到站点提交请求');
+  console.log('Context 结构:', { 
+    hasRequest: !!request, 
+    hasEnv: !!env,
+    envType: typeof env,
+    contextKeys: Object.keys(context || {})
+  });
+  
   console.log('环境变量检查:', { 
     hasGithubToken: !!GITHUB_TOKEN, 
     hasGithubRepo: !!GITHUB_REPO,
     hasResendKey: !!RESEND_API_KEY,
     hasAdminEmail: !!ADMIN_EMAIL
   });
+  
   console.log('环境变量详情:', {
     githubTokenPrefix: GITHUB_TOKEN ? GITHUB_TOKEN.substring(0, 4) + '...' : 'undefined',
     githubRepo: GITHUB_REPO || 'undefined',
@@ -39,7 +49,16 @@ export async function onRequestPost({ request, env }) {
   });
   
   // 调试：显示所有环境变量键（不显示值，仅显示键名）
-  console.log('可用的环境变量键:', Object.keys(env));
+  if (env && typeof env === 'object') {
+    console.log('env 对象的键:', Object.keys(env));
+  } else {
+    console.log('env 不是对象或为空:', env);
+  }
+  
+  // 也检查 process.env
+  console.log('process.env 中的相关键:', Object.keys(process.env || {}).filter(key => 
+    key.includes('GITHUB') || key.includes('RESEND') || key.includes('ADMIN')
+  ));
 
   try {
     // 解析请求数据
