@@ -21,11 +21,34 @@ export async function onRequestPost({ request, env }) {
   try {
     console.log('API调用开始');
     
-    // 直接返回简单的成功响应，测试基础功能
+    // 测试请求数据解析
+    let requestData = {};
+    try {
+      requestData = await request.json();
+      console.log('请求解析成功，字段数量:', Object.keys(requestData).length);
+    } catch (parseError) {
+      console.log('请求解析失败:', parseError.message);
+      return new Response(JSON.stringify({
+        success: false,
+        message: '请求数据解析失败: ' + parseError.message,
+        step: 'parse_request'
+      }), {
+        status: 400,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    }
+    
     return new Response(JSON.stringify({
       success: true,
-      message: 'submit-website API 基础功能正常',
-      timestamp: new Date().toISOString()
+      message: '请求解析成功',
+      debug: {
+        receivedFields: Object.keys(requestData),
+        fieldCount: Object.keys(requestData).length,
+        timestamp: new Date().toISOString()
+      }
     }), {
       status: 200,
       headers: { 
