@@ -31,7 +31,7 @@ const SubmitWebsiteForm = ({ isOpen, onClose }) => {
     setMessage({ type: '', content: '' })
 
     try {
-      const response = await fetch('/api/submit-website', {
+      const response = await fetch('/api/debug-test', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -39,20 +39,33 @@ const SubmitWebsiteForm = ({ isOpen, onClose }) => {
         body: JSON.stringify(formData)
       })
 
-      // 检查响应是否成功
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-
-      // 检查响应内容类型
+      // 检查响应内容类型（先于状态码检查）
       const contentType = response.headers.get('content-type')
-      if (!contentType || !contentType.includes('application/json')) {
+      
+      let result = null
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          result = await response.json()
+        } catch (parseError) {
+          console.error('JSON解析失败:', parseError)
+          throw new Error('服务器响应JSON格式错误')
+        }
+      } else {
         const textResponse = await response.text()
         console.error('服务器返回非JSON响应:', textResponse)
         throw new Error('服务器响应格式错误，请联系管理员')
       }
 
-      const result = await response.json()
+      // 检查响应是否成功
+      if (!response.ok) {
+        // 如果是JSON响应且包含错误信息，显示具体错误
+        if (result && result.message) {
+          console.error('API错误响应:', result)
+          throw new Error(result.message)
+        } else {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        }
+      }
 
       if (result.success) {
         setMessage({ type: 'success', content: result.message })
@@ -76,6 +89,11 @@ const SubmitWebsiteForm = ({ isOpen, onClose }) => {
         if (result.debug) {
           console.error('API调试信息:', result.debug)
         }
+        if (result.error) {
+          console.error('API错误详情:', result.error)
+        }
+        // 显示完整的响应信息用于调试
+        console.error('完整API响应:', result)
       }
     } catch (error) {
       console.error('提交失败:', error)
