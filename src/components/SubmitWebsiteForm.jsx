@@ -31,7 +31,7 @@ const SubmitWebsiteForm = ({ isOpen, onClose }) => {
     setMessage({ type: '', content: '' })
 
     try {
-      const response = await fetch('/api/debug-test', {
+      const response = await fetch('/api/submit-website', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
