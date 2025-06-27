@@ -68,10 +68,28 @@ const PendingWebsiteManager = () => {
 
     setIsProcessing(true)
     try {
-      // 这里需要调用API来处理审核通过
-      // 暂时显示成功消息
-      alert('审核通过功能正在开发中，请使用管理后台的网站管理功能手动添加')
+      const response = await fetch('/api/process-website-submission', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          websiteId: website.id,
+          action: 'approve'
+        })
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        alert('审核通过成功！网站已添加到导航中。')
+        // 刷新待审核列表
+        await refreshPendingWebsites()
+      } else {
+        throw new Error(result.message || '审核处理失败')
+      }
     } catch (error) {
+      console.error('审核处理失败:', error)
       alert('审核处理失败：' + error.message)
     } finally {
       setIsProcessing(false)
@@ -84,10 +102,29 @@ const PendingWebsiteManager = () => {
 
     setIsProcessing(true)
     try {
-      // 这里需要调用API来处理审核拒绝
-      // 暂时显示成功消息
-      alert('拒绝审核功能正在开发中')
+      const response = await fetch('/api/process-website-submission', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          websiteId: website.id,
+          action: 'reject',
+          rejectReason: reason || '不符合收录标准'
+        })
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        alert('审核拒绝成功！已发送通知邮件给提交者。')
+        // 刷新待审核列表
+        await refreshPendingWebsites()
+      } else {
+        throw new Error(result.message || '审核处理失败')
+      }
     } catch (error) {
+      console.error('审核处理失败:', error)
       alert('审核处理失败：' + error.message)
     } finally {
       setIsProcessing(false)
@@ -101,10 +138,29 @@ const PendingWebsiteManager = () => {
 
     setIsProcessing(true)
     try {
-      // 这里需要调用API来删除提交记录
-      // 暂时显示成功消息
-      alert('删除功能正在开发中')
+      // 直接从待审核列表中删除，不发送邮件通知
+      const response = await fetch('/api/process-website-submission', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          websiteId: website.id,
+          action: 'delete'
+        })
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        alert('删除成功！')
+        // 刷新待审核列表
+        await refreshPendingWebsites()
+      } else {
+        throw new Error(result.message || '删除失败')
+      }
     } catch (error) {
+      console.error('删除失败:', error)
       alert('删除失败：' + error.message)
     } finally {
       setIsProcessing(false)
