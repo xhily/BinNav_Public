@@ -8,7 +8,7 @@ import TabNavigation from '../components/admin/TabNavigation'
 import WebsiteManager from '../components/admin/WebsiteManager'
 import CategoryManager from '../components/admin/CategoryManager'
 import LogoUploader from '../components/admin/LogoUploader'
-import PendingWebsiteManager from '../components/admin/PendingWebsiteManager'
+import PendingWebsiteManager from '../components/admin/PendingWebsiteManager.jsx'
 
 
 function Admin() {

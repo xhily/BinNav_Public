@@ -19,11 +19,20 @@ export async function onRequestOptions({ request }) {
 
 // 处理POST请求
 export async function onRequestPost({ request, env }) {
-  const { RESEND_API_KEY, ADMIN_EMAIL } = env;
+  const { RESEND_API_KEY, ADMIN_EMAIL, GITHUB_TOKEN, GITHUB_REPO } = env;
+
+  console.log('接收到站点提交请求');
+  console.log('环境变量检查:', { 
+    hasGithubToken: !!GITHUB_TOKEN, 
+    hasGithubRepo: !!GITHUB_REPO,
+    hasResendKey: !!RESEND_API_KEY,
+    hasAdminEmail: !!ADMIN_EMAIL
+  });
 
   try {
     // 解析请求数据
     const submissionData = await request.json();
+    console.log('提交数据:', { name: submissionData.name, url: submissionData.url });
     const { name, url, description, category, tags, contactEmail, submitterName } = submissionData;
 
     // 验证必填字段
@@ -94,9 +103,9 @@ export async function onRequestPost({ request, env }) {
       submittedAt: currentTime
     };
 
-    // 通过GitHub API获取现有的待审核站点列表
-    const { GITHUB_TOKEN, GITHUB_REPO } = env;
+    // 检查GitHub配置
     if (!GITHUB_TOKEN || !GITHUB_REPO) {
+      console.error('GitHub配置缺失:', { hasToken: !!GITHUB_TOKEN, hasRepo: !!GITHUB_REPO });
       return new Response(JSON.stringify({
         success: false,
         message: 'GitHub配置未完成，请联系管理员'
@@ -114,7 +123,7 @@ export async function onRequestPost({ request, env }) {
 
     try {
       // 尝试获取现有的待审核文件
-      const fileResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/pending-websites.json`, {
+      const fileResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/public/pending-websites.json`, {
         headers: {
           'Authorization': `token ${GITHUB_TOKEN}`,
           'Accept': 'application/vnd.github.v3+json'
@@ -156,7 +165,7 @@ export async function onRequestPost({ request, env }) {
     // 通过GitHub API保存更新后的待审核列表
     const updatedContent = btoa(JSON.stringify(pendingWebsites, null, 2));
     
-    const commitResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/pending-websites.json`, {
+    const commitResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/public/pending-websites.json`, {
       method: 'PUT',
       headers: {
         'Authorization': `token ${GITHUB_TOKEN}`,
@@ -276,9 +285,24 @@ export async function onRequestPost({ request, env }) {
   } catch (error) {
     console.error('站点提交失败:', error);
     
+    // 提供更详细的错误信息
+    let errorMessage = '提交失败，请稍后重试';
+    
+    if (error.message) {
+      // 根据错误类型提供更具体的错误信息
+      if (error.message.includes('GitHub')) {
+        errorMessage = 'GitHub配置错误，请联系管理员';
+      } else if (error.message.includes('fetch')) {
+        errorMessage = '网络连接失败，请检查网络后重试';
+      } else {
+        errorMessage = `提交失败: ${error.message}`;
+      }
+    }
+    
     return new Response(JSON.stringify({
       success: false,
-      message: '提交失败，请稍后重试'
+      message: errorMessage,
+      debug: process.env.NODE_ENV === 'development' ? error.stack : undefined
     }), {
       status: 500,
       headers: { 
