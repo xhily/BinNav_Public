@@ -5,7 +5,7 @@
  */
 
 // 处理OPTIONS请求（CORS预检）
-export async function onRequestOptions() {
+export async function onRequestOptions({ request }) {
   return new Response(null, {
     status: 200,
     headers: {
@@ -97,15 +97,9 @@ export async function onRequestPost({ request, env }) {
       const content = decodeURIComponent(escape(atob(fileData.content)));
       pendingWebsites = JSON.parse(content);
     } catch (error) {
-      console.error('获取待审核数据失败:', error);
       return new Response(JSON.stringify({
         success: false,
-        message: '获取待审核数据失败: ' + error.message,
-        debug: {
-          error: error.name,
-          message: error.message,
-          stack: error.stack
-        }
+        message: '数据格式错误'
       }), {
         status: 500,
         headers: { 
@@ -270,11 +264,7 @@ export async function onRequestPost({ request, env }) {
     }
 
     // 发送邮件通知提交者（删除操作不发送邮件）
-    // EMAIL_FROM环境变量：自定义发送邮箱地址，未配置时使用Resend默认地址
     if (RESEND_API_KEY && website.contactEmail && action !== 'delete') {
-      console.log('开始发送审核通知邮件，收件人:', website.contactEmail, '操作:', action);
-      const fromEmail = env.EMAIL_FROM || 'onboarding@resend.dev';
-      console.log('使用发送地址:', fromEmail);
       try {
         const isApproved = action === 'approve';
         const emailSubject = isApproved 
@@ -386,25 +376,20 @@ export async function onRequestPost({ request, env }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: fromEmail,
+            from: 'BinNav <noreply@binnav.top>',
             to: [website.contactEmail],
             subject: emailSubject,
             html: emailHtml
           })
         });
 
-        if (emailResponse.ok) {
-          console.log('审核通知邮件发送成功');
-        } else {
-          const errorText = await emailResponse.text();
-          console.error('发送审核通知邮件失败:', emailResponse.status, errorText);
+        if (!emailResponse.ok) {
+          console.error('发送审核通知邮件失败:', await emailResponse.text());
         }
       } catch (emailError) {
         console.error('邮件发送失败:', emailError);
         // 邮件发送失败不影响审核操作
       }
-    } else {
-      console.log('跳过邮件发送，配置状态 - RESEND_API_KEY:', !!RESEND_API_KEY, 'contactEmail:', !!website.contactEmail, 'action:', action);
     }
 
     return new Response(JSON.stringify({

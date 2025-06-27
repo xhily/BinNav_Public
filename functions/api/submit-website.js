@@ -5,7 +5,7 @@
  */
 
 // 处理OPTIONS请求（CORS预检）
-export async function onRequestOptions() {
+export async function onRequestOptions({ request }) {
   return new Response(null, {
     status: 200,
     headers: {
@@ -195,11 +195,8 @@ export async function onRequestPost({ request, env }) {
     }
 
     // 发送邮件通知（如果配置了）
-    // EMAIL_FROM环境变量：自定义发送邮箱地址，未配置时使用Resend默认地址
     if (RESEND_API_KEY && ADMIN_EMAIL) {
       console.log('开始发送邮件通知，ADMIN_EMAIL:', ADMIN_EMAIL);
-      const fromEmail = env.EMAIL_FROM || 'onboarding@resend.dev';
-      console.log('使用发送地址:', fromEmail);
       try {
         const emailResponse = await fetch('https://api.resend.com/emails', {
           method: 'POST',
@@ -208,7 +205,7 @@ export async function onRequestPost({ request, env }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: fromEmail,
+            from: 'BinNav <noreply@binnav.top>',
             to: [ADMIN_EMAIL],
             subject: `[BinNav] 新站点提交 - ${name}`,
             html: `
