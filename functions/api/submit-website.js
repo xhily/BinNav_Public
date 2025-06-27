@@ -196,9 +196,8 @@ export async function onRequestPost({ request, env }) {
 
     // 发送邮件通知（如果配置了）
     if (RESEND_API_KEY && ADMIN_EMAIL) {
-      console.log('开始发送邮件通知，ADMIN_EMAIL:', ADMIN_EMAIL);
       try {
-        const emailResponse = await fetch('https://api.resend.com/emails', {
+        await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${RESEND_API_KEY}`,
@@ -221,19 +220,10 @@ export async function onRequestPost({ request, env }) {
             `
           })
         });
-        
-        if (emailResponse.ok) {
-          console.log('邮件发送成功');
-        } else {
-          const errorText = await emailResponse.text();
-          console.error('邮件发送失败，响应:', emailResponse.status, errorText);
-        }
       } catch (emailError) {
         console.error('邮件发送失败:', emailError);
         // 邮件发送失败不影响提交成功
       }
-    } else {
-      console.log('邮件配置不完整，跳过发送。RESEND_API_KEY存在:', !!RESEND_API_KEY, 'ADMIN_EMAIL存在:', !!ADMIN_EMAIL);
     }
 
     return new Response(JSON.stringify({
