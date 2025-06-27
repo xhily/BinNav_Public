@@ -5,7 +5,7 @@
  */
 
 // 处理OPTIONS请求（CORS预检）
-export async function onRequestOptions({ request }) {
+export async function onRequestOptions() {
   return new Response(null, {
     status: 200,
     headers: {
@@ -270,8 +270,11 @@ export async function onRequestPost({ request, env }) {
     }
 
     // 发送邮件通知提交者（删除操作不发送邮件）
+    // EMAIL_FROM环境变量：自定义发送邮箱地址，未配置时使用Resend默认地址
     if (RESEND_API_KEY && website.contactEmail && action !== 'delete') {
       console.log('开始发送审核通知邮件，收件人:', website.contactEmail, '操作:', action);
+      const fromEmail = env.EMAIL_FROM || 'onboarding@resend.dev';
+      console.log('使用发送地址:', fromEmail);
       try {
         const isApproved = action === 'approve';
         const emailSubject = isApproved 
@@ -383,7 +386,7 @@ export async function onRequestPost({ request, env }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'onboarding@resend.dev',
+            from: fromEmail,
             to: [website.contactEmail],
             subject: emailSubject,
             html: emailHtml
