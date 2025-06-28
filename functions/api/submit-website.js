@@ -196,59 +196,197 @@ export async function onRequestPost({ request, env }) {
       throw new Error(`GitHub更新失败: ${commitResponse.status} ${commitResponse.statusText} - ${errorText}`);
     }
 
-    // 发送邮件通知（如果配置了）
-    if (RESEND_API_KEY && ADMIN_EMAIL) {
-      console.log('开始发送邮件通知，ADMIN_EMAIL:', ADMIN_EMAIL);
+    // 发送邮件通知
+    if (RESEND_API_KEY) {
+      console.log('开始发送邮件通知...');
+      
+      // 1. 发送给管理员的通知邮件
+      if (ADMIN_EMAIL) {
+        console.log('发送管理员通知邮件，ADMIN_EMAIL:', ADMIN_EMAIL);
+        try {
+          const adminEmailPayload = {
+            from: 'onboarding@resend.dev',
+            to: [ADMIN_EMAIL],
+            subject: `[BinNav] 新站点提交 - ${name}`,
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                  <h1 style="margin: 0; font-size: 24px;">📝 新站点提交通知</h1>
+                </div>
+                
+                <div style="padding: 30px; background-color: #f9fafb; border-radius: 0 0 8px 8px;">
+                  <p style="font-size: 16px; color: #374151; margin-bottom: 20px;">
+                    有新的网站提交待您审核，请及时处理。
+                  </p>
+                  
+                  <div style="background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <h3 style="margin-top: 0; color: #2563eb;">网站信息</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                      <tr>
+                        <td style="padding: 8px 0; font-weight: bold; color: #6b7280; width: 100px;">网站名称:</td>
+                        <td style="padding: 8px 0;">${name}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">网站链接:</td>
+                        <td style="padding: 8px 0;"><a href="${processedUrl}" target="_blank" style="color: #2563eb;">${processedUrl}</a></td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">描述:</td>
+                        <td style="padding: 8px 0;">${description}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">分类:</td>
+                        <td style="padding: 8px 0;">${category}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">标签:</td>
+                        <td style="padding: 8px 0;">${tags || '无'}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">联系邮箱:</td>
+                        <td style="padding: 8px 0;">${contactEmail}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">提交者:</td>
+                        <td style="padding: 8px 0;">${submitterName || '未提供'}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">提交时间:</td>
+                        <td style="padding: 8px 0;">${new Date(currentTime).toLocaleString('zh-CN')}</td>
+                      </tr>
+                    </table>
+                  </div>
+                  
+                  <div style="text-align: center; margin: 30px 0;">
+                    <a href="${request.headers.get('origin') || 'https://binnav.top'}/admin" 
+                       style="display: inline-block; background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                      前往管理后台审核
+                    </a>
+                  </div>
+                </div>
+                
+                <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px;">
+                  此邮件由 BinNav 系统自动发送，请勿回复。
+                </div>
+              </div>
+            `
+          };
+          
+          console.log('管理员邮件载荷:', JSON.stringify(adminEmailPayload, null, 2));
+          
+          const adminEmailResponse = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${RESEND_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(adminEmailPayload)
+          });
+          
+          const adminResponseText = await adminEmailResponse.text();
+          
+          if (adminEmailResponse.ok) {
+            console.log('管理员通知邮件发送成功，响应:', adminResponseText);
+          } else {
+            console.error('管理员通知邮件发送失败，状态:', adminEmailResponse.status);
+            console.error('管理员通知邮件发送失败，响应:', adminResponseText);
+          }
+        } catch (adminEmailError) {
+          console.error('管理员邮件发送异常:', adminEmailError);
+        }
+      } else {
+        console.log('ADMIN_EMAIL未配置，跳过管理员通知邮件');
+      }
+      
+      // 2. 发送给提交者的确认邮件
+      console.log('发送提交者确认邮件，contactEmail:', contactEmail);
       try {
-        const emailPayload = {
+        const submitterEmailPayload = {
           from: 'onboarding@resend.dev',
-          to: [ADMIN_EMAIL],
-          subject: `[BinNav] 新站点提交 - ${name}`,
+          to: [contactEmail],
+          subject: `[BinNav] 站点提交确认 - ${name}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #2563eb;">新站点提交通知</h2>
-              <p><strong>网站名称:</strong> ${name}</p>
-              <p><strong>网站链接:</strong> <a href="${processedUrl}">${processedUrl}</a></p>
-              <p><strong>描述:</strong> ${description}</p>
-              <p><strong>分类:</strong> ${category}</p>
-              <p><strong>标签:</strong> ${tags || '无'}</p>
-              <p><strong>联系邮箱:</strong> ${contactEmail}</p>
-              <p><strong>提交者:</strong> ${submitterName || '未提供'}</p>
-              <p><strong>提交时间:</strong> ${new Date(currentTime).toLocaleString('zh-CN')}</p>
-              <hr style="margin: 20px 0;">
-              <p style="color: #666; font-size: 14px;">请前往管理后台进行审核处理</p>
+              <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                <h1 style="margin: 0; font-size: 24px;">✅ 站点提交成功</h1>
+              </div>
+              
+              <div style="padding: 30px; background-color: #f9fafb; border-radius: 0 0 8px 8px;">
+                <p style="font-size: 16px; color: #374151; margin-bottom: 20px;">
+                  ${submitterName ? `尊敬的 ${submitterName}，` : ''}感谢您向 BinNav 提交网站！您的提交已成功接收。
+                </p>
+                
+                <div style="background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                  <h3 style="margin-top: 0; color: #10b981;">提交信息</h3>
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 8px 0; font-weight: bold; color: #6b7280; width: 100px;">网站名称:</td>
+                      <td style="padding: 8px 0;">${name}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">网站链接:</td>
+                      <td style="padding: 8px 0;"><a href="${processedUrl}" target="_blank" style="color: #2563eb;">${processedUrl}</a></td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">分类:</td>
+                      <td style="padding: 8px 0;">${category}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">提交时间:</td>
+                      <td style="padding: 8px 0;">${new Date(currentTime).toLocaleString('zh-CN')}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">提交ID:</td>
+                      <td style="padding: 8px 0;">#${submissionId}</td>
+                    </tr>
+                  </table>
+                </div>
+                
+                <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 15px; margin: 20px 0;">
+                  <h4 style="margin-top: 0; color: #065f46;">📋 审核流程</h4>
+                  <ul style="margin: 10px 0; padding-left: 20px; color: #065f46;">
+                    <li>我们将在 1-3 个工作日内审核您的提交</li>
+                    <li>审核通过后，您的网站将出现在 BinNav 导航中</li>
+                    <li>审核结果将通过邮件通知您</li>
+                  </ul>
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${request.headers.get('origin') || 'https://binnav.top'}" 
+                     style="display: inline-block; background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                    访问 BinNav
+                  </a>
+                </div>
+              </div>
+              
+              <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px;">
+                此邮件由 BinNav 系统自动发送，请勿回复。
+              </div>
             </div>
           `
         };
         
-        console.log('邮件载荷:', JSON.stringify(emailPayload, null, 2));
+        console.log('提交者邮件载荷:', JSON.stringify(submitterEmailPayload, null, 2));
         
-        const emailResponse = await fetch('https://api.resend.com/emails', {
+        const submitterEmailResponse = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${RESEND_API_KEY}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(emailPayload)
+          body: JSON.stringify(submitterEmailPayload)
         });
         
-        const responseText = await emailResponse.text();
+        const submitterResponseText = await submitterEmailResponse.text();
         
-        if (emailResponse.ok) {
-          console.log('邮件发送成功，响应:', responseText);
+        if (submitterEmailResponse.ok) {
+          console.log('提交者确认邮件发送成功，响应:', submitterResponseText);
         } else {
-          console.error('邮件发送失败，状态:', emailResponse.status);
-          console.error('邮件发送失败，响应:', responseText);
-          console.error('邮件发送失败，响应头:', [...emailResponse.headers.entries()]);
+          console.error('提交者确认邮件发送失败，状态:', submitterEmailResponse.status);
+          console.error('提交者确认邮件发送失败，响应:', submitterResponseText);
         }
-      } catch (emailError) {
-        console.error('邮件发送异常:', emailError);
-        console.error('邮件发送异常详情:', {
-          name: emailError.name,
-          message: emailError.message,
-          stack: emailError.stack
-        });
-        // 邮件发送失败不影响提交成功
+      } catch (submitterEmailError) {
+        console.error('提交者邮件发送异常:', submitterEmailError);
       }
     } else {
       console.log('邮件配置检查:');
