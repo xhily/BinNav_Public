@@ -383,12 +383,27 @@ export async function onRequestPost({ request, env }) {
       }
     }
 
-    return new Response(JSON.stringify({
+    // 简化响应用于测试
+    let responseData = {
       success: true,
       message: '站点提交成功！我们将在1-3个工作日内审核您的提交。',
-      submissionId: submissionId,
-      email_status: emailStatus
-    }), {
+      submissionId: submissionId
+    };
+    
+    // 只在开发/测试时添加邮件状态信息
+    try {
+      responseData.email_status = {
+        admin_email_sent: emailStatus.admin_email_sent,
+        submitter_email_sent: emailStatus.submitter_email_sent,
+        admin_email_error: emailStatus.admin_email_error ? String(emailStatus.admin_email_error).substring(0, 100) : null,
+        submitter_email_error: emailStatus.submitter_email_error ? String(emailStatus.submitter_email_error).substring(0, 100) : null
+      };
+    } catch (e) {
+      // 如果邮件状态有问题，忽略它
+      responseData.debug_note = "邮件状态信息序列化失败";
+    }
+
+    return new Response(JSON.stringify(responseData), {
       status: 200,
       headers: { 
         'Content-Type': 'application/json',

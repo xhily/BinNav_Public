@@ -79,6 +79,24 @@ const SubmitWebsiteForm = ({ isOpen, onClose }) => {
       }
 
       if (result.success) {
+        // 显示完整响应用于调试
+        console.log('✅ 提交成功！完整响应:', result);
+        
+        // 显示邮件状态信息
+        if (result.email_status) {
+          console.log('📧 邮件发送状态:', result.email_status);
+          if (result.email_status.admin_email_sent) {
+            console.log('✅ 管理员邮件发送成功');
+          } else {
+            console.log('❌ 管理员邮件发送失败:', result.email_status.admin_email_error);
+          }
+          if (result.email_status.submitter_email_sent) {
+            console.log('✅ 提交者邮件发送成功');
+          } else {
+            console.log('❌ 提交者邮件发送失败:', result.email_status.submitter_email_error);
+          }
+        }
+        
         setMessage({ type: 'success', content: result.message })
         // 清空表单
         setFormData({
