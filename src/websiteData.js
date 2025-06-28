@@ -684,6 +684,16 @@ export const websiteData = [
     "tags": [],
     "icon": "/assets/tools_icon.png",
     "popularity": 50
+  },
+  {
+    "id": 52,
+    "name": "test",
+    "description": "gg",
+    "url": "https://pan.nbvil.com",
+    "category": "author",
+    "tags": [],
+    "icon": "/assets/tools_icon.png",
+    "popularity": 50
   }
 ];
 
