@@ -197,6 +197,13 @@ export async function onRequestPost({ request, env }) {
     }
 
     // 发送邮件通知
+    let emailStatus = {
+      admin_email_sent: false,
+      submitter_email_sent: false,
+      admin_email_error: null,
+      submitter_email_error: null
+    };
+    
     if (RESEND_API_KEY) {
       // 1. 发送给管理员的通知邮件
       if (ADMIN_EMAIL) {
@@ -277,8 +284,15 @@ export async function onRequestPost({ request, env }) {
             },
             body: JSON.stringify(adminEmailPayload)
           });
+          
+          if (adminEmailResponse.ok) {
+            emailStatus.admin_email_sent = true;
+          } else {
+            const errorText = await adminEmailResponse.text();
+            emailStatus.admin_email_error = `HTTP ${adminEmailResponse.status}: ${errorText}`;
+          }
         } catch (adminEmailError) {
-          // 管理员邮件发送失败，不影响整体流程
+          emailStatus.admin_email_error = `异常: ${adminEmailError.message}`;
         }
       }
       
@@ -357,15 +371,23 @@ export async function onRequestPost({ request, env }) {
           },
           body: JSON.stringify(submitterEmailPayload)
         });
-              } catch (submitterEmailError) {
-          // 提交者邮件发送失败，不影响整体流程
+        
+        if (submitterEmailResponse.ok) {
+          emailStatus.submitter_email_sent = true;
+        } else {
+          const errorText = await submitterEmailResponse.text();
+          emailStatus.submitter_email_error = `HTTP ${submitterEmailResponse.status}: ${errorText}`;
         }
+      } catch (submitterEmailError) {
+        emailStatus.submitter_email_error = `异常: ${submitterEmailError.message}`;
+      }
     }
 
     return new Response(JSON.stringify({
       success: true,
       message: '站点提交成功！我们将在1-3个工作日内审核您的提交。',
-      submissionId: submissionId
+      submissionId: submissionId,
+      email_status: emailStatus
     }), {
       status: 200,
       headers: { 

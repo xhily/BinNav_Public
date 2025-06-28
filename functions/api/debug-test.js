@@ -113,6 +113,169 @@ export async function onRequestPost({ request, env }) {
   try {
     const body = await request.json();
     
+    // 测试管理员邮件发送
+    if (body.test === 'admin-email') {
+      const { RESEND_API_KEY, ADMIN_EMAIL } = env;
+      
+      if (!RESEND_API_KEY) {
+        return new Response(JSON.stringify({
+          status: 'error',
+          message: 'RESEND_API_KEY未配置'
+        }), {
+          status: 400,
+          headers: { 
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      }
+      
+      if (!ADMIN_EMAIL) {
+        return new Response(JSON.stringify({
+          status: 'error',
+          message: 'ADMIN_EMAIL未配置'
+        }), {
+          status: 400,
+          headers: { 
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      }
+      
+      try {
+        const testEmailPayload = {
+          from: 'onboarding@resend.dev',
+          to: [ADMIN_EMAIL],
+          subject: '[BinNav] 管理员邮件测试',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                <h1 style="margin: 0; font-size: 24px;">🧪 邮件系统测试</h1>
+              </div>
+              
+              <div style="padding: 30px; background-color: #f9fafb; border-radius: 0 0 8px 8px;">
+                <p style="font-size: 16px; color: #374151; margin-bottom: 20px;">
+                  这是一封测试邮件，用于验证管理员邮件通知功能是否正常工作。
+                </p>
+                
+                <div style="background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                  <h3 style="margin-top: 0; color: #2563eb;">测试信息</h3>
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 8px 0; font-weight: bold; color: #6b7280; width: 120px;">测试时间:</td>
+                      <td style="padding: 8px 0;">${new Date().toLocaleString('zh-CN')}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">收件人:</td>
+                      <td style="padding: 8px 0;">${ADMIN_EMAIL}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; font-weight: bold; color: #6b7280;">发送方式:</td>
+                      <td style="padding: 8px 0;">EdgeOne Functions + Resend API</td>
+                    </tr>
+                  </table>
+                </div>
+                
+                <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 15px; margin: 20px 0;">
+                  <p style="margin: 0; color: #065f46;">
+                    <strong>✅ 如果您收到这封邮件，说明管理员邮件通知功能正常！</strong><br>
+                    如果在站点提交时没有收到通知邮件，请检查垃圾邮件箱或联系技术支持。
+                  </p>
+                </div>
+              </div>
+              
+              <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px;">
+                此邮件由 BinNav 邮件测试系统发送。
+              </div>
+            </div>
+          `
+        };
+        
+        const emailResponse = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(testEmailPayload)
+        });
+        
+        const responseText = await emailResponse.text();
+        
+        if (emailResponse.ok) {
+          let emailId = null;
+          try {
+            const responseData = JSON.parse(responseText);
+            emailId = responseData.id;
+          } catch (e) {
+            // 忽略解析错误
+          }
+          
+          return new Response(JSON.stringify({
+            status: 'success',
+            message: '管理员测试邮件发送成功',
+            email_details: {
+              to: ADMIN_EMAIL,
+              from: 'onboarding@resend.dev',
+              subject: '[BinNav] 管理员邮件测试',
+              email_id: emailId,
+              response_status: emailResponse.status,
+              timestamp: new Date().toISOString()
+            },
+            next_steps: [
+              '1. 检查管理员邮箱: ' + ADMIN_EMAIL,
+              '2. 如果没收到，检查垃圾邮件箱',
+              '3. 确认邮箱地址是否正确',
+              '4. 等待几分钟，邮件可能有延迟'
+            ]
+          }), {
+            status: 200,
+            headers: { 
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
+            }
+          });
+        } else {
+          return new Response(JSON.stringify({
+            status: 'error',
+            message: '管理员测试邮件发送失败',
+            error_details: {
+              response_status: emailResponse.status,
+              response_text: responseText,
+              to: ADMIN_EMAIL,
+              timestamp: new Date().toISOString()
+            }
+          }), {
+            status: 500,
+            headers: { 
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
+            }
+          });
+        }
+        
+      } catch (emailError) {
+        return new Response(JSON.stringify({
+          status: 'error',
+          message: '邮件发送异常',
+          error_details: {
+            name: emailError.name,
+            message: emailError.message,
+            to: ADMIN_EMAIL,
+            timestamp: new Date().toISOString()
+          }
+        }), {
+          status: 500,
+          headers: { 
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      }
+    }
+    
+    // 原有的POST测试功能
     return new Response(JSON.stringify({
       status: 'success',
       message: 'POST请求测试成功',
