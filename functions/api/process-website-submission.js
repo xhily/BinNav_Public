@@ -94,7 +94,9 @@ export async function onRequestPost({ request, env }) {
 
       const fileData = await fileResponse.json();
       pendingFileSha = fileData.sha;
-      const content = decodeURIComponent(escape(atob(fileData.content)));
+      // 清理base64字符串，移除换行符和空格
+      const cleanBase64 = fileData.content.replace(/\s/g, '');
+      const content = decodeURIComponent(escape(atob(cleanBase64)));
       pendingWebsites = JSON.parse(content);
     } catch (error) {
       console.error('解析待审核数据失败:', error);
@@ -156,7 +158,9 @@ export async function onRequestPost({ request, env }) {
         }
 
         const configFile = await configResponse.json();
-        const configContent = decodeURIComponent(escape(atob(configFile.content)));
+        // 清理base64字符串，移除换行符和空格
+        const cleanConfigBase64 = configFile.content.replace(/\s/g, '');
+        const configContent = decodeURIComponent(escape(atob(cleanConfigBase64)));
         
         // 解析当前配置
         const websiteDataMatch = configContent.match(/export const websiteData = (\[[\s\S]*?\]);/);

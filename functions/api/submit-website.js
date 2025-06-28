@@ -141,7 +141,9 @@ export async function onRequestPost({ request, env }) {
       if (fileResponse.ok) {
         const fileData = await fileResponse.json();
         fileSha = fileData.sha;
-        const content = decodeURIComponent(escape(atob(fileData.content)));
+        // 清理base64字符串，移除换行符和空格
+        const cleanBase64 = fileData.content.replace(/\s/g, '');
+        const content = decodeURIComponent(escape(atob(cleanBase64)));
         pendingWebsites = JSON.parse(content);
       }
     } catch (error) {
@@ -198,42 +200,63 @@ export async function onRequestPost({ request, env }) {
     if (RESEND_API_KEY && ADMIN_EMAIL) {
       console.log('开始发送邮件通知，ADMIN_EMAIL:', ADMIN_EMAIL);
       try {
+        const emailPayload = {
+          from: 'onboarding@resend.dev',
+          to: [ADMIN_EMAIL],
+          subject: `[BinNav] 新站点提交 - ${name}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #2563eb;">新站点提交通知</h2>
+              <p><strong>网站名称:</strong> ${name}</p>
+              <p><strong>网站链接:</strong> <a href="${processedUrl}">${processedUrl}</a></p>
+              <p><strong>描述:</strong> ${description}</p>
+              <p><strong>分类:</strong> ${category}</p>
+              <p><strong>标签:</strong> ${tags || '无'}</p>
+              <p><strong>联系邮箱:</strong> ${contactEmail}</p>
+              <p><strong>提交者:</strong> ${submitterName || '未提供'}</p>
+              <p><strong>提交时间:</strong> ${new Date(currentTime).toLocaleString('zh-CN')}</p>
+              <hr style="margin: 20px 0;">
+              <p style="color: #666; font-size: 14px;">请前往管理后台进行审核处理</p>
+            </div>
+          `
+        };
+        
+        console.log('邮件载荷:', JSON.stringify(emailPayload, null, 2));
+        
         const emailResponse = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${RESEND_API_KEY}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            from: 'onboarding@resend.dev',
-            to: [ADMIN_EMAIL],
-            subject: `[BinNav] 新站点提交 - ${name}`,
-            html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #2563eb;">新站点提交通知</h2>
-                <p><strong>网站名称:</strong> ${name}</p>
-                <p><strong>网站链接:</strong> <a href="${processedUrl}">${processedUrl}</a></p>
-                <p><strong>描述:</strong> ${description}</p>
-                <p><strong>分类:</strong> ${category}</p>
-                <p><strong>联系邮箱:</strong> ${contactEmail}</p>
-                <p><strong>提交时间:</strong> ${new Date(currentTime).toLocaleString('zh-CN')}</p>
-              </div>
-            `
-          })
+          body: JSON.stringify(emailPayload)
         });
         
+        const responseText = await emailResponse.text();
+        
         if (emailResponse.ok) {
-          console.log('邮件发送成功');
+          console.log('邮件发送成功，响应:', responseText);
         } else {
-          const errorText = await emailResponse.text();
-          console.error('邮件发送失败，响应:', emailResponse.status, errorText);
+          console.error('邮件发送失败，状态:', emailResponse.status);
+          console.error('邮件发送失败，响应:', responseText);
+          console.error('邮件发送失败，响应头:', [...emailResponse.headers.entries()]);
         }
       } catch (emailError) {
-        console.error('邮件发送失败:', emailError);
+        console.error('邮件发送异常:', emailError);
+        console.error('邮件发送异常详情:', {
+          name: emailError.name,
+          message: emailError.message,
+          stack: emailError.stack
+        });
         // 邮件发送失败不影响提交成功
       }
     } else {
-      console.log('邮件配置不完整，跳过发送。RESEND_API_KEY存在:', !!RESEND_API_KEY, 'ADMIN_EMAIL存在:', !!ADMIN_EMAIL);
+      console.log('邮件配置检查:');
+      console.log('- RESEND_API_KEY存在:', !!RESEND_API_KEY);
+      console.log('- RESEND_API_KEY长度:', RESEND_API_KEY ? RESEND_API_KEY.length : 0);
+      console.log('- ADMIN_EMAIL存在:', !!ADMIN_EMAIL);
+      console.log('- ADMIN_EMAIL值:', ADMIN_EMAIL || 'undefined');
+      console.log('跳过邮件发送');
     }
 
     return new Response(JSON.stringify({
