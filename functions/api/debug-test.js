@@ -43,6 +43,30 @@ export async function onRequestGet({ request, env }) {
           repoName: env.GITHUB_REPO || 'not configured'
         }
       };
+    } else if (testType === 'email') {
+      // 测试邮件相关环境变量
+      result.emailTest = {
+        message: '邮件环境变量检查',
+        environment_variables: {
+          RESEND_API_KEY: {
+            exists: !!env.RESEND_API_KEY,
+            length: env.RESEND_API_KEY ? env.RESEND_API_KEY.length : 0,
+            status: !!env.RESEND_API_KEY ? '✅ 已配置' : '❌ 未配置'
+          },
+          ADMIN_EMAIL: {
+            exists: !!env.ADMIN_EMAIL,
+            value: env.ADMIN_EMAIL ? env.ADMIN_EMAIL : 'not configured',
+            length: env.ADMIN_EMAIL ? env.ADMIN_EMAIL.length : 0,
+            status: !!env.ADMIN_EMAIL ? '✅ 已配置' : '❌ 未配置'
+          }
+        },
+        all_env_keys: Object.keys(env),
+        email_functionality: {
+          can_send_submitter_email: !!env.RESEND_API_KEY,
+          can_send_admin_email: !!(env.RESEND_API_KEY && env.ADMIN_EMAIL),
+          recommendation: !env.ADMIN_EMAIL ? '请在EdgeOne控制台配置 ADMIN_EMAIL 环境变量' : '邮件配置正常'
+        }
+      };
     } else {
       // 基础测试
       result.basic = {
