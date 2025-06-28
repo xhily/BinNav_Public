@@ -198,11 +198,23 @@ export async function onRequestPost({ request, env }) {
 
     // 发送邮件通知
     if (RESEND_API_KEY) {
-      console.log('开始发送邮件通知...');
+      console.log('=== 邮件通知系统启动 ===');
+      console.log('RESEND_API_KEY存在:', !!RESEND_API_KEY);
+      console.log('RESEND_API_KEY长度:', RESEND_API_KEY ? RESEND_API_KEY.length : 0);
+      
+      // 详细的环境变量检查
+      console.log('=== 环境变量检查 ===');
+      console.log('env对象:', Object.keys(env));
+      console.log('ADMIN_EMAIL原始值:', env.ADMIN_EMAIL);
+      console.log('ADMIN_EMAIL类型:', typeof env.ADMIN_EMAIL);
+      console.log('ADMIN_EMAIL存在:', !!ADMIN_EMAIL);
+      console.log('ADMIN_EMAIL值:', ADMIN_EMAIL);
+      console.log('ADMIN_EMAIL长度:', ADMIN_EMAIL ? ADMIN_EMAIL.length : 0);
       
       // 1. 发送给管理员的通知邮件
       if (ADMIN_EMAIL) {
-        console.log('发送管理员通知邮件，ADMIN_EMAIL:', ADMIN_EMAIL);
+        console.log('✅ 开始发送管理员通知邮件');
+        console.log('📧 收件人:', ADMIN_EMAIL);
         try {
           const adminEmailPayload = {
             from: 'onboarding@resend.dev',
@@ -292,14 +304,22 @@ export async function onRequestPost({ request, env }) {
             console.error('管理员通知邮件发送失败，响应:', adminResponseText);
           }
         } catch (adminEmailError) {
-          console.error('管理员邮件发送异常:', adminEmailError);
+          console.error('❌ 管理员邮件发送异常:', adminEmailError);
+          console.error('❌ 异常详情:', {
+            name: adminEmailError.name,
+            message: adminEmailError.message,
+            stack: adminEmailError.stack
+          });
         }
       } else {
-        console.log('ADMIN_EMAIL未配置，跳过管理员通知邮件');
+        console.log('❌ ADMIN_EMAIL未配置，跳过管理员通知邮件');
+        console.log('❌ 请在EdgeOne控制台中配置 ADMIN_EMAIL 环境变量');
+        console.log('❌ 当前环境变量列表:', Object.keys(env));
       }
       
       // 2. 发送给提交者的确认邮件
-      console.log('发送提交者确认邮件，contactEmail:', contactEmail);
+      console.log('✅ 开始发送提交者确认邮件');
+      console.log('📧 收件人:', contactEmail);
       try {
         const submitterEmailPayload = {
           from: 'onboarding@resend.dev',
@@ -385,9 +405,14 @@ export async function onRequestPost({ request, env }) {
           console.error('提交者确认邮件发送失败，状态:', submitterEmailResponse.status);
           console.error('提交者确认邮件发送失败，响应:', submitterResponseText);
         }
-      } catch (submitterEmailError) {
-        console.error('提交者邮件发送异常:', submitterEmailError);
-      }
+              } catch (submitterEmailError) {
+          console.error('❌ 提交者邮件发送异常:', submitterEmailError);
+          console.error('❌ 异常详情:', {
+            name: submitterEmailError.name,
+            message: submitterEmailError.message,
+            stack: submitterEmailError.stack
+          });
+        }
     } else {
       console.log('邮件配置检查:');
       console.log('- RESEND_API_KEY存在:', !!RESEND_API_KEY);
