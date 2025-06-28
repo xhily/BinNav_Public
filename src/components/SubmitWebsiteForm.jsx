@@ -31,6 +31,11 @@ const SubmitWebsiteForm = ({ isOpen, onClose }) => {
     setMessage({ type: '', content: '' })
 
     try {
+      // 添加调试信息
+      console.log('准备提交网站数据:', formData)
+      console.log('请求URL:', '/api/submit-website')
+      console.log('当前域名:', window.location.origin)
+      
       const response = await fetch('/api/submit-website', {
         method: 'POST',
         headers: {
@@ -39,8 +44,14 @@ const SubmitWebsiteForm = ({ isOpen, onClose }) => {
         body: JSON.stringify(formData)
       })
 
+      // 添加响应调试信息
+      console.log('响应状态:', response.status)
+      console.log('响应URL:', response.url)
+      console.log('响应头:', [...response.headers.entries()])
+
       // 检查响应内容类型（先于状态码检查）
       const contentType = response.headers.get('content-type')
+      console.log('响应Content-Type:', contentType)
       
       let result = null
       if (contentType && contentType.includes('application/json')) {

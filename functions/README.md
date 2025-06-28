@@ -12,7 +12,13 @@ functions/
     ├── health.js       # 健康检查 - GET /api/health
     ├── verify-password.js # 密码验证 - POST /api/verify-password
     ├── get-config.js   # 获取配置 - GET /api/get-config
-    └── update-config.js # 更新配置 - POST /api/update-config
+    ├── update-config.js # 更新配置 - POST /api/update-config
+    ├── submit-website.js # 提交网站 - POST /api/submit-website
+    ├── process-website-submission.js # 处理网站审核 - POST /api/process-website-submission
+    ├── upload-icon.js  # 上传图标 - POST /api/upload-icon
+    ├── delete-icon.js  # 删除图标 - POST /api/delete-icon
+    ├── debug-test.js   # 调试测试 - GET /api/debug-test
+    └── test-submit.js  # 测试提交 - POST /api/test-submit
 ```
 
 ## API端点
@@ -46,6 +52,49 @@ functions/
   {
     "config": "文件内容",
     "sha": "当前文件SHA值"
+  }
+  ```
+
+### 5. 提交网站
+- **端点**: `POST /api/submit-website`
+- **用途**: 用户提交新网站，保存到待审核列表
+- **请求体**: 
+  ```json
+  {
+    "name": "网站名称",
+    "url": "网站链接",
+    "description": "网站描述",
+    "category": "分类",
+    "tags": "标签",
+    "contactEmail": "联系邮箱",
+    "submitterName": "提交者姓名"
+  }
+  ```
+
+### 6. 处理网站审核
+- **端点**: `POST /api/process-website-submission`
+- **用途**: 管理员审核网站提交（通过或拒绝）
+- **请求体**: 
+  ```json
+  {
+    "websiteId": "网站ID",
+    "action": "approve|reject",
+    "rejectReason": "拒绝原因（可选）"
+  }
+  ```
+
+### 7. 上传图标
+- **端点**: `POST /api/upload-icon`
+- **用途**: 上传网站图标文件
+- **请求体**: FormData with file
+
+### 8. 删除图标
+- **端点**: `POST /api/delete-icon`
+- **用途**: 删除指定的图标文件
+- **请求体**: 
+  ```json
+  {
+    "filename": "图标文件名"
   }
   ```
 
