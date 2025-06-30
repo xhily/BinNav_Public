@@ -1,8 +1,251 @@
-import React, { useState } from 'react'
-import { Plus, Edit3, Trash2, GripVertical, ChevronUp, ChevronDown, Folder, X, Save } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Plus, Edit3, Trash2, GripVertical, ChevronUp, ChevronDown, Folder, X, Save, Upload, Image, Eye, EyeOff } from 'lucide-react'
 import { DndContext, closestCenter, useSensor, useSensors, PointerSensor } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+
+/**
+ * 图标选择器组件
+ */
+const IconSelector = ({ selectedIcon, onIconSelect, showMessage }) => {
+  const [availableIcons, setAvailableIcons] = useState([])
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [deleting, setDeleting] = useState(null)
+
+  // 获取现有图标列表
+  const fetchAvailableIcons = async () => {
+    try {
+      const iconsData = [
+        'dev_tools_icon.png',
+        'education_icon.png', 
+        'innovation_icon.png',
+        'logo.png',
+        'network_icon.png',
+        'server_icon.png',
+        'social_icon.png',
+        'tech_blogger_avatar.png',
+        'tools_icon.png'
+      ]
+      setAvailableIcons(iconsData)
+    } catch (error) {
+      console.error('获取图标列表失败:', error)
+      showMessage('error', '获取图标列表失败')
+    }
+  }
+
+  useEffect(() => {
+    fetchAvailableIcons()
+  }, [])
+
+  // 处理文件上传
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+
+    // 验证文件类型
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/svg+xml']
+    if (!allowedTypes.includes(file.type)) {
+      showMessage('error', '仅支持PNG、JPG、GIF、SVG格式的图片')
+      return
+    }
+
+    // 验证文件大小（限制为2MB）
+    if (file.size > 2 * 1024 * 1024) {
+      showMessage('error', '文件大小不能超过2MB')
+      return
+    }
+
+    setUploading(true)
+
+    try {
+      // 转换为base64
+      const reader = new FileReader()
+      reader.onload = async (e) => {
+        const fileContent = e.target.result
+
+        const response = await fetch('/api/upload-icon', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            fileName: file.name,
+            fileContent: fileContent,
+            fileType: file.type
+          })
+        })
+
+        const result = await response.json()
+
+        if (result.success) {
+          showMessage('success', result.message)
+          // 刷新图标列表
+          await fetchAvailableIcons()
+          // 自动选择新上传的图标
+          onIconSelect(result.icon.path)
+        } else {
+          throw new Error(result.message || '上传失败')
+        }
+      }
+
+      reader.onerror = () => {
+        throw new Error('文件读取失败')
+      }
+
+      reader.readAsDataURL(file)
+    } catch (error) {
+      console.error('上传图标失败:', error)
+      showMessage('error', `上传失败: ${error.message}`)
+    } finally {
+      setUploading(false)
+      // 清空文件输入
+      event.target.value = ''
+    }
+  }
+
+  // 删除图标
+  const handleDeleteIcon = async (iconName) => {
+    if (!window.confirm(`确定要删除图标 "${iconName}" 吗？`)) {
+      return
+    }
+
+    setDeleting(iconName)
+
+    try {
+      const response = await fetch('/api/delete-icon', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          fileName: iconName
+        })
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        showMessage('success', result.message)
+        // 刷新图标列表
+        await fetchAvailableIcons()
+        // 如果删除的是当前选中的图标，重置为默认图标
+        if (selectedIcon === `/assets/${iconName}`) {
+          onIconSelect('/assets/tools_icon.png')
+        }
+      } else {
+        throw new Error(result.message || '删除失败')
+      }
+    } catch (error) {
+      console.error('删除图标失败:', error)
+      showMessage('error', `删除失败: ${error.message}`)
+    } finally {
+      setDeleting(null)
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <label className="block text-sm font-medium text-gray-700">图标选择</label>
+        <div className="flex items-center space-x-2">
+          {/* 上传按钮 */}
+          <label className="flex items-center space-x-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded cursor-pointer transition-colors">
+            <Upload size={12} />
+            <span>{uploading ? '上传中...' : '上传图标'}</span>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileUpload}
+              disabled={uploading}
+              className="hidden"
+            />
+          </label>
+          {/* 展开/收起按钮 */}
+          <button
+            type="button"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="flex items-center space-x-1 px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-xs rounded transition-colors"
+          >
+            {isExpanded ? <EyeOff size={12} /> : <Eye size={12} />}
+            <span>{isExpanded ? '收起' : '展开'}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 当前选中的图标 */}
+      <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border">
+        <img 
+          src={selectedIcon} 
+          alt="当前图标"
+          className="w-10 h-10 rounded border border-gray-200 bg-white p-1"
+          onError={(e) => { e.target.src = '/assets/tools_icon.png' }}
+        />
+        <div className="flex-1">
+          <div className="text-sm font-medium text-gray-900">当前选中</div>
+          <div className="text-xs text-gray-500">{selectedIcon}</div>
+        </div>
+      </div>
+
+      {/* 图标网格 */}
+      {isExpanded && (
+        <div className="border border-gray-200 rounded-lg p-4 bg-white">
+          <div className="text-sm font-medium text-gray-700 mb-3">
+            可用图标 ({availableIcons.length} 个)
+          </div>
+          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3">
+            {availableIcons.map((iconName) => {
+              const iconPath = `/assets/${iconName}`
+              const isSelected = selectedIcon === iconPath
+              
+              return (
+                <div key={iconName} className="relative group">
+                  <button
+                    type="button"
+                    onClick={() => onIconSelect(iconPath)}
+                    className={`
+                      w-12 h-12 rounded-lg border-2 p-1 transition-all duration-200
+                      ${isSelected 
+                        ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200' 
+                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                      }
+                    `}
+                    title={iconName}
+                  >
+                    <img
+                      src={iconPath}
+                      alt={iconName}
+                      className="w-full h-full object-contain"
+                      onError={(e) => { e.target.src = '/assets/tools_icon.png' }}
+                    />
+                  </button>
+                  
+                  {/* 删除按钮 */}
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteIcon(iconName)}
+                    disabled={deleting === iconName}
+                    className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center text-xs"
+                    title="删除图标"
+                  >
+                    {deleting === iconName ? '...' : '×'}
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+          
+          {availableIcons.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              <Image className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+              <div className="text-sm">暂无可用图标</div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
 
 /**
  * 内联编辑表单组件
@@ -75,8 +318,8 @@ const InlineEditForm = ({
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+        <div>
+          <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               分类名称
             </label>
@@ -90,24 +333,12 @@ const InlineEditForm = ({
             />
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">图标路径</label>
-            <div className="flex items-center space-x-2">
-              <input
-                type="text"
-                value={formData.icon}
-                onChange={(e) => setFormData({...formData, icon: e.target.value})}
-                className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                placeholder="/assets/tools_icon.png"
-                required
-              />
-              <img 
-                src={formData.icon} 
-                alt="图标预览"
-                className="w-8 h-8 rounded border border-gray-200 bg-white p-1"
-                onError={(e) => { e.target.src = '/assets/tools_icon.png' }}
-              />
-            </div>
+          <div className="mb-4">
+            <IconSelector
+              selectedIcon={formData.icon}
+              onIconSelect={(iconPath) => setFormData({...formData, icon: iconPath})}
+              showMessage={showMessage}
+            />
           </div>
         </div>
         

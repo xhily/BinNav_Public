@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Lock, Image } from 'lucide-react'
+import { Lock, Image, Github } from 'lucide-react'
 import { useAdminConfig } from '../hooks/useAdminConfig'
+import { useSiteConfig, updateSiteConfig } from '../hooks/useSiteConfig'
 
 import MessageBar from '../components/admin/MessageBar'
 import UserHeader from '../components/admin/UserHeader'
@@ -19,12 +20,11 @@ function Admin() {
   const [activeTab, setActiveTab] = useState('websites')
   const [loginMessage, setLoginMessage] = useState({ type: '', content: '' })
 
-  // 系统设置相关状态
-  const [siteSettings, setSiteSettings] = useState({
-    siteName: 'BinNav',
-    siteLogo: '/logo.png',
-    siteDescription: '精选网站导航'
-  })
+  // 使用全局站点配置
+  const { siteConfig } = useSiteConfig()
+  
+  // 系统设置相关状态 - 从全局配置初始化
+  const [siteSettings, setSiteSettings] = useState(siteConfig)
 
   // 图标管理器状态
   const [showLogoManager, setShowLogoManager] = useState(false)
@@ -39,6 +39,16 @@ function Admin() {
     updateWebsiteData,
     updateCategories
   } = useAdminConfig()
+
+  // 监听全局配置变化，同步到本地状态
+  useEffect(() => {
+    setSiteSettings(siteConfig)
+  }, [siteConfig])
+
+  // 设置Admin页面标题
+  useEffect(() => {
+    document.title = `管理后台 - ${siteConfig.siteName}`
+  }, [siteConfig.siteName])
 
 
 
@@ -141,8 +151,18 @@ function Admin() {
 
   // 保存系统设置
   const handleSaveSettings = () => {
+    // 更新全局配置
+    updateSiteConfig(siteSettings)
     // 在实际实现中，这里会生成包含系统设置的配置文件
     showMessage('success', '系统设置已更新')
+  }
+
+  // 综合保存函数 - 保存所有配置包括站点设置
+  const handleSaveAll = async () => {
+    // 保存站点设置
+    updateSiteConfig(siteSettings)
+    // 保存其他配置
+    await saveConfig()
   }
 
   // 登录页面UI
@@ -230,7 +250,7 @@ function Admin() {
       <div className="container mx-auto px-4 py-8">
         <UserHeader 
           isUpdating={isUpdating}
-          onSave={saveConfig}
+          onSave={handleSaveAll}
           onLogout={handleLogout}
         />
 
@@ -281,16 +301,28 @@ function Admin() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">站点名称</label>
-                  <input
-                    type="text"
-                    value={siteSettings.siteName}
-                    onChange={(e) => setSiteSettings({...siteSettings, siteName: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      <input
+                        type="text"
+                        value={siteSettings.siteName}
+                        onChange={(e) => setSiteSettings({...siteSettings, siteName: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="BinNav"
-                  />
-                </div>
-                
-                <div>
+                      />
+                      <p className="text-xs text-gray-500 mt-1">显示在网站头部的品牌名称</p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">站点标题</label>
+                      <input
+                        type="text"
+                        value={siteSettings.siteTitle}
+                        onChange={(e) => setSiteSettings({...siteSettings, siteTitle: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="BinNav - 精选网站导航"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">显示在浏览器标签页和搜索引擎中的标题</p>
+                    </div>
+                    <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2">站点Logo</label>
                       <div className="flex items-center space-x-3">
                         <div className="flex items-center space-x-2 flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50">
@@ -313,18 +345,20 @@ function Admin() {
                           <span>更换</span>
                         </button>
                       </div>
-                </div>
+                      <p className="text-xs text-gray-500 mt-1">建议使用32x32像素或64x64像素的PNG格式图片</p>
+                    </div>
                 
-                <div className="md:col-span-2">
+                    <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2">站点描述</label>
-                  <textarea
-                    value={siteSettings.siteDescription}
-                    onChange={(e) => setSiteSettings({...siteSettings, siteDescription: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      <textarea
+                        value={siteSettings.siteDescription}
+                        onChange={(e) => setSiteSettings({...siteSettings, siteDescription: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         rows="3"
-                    placeholder="精选网站导航"
-                  />
-                </div>
+                        placeholder="发现优质网站，提升工作效率。汇聚设计、开发、工具等各类精选网站资源。"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">网站的简介描述，用于SEO和页面介绍，建议控制在100字以内</p>
+                    </div>
               </div>
               
                   <div className="mt-6">
@@ -339,22 +373,17 @@ function Admin() {
                   <h4 className="text-base font-medium text-gray-900 mb-4">版本信息</h4>
                   
                   <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-sm text-gray-900">
-                      <span className="font-medium">v1.0.0</span>
-                      <span className="mx-2 text-gray-400">|</span>
-                      <a 
-                        href="https://github.com/navigator-dev/binnav" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 underline"
-                      >
-                        BinNav 导航网站
-                      </a>
-                      <span className="mx-2 text-gray-400">|</span>
-                      <span>BinNav Team</span>
-                    </p>
-              </div>
-            </div>
+                    <a 
+                      href="https://github.com/navigator-dev/binnav" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                    >
+                      <Github className="w-5 h-5" />
+                      <span>v1.0.0</span>
+                    </a>
+                  </div>
+                </div>
           </div>
         )}
         </div>

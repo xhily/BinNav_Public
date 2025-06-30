@@ -5,19 +5,28 @@ import { Input } from '../components/ui/input.jsx'
 import WebsiteCard from '../components/WebsiteCard.jsx'
 import SubmitWebsiteForm from '../components/SubmitWebsiteForm.jsx'
 import { websiteData, categories, searchEngines } from '../websiteData.js'
+import { useSiteConfig } from '../hooks/useSiteConfig.js'
 
 // 导入图片
 import logoImg from '../assets/logo.png'
 
 function HomePage() {
   const [searchTerm, setSearchTerm] = useState('')
-  const [activeCategory, setActiveCategory] = useState('')
+  // activeCategory 状态已移除 - 不再跟踪滚动选中状态
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [selectedSearchEngine, setSelectedSearchEngine] = useState('internal')
   const [expandedCategories, setExpandedCategories] = useState({})
   const [showSubmitForm, setShowSubmitForm] = useState(false)
   const mainContentRef = useRef(null)
   const sectionRefs = useRef({})
+  
+  // 使用全局站点配置
+  const { siteConfig } = useSiteConfig()
+  
+  // 动态设置页面标题
+  useEffect(() => {
+    document.title = siteConfig.siteTitle
+  }, [siteConfig.siteTitle])
 
   // 智能搜索功能
   const smartSearch = (query) => {
@@ -76,35 +85,7 @@ function HomePage() {
 
   const filteredWebsites = smartSearch(searchTerm)
 
-  // 滚动监听
-  useEffect(() => {
-    const handleScroll = () => {
-      if (searchTerm) return
-
-      const scrollPosition = window.pageYOffset || 0
-      let currentSection = ''
-
-      for (const categoryId of categories.map(c => c.id)) {
-        const sectionElement = sectionRefs.current[categoryId]
-        if (sectionElement) {
-          const sectionTop = sectionElement.offsetTop - 200
-          const sectionBottom = sectionTop + sectionElement.offsetHeight
-          
-          if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
-            currentSection = categoryId
-            break
-          }
-        }
-      }
-
-      if (currentSection && currentSection !== activeCategory) {
-        setActiveCategory(currentSection)
-      }
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [categories, activeCategory, searchTerm])
+  // 滚动监听已移除 - 不再显示跟随滚动的选中光圈
 
   const scrollToCategory = (categoryId) => {
     const sectionElement = sectionRefs.current[categoryId]
@@ -135,11 +116,16 @@ function HomePage() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
               <div className="relative">
-                <img src={logoImg} alt="Logo" className="h-8 w-8 rounded-lg shadow-sm" />
+                <img 
+                  src={siteConfig.siteLogo} 
+                  alt="Logo" 
+                  className="h-8 w-8 rounded-lg shadow-sm" 
+                  onError={(e) => { e.target.src = logoImg }}
+                />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
               </div>
               <span className="text-gray-900 text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                BinNav
+                {siteConfig.siteName}
               </span>
             </div>
 
@@ -194,11 +180,7 @@ function HomePage() {
                             scrollToCategory(category.id)
                           }
                         }}
-                        className={`flex items-center justify-between w-full px-3 py-2 text-sm rounded-md transition-colors ${
-                          activeCategory === category.id
-                            ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
-                            : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                        }`}
+                        className="flex items-center justify-between w-full px-3 py-2 text-sm rounded-md transition-colors text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                       >
                         <div className="flex items-center">
                           <img 
@@ -229,11 +211,7 @@ function HomePage() {
                             <button
                               key={subcat.id}
                               onClick={() => scrollToCategory(subcat.id)}
-                              className={`flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${
-                                activeCategory === subcat.id
-                                  ? 'bg-blue-50 text-blue-600'
-                                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
-                              }`}
+                              className="flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-800"
                             >
                               <img 
                                 src={subcat.icon} 

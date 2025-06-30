@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { CheckCircle, XCircle, Eye, Clock, Mail, Globe, Tag, Calendar, User, Trash2, RefreshCw } from 'lucide-react'
+import { CheckCircle, XCircle, Eye, Clock, Mail, Globe, Tag, Calendar, User, RefreshCw } from 'lucide-react'
 import { Button } from '../ui/button.jsx'
 
 const PendingWebsiteManager = () => {
@@ -131,41 +131,7 @@ const PendingWebsiteManager = () => {
     }
   }
 
-  const handleDelete = async (website) => {
-    if (!confirm(`确定要删除 "${website.name}" 的提交记录吗？此操作不可恢复。`)) {
-      return
-    }
 
-    setIsProcessing(true)
-    try {
-      // 直接从待审核列表中删除，不发送邮件通知
-      const response = await fetch('/api/process-website-submission', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          websiteId: website.id,
-          action: 'delete'
-        })
-      })
-
-      const result = await response.json()
-      
-      if (result.success) {
-        alert('删除成功！')
-        // 刷新待审核列表
-        await refreshPendingWebsites()
-      } else {
-        throw new Error(result.message || '删除失败')
-      }
-    } catch (error) {
-      console.error('删除失败:', error)
-      alert('删除失败：' + error.message)
-    } finally {
-      setIsProcessing(false)
-    }
-  }
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString('zh-CN')
@@ -174,7 +140,7 @@ const PendingWebsiteManager = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-blue-50 text-blue-700'
       case 'approved':
         return 'bg-green-100 text-green-800'
       case 'rejected':
@@ -218,7 +184,7 @@ const PendingWebsiteManager = () => {
         <p className="text-red-700">{error}</p>
         <Button 
           onClick={refreshPendingWebsites}
-          className="mt-3"
+          className="mt-3 bg-blue-600 hover:bg-blue-700 text-white"
           size="sm"
         >
           <RefreshCw className="w-4 h-4 mr-1" />
@@ -233,7 +199,7 @@ const PendingWebsiteManager = () => {
       {/* 头部信息 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Clock className="w-5 h-5 text-yellow-600" />
+          <Clock className="w-5 h-5 text-blue-600" />
           <h2 className="text-lg font-semibold text-gray-900">
             待审核网站 ({pendingWebsites.length})
           </h2>
@@ -243,6 +209,7 @@ const PendingWebsiteManager = () => {
           variant="outline"
           size="sm"
           disabled={isLoading}
+          className="border-blue-300 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
         >
           <RefreshCw className={`w-4 h-4 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
           刷新
@@ -324,7 +291,7 @@ const PendingWebsiteManager = () => {
                         onClick={() => handleApprove(website)}
                         disabled={isProcessing}
                         size="sm"
-                        className="bg-green-600 hover:bg-green-700"
+                        className="bg-green-600 hover:bg-green-700 text-white"
                       >
                         <CheckCircle className="w-4 h-4 mr-1" />
                         通过
@@ -334,23 +301,13 @@ const PendingWebsiteManager = () => {
                         disabled={isProcessing}
                         variant="outline"
                         size="sm"
-                        className="border-red-300 text-red-600 hover:bg-red-50"
+                        className="border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700"
                       >
                         <XCircle className="w-4 h-4 mr-1" />
                         拒绝
                       </Button>
                     </>
                   )}
-                  <Button
-                    onClick={() => handleDelete(website)}
-                    disabled={isProcessing}
-                    variant="outline"
-                    size="sm"
-                    className="border-gray-300 text-gray-600 hover:bg-gray-50"
-                  >
-                    <Trash2 className="w-4 h-4 mr-1" />
-                    删除
-                  </Button>
                 </div>
               </div>
             </div>
