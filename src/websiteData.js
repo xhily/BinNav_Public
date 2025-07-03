@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/3 21:02:01
+// 网站数据 - 通过管理后台更新于 2025/7/3 21:06:03
 export const websiteData = [
   {
     "id": 40,
@@ -13,22 +13,6 @@ export const websiteData = [
     ],
     "icon": "/assets/tech_blogger_avatar.png",
     "popularity": 95,
-    "featured": true
-  },
-  {
-    "id": 41,
-    "name": "GitHub Projects",
-    "description": "开源项目集合 | React & Vue 组件库",
-    "url": "https://github.com/navigator-dev",
-    "category": "author",
-    "tags": [
-      "开源项目",
-      "React",
-      "Vue",
-      "组件库"
-    ],
-    "icon": "/assets/dev_tools_icon.png",
-    "popularity": 92,
     "featured": true
   },
   {
@@ -60,32 +44,18 @@ export const websiteData = [
     "popularity": 87
   },
   {
-    "id": 1,
-    "name": "Dribbble",
-    "description": "全球UI设计师作品分享平台",
-    "url": "https://dribbble.com",
+    "id": 41,
+    "name": "GitHub Projects",
+    "description": "开源项目集合 | React & Vue 组件库",
+    "url": "https://github.com/navigator-dev",
     "category": "recommended",
     "tags": [
-      "设计",
-      "UI",
-      "作品展示"
+      "开源项目",
+      "React",
+      "Vue",
+      "组件库"
     ],
-    "icon": "/assets/dev_tools_icon.png",
-    "popularity": 95
-  },
-  {
-    "id": 2,
-    "name": "Behance",
-    "description": "Adobe旗下的设计师交流平台",
-    "url": "https://behance.net",
-    "category": "recommended",
-    "tags": [
-      "设计",
-      "创意",
-      "Adobe"
-    ],
-    "icon": "/assets/tools_icon.png",
-    "popularity": 92
+    "icon": "/default_icon.png"
   },
   {
     "id": 3,
@@ -674,16 +644,6 @@ export const websiteData = [
     ],
     "icon": "/assets/dev_tools_icon.png",
     "popularity": 92
-  },
-  {
-    "id": 51,
-    "name": "nbvil",
-    "description": "gg",
-    "url": "https://blog.nbvil.com",
-    "category": "friend_links",
-    "tags": [],
-    "icon": "/assets/tools_icon.png",
-    "popularity": 50
   }
 ];
 
@@ -692,7 +652,7 @@ export const categories = [
   {
     "id": "author",
     "name": "作者专栏",
-    "icon": "/assets/_____20250620162804.png",
+    "icon": "/assets/logo.png",
     "special": true,
     "subcategories": []
   },
