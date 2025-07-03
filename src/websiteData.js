@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/3 18:12:12
+// 网站数据 - 通过管理后台更新于 2025/7/3 21:02:01
 export const websiteData = [
   {
     "id": 40,
@@ -692,8 +692,7 @@ export const categories = [
   {
     "id": "author",
     "name": "作者专栏",
-    "icon": "/assets/tech_blogger_avatar.png",
-    "color": "bg-gradient-to-r from-purple-500 to-pink-500",
+    "icon": "/assets/_____20250620162804.png",
     "special": true,
     "subcategories": []
   },
