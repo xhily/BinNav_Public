@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/3 22:39:09
+// 网站数据 - 通过管理后台更新于 2025/7/3 22:57:02
 export const websiteData = [
   {
     "id": 40,
@@ -697,7 +697,9 @@ export const categories = [
       {
         "id": "design_resources",
         "name": "平面素材",
-        "icon": "/assets/tools_icon.png"
+        "icon": "/assets/tools_icon.png",
+        "special": false,
+        "subcategories": []
       }
     ]
   },
@@ -712,13 +714,6 @@ export const categories = [
         "name": "界面设计",
         "icon": "/assets/tools_icon.png",
         "special": false,
-        "subcategories": []
-      },
-      {
-        "id": "color_tools",
-        "name": "配色",
-        "icon": "/assets/tools_icon.png",
-        "special": true,
         "subcategories": []
       }
     ]
@@ -749,6 +744,13 @@ export const categories = [
     "name": "友情链接",
     "icon": "/assets/network_icon.png",
     "color": "bg-pink-500",
+    "subcategories": []
+  },
+  {
+    "id": "color_tools",
+    "name": "配色",
+    "icon": "/assets/tools_icon.png",
+    "special": true,
     "subcategories": []
   }
 ];
