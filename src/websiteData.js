@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/3 21:43:30
+// 网站数据 - 通过管理后台更新于 2025/7/3 21:45:46
 export const websiteData = [
   {
     "id": 40,
@@ -38,6 +38,19 @@ export const websiteData = [
     "tags": [
       "知乎专栏",
       "技术文章"
+    ],
+    "icon": "/default_icon.png"
+  },
+  {
+    "id": 50,
+    "name": "Vue.js",
+    "description": "渐进式JavaScript框架",
+    "url": "https://vuejs.org",
+    "category": "category_1751550177044",
+    "tags": [
+      "JavaScript",
+      "框架",
+      "前端"
     ],
     "icon": "/default_icon.png"
   },
@@ -628,20 +641,6 @@ export const websiteData = [
     ],
     "icon": "/assets/tools_icon.png",
     "popularity": 88
-  },
-  {
-    "id": 50,
-    "name": "Vue.js",
-    "description": "渐进式JavaScript框架",
-    "url": "https://vuejs.org",
-    "category": "friend_links",
-    "tags": [
-      "JavaScript",
-      "框架",
-      "前端"
-    ],
-    "icon": "/assets/dev_tools_icon.png",
-    "popularity": 92
   }
 ];
 
