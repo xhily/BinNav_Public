@@ -10,25 +10,67 @@ const IconManager = ({
   const [availableIcons, setAvailableIcons] = useState([])
   const [isUploading, setIsUploading] = useState(false)
   const [isDeleting, setIsDeleting] = useState(null)
-  const [uploadedIcons, setUploadedIcons] = useState([])
   const [showDeleteMode, setShowDeleteMode] = useState(false)
 
-  // 内置图标列表（现有的图标，排除logo.png）
-  const builtinIcons = [
-    { name: 'dev_tools_icon.png', path: '/assets/dev_tools_icon.png', type: 'builtin' },
-    { name: 'education_icon.png', path: '/assets/education_icon.png', type: 'builtin' },
-    { name: 'innovation_icon.png', path: '/assets/innovation_icon.png', type: 'builtin' },
-    { name: 'network_icon.png', path: '/assets/network_icon.png', type: 'builtin' },
-    { name: 'server_icon.png', path: '/assets/server_icon.png', type: 'builtin' },
-    { name: 'social_icon.png', path: '/assets/social_icon.png', type: 'builtin' },
-    { name: 'tech_blogger_avatar.png', path: '/assets/tech_blogger_avatar.png', type: 'builtin' },
-    { name: 'tools_icon.png', path: '/assets/tools_icon.png', type: 'builtin' }
-  ]
+  // 获取服务器上的图标列表
+  const fetchAvailableIcons = async () => {
+    try {
+      const response = await fetch('/api/list-icons', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        // 将服务器返回的图标转换为组件需要的格式
+        const serverIcons = result.icons.map(icon => ({
+          name: icon.name,
+          path: icon.path,
+          type: 'server', // 标记为服务器图标
+          size: icon.size,
+          sha: icon.sha
+        }))
+        setAvailableIcons(serverIcons)
+      } else {
+        console.error('获取图标列表失败:', result.message)
+        // 如果API失败，使用默认图标列表作为后备
+        const fallbackIcons = [
+          { name: 'dev_tools_icon.png', path: '/assets/dev_tools_icon.png', type: 'builtin' },
+          { name: 'education_icon.png', path: '/assets/education_icon.png', type: 'builtin' },
+          { name: 'innovation_icon.png', path: '/assets/innovation_icon.png', type: 'builtin' },
+          { name: 'network_icon.png', path: '/assets/network_icon.png', type: 'builtin' },
+          { name: 'server_icon.png', path: '/assets/server_icon.png', type: 'builtin' },
+          { name: 'social_icon.png', path: '/assets/social_icon.png', type: 'builtin' },
+          { name: 'tech_blogger_avatar.png', path: '/assets/tech_blogger_avatar.png', type: 'builtin' },
+          { name: 'tools_icon.png', path: '/assets/tools_icon.png', type: 'builtin' }
+        ]
+        setAvailableIcons(fallbackIcons)
+        showMessage('warning', '使用默认图标列表')
+      }
+    } catch (error) {
+      console.error('获取图标列表失败:', error)
+      // 如果请求失败，使用默认图标列表作为后备
+      const fallbackIcons = [
+        { name: 'dev_tools_icon.png', path: '/assets/dev_tools_icon.png', type: 'builtin' },
+        { name: 'education_icon.png', path: '/assets/education_icon.png', type: 'builtin' },
+        { name: 'innovation_icon.png', path: '/assets/innovation_icon.png', type: 'builtin' },
+        { name: 'network_icon.png', path: '/assets/network_icon.png', type: 'builtin' },
+        { name: 'server_icon.png', path: '/assets/server_icon.png', type: 'builtin' },
+        { name: 'social_icon.png', path: '/assets/social_icon.png', type: 'builtin' },
+        { name: 'tech_blogger_avatar.png', path: '/assets/tech_blogger_avatar.png', type: 'builtin' },
+        { name: 'tools_icon.png', path: '/assets/tools_icon.png', type: 'builtin' }
+      ]
+      setAvailableIcons(fallbackIcons)
+      showMessage('error', '获取图标列表失败，使用默认列表')
+    }
+  }
 
   useEffect(() => {
-    // 合并内置图标和用户上传的图标
-    setAvailableIcons([...builtinIcons, ...uploadedIcons])
-  }, [uploadedIcons])
+    fetchAvailableIcons()
+  }, [])
 
   // 处理文件上传
   const handleFileUpload = async (event) => {
@@ -73,14 +115,11 @@ const IconManager = ({
           const result = await response.json()
 
           if (result.success) {
-            // 添加到已上传图标列表
-            const newIcon = {
-              name: result.icon.fileName,
-              path: result.icon.path,
-              type: 'uploaded'
-            }
-            setUploadedIcons(prev => [...prev, newIcon])
             showMessage('success', result.message)
+            // 重新获取图标列表
+            await fetchAvailableIcons()
+            // 自动选择新上传的图标
+            onIconSelect(result.icon.path)
           } else {
             showMessage('error', result.message || '上传失败')
           }
@@ -123,14 +162,13 @@ const IconManager = ({
       const result = await response.json()
 
       if (result.success) {
-        // 从对应的图标列表中移除
-        if (icon.type === 'uploaded') {
-          setUploadedIcons(prev => prev.filter(i => i.name !== icon.name))
-        } else {
-          // 如果是内置图标被删除，从builtinIcons中移除（通过重新设置availableIcons）
-          setAvailableIcons(prev => prev.filter(i => i.name !== icon.name))
-        }
         showMessage('success', result.message)
+        // 重新获取图标列表
+        await fetchAvailableIcons()
+        // 如果删除的是当前选中的图标，重置为默认图标
+        if (selectedIcon === icon.path) {
+          onIconSelect('/assets/tools_icon.png')
+        }
       } else {
         showMessage('error', result.message || '删除失败')
       }
@@ -275,11 +313,13 @@ const IconManager = ({
 
                 {/* 类型标识 */}
                 <div className={`absolute bottom-1 right-1 text-xs px-1 rounded ${
-                  icon.type === 'builtin' 
-                    ? 'bg-blue-100 text-blue-600' 
+                  icon.type === 'builtin'
+                    ? 'bg-blue-100 text-blue-600'
+                    : icon.type === 'server'
+                    ? 'bg-purple-100 text-purple-600'
                     : 'bg-green-100 text-green-600'
                 }`}>
-                  {icon.type === 'builtin' ? '内置' : '自定义'}
+                  {icon.type === 'builtin' ? '内置' : icon.type === 'server' ? '服务器' : '自定义'}
                 </div>
               </div>
             ))}

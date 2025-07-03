@@ -21,7 +21,12 @@ export async function onRequestGet({ request, env }) {
       '/api/health',
       '/api/verify-password',
       '/api/get-config',
-      '/api/update-config'
+      '/api/update-config',
+      '/api/submit-website',
+      '/api/process-website-submission',
+      '/api/upload-icon',
+      '/api/delete-icon',
+      '/api/list-icons'
     ]
   }), {
     headers: { 

@@ -79,13 +79,14 @@ export async function onRequestGet({ request, env }) {
         message: 'EdgeOne Functions 正常运行',
         functions_available: [
           '/api/health',
-          '/api/verify-password', 
+          '/api/verify-password',
           '/api/get-config',
           '/api/update-config',
           '/api/submit-website',
           '/api/process-website-submission',
           '/api/upload-icon',
           '/api/delete-icon',
+          '/api/list-icons',
           '/api/debug-test'
         ]
       };

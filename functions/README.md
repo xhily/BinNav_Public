@@ -17,6 +17,7 @@ functions/
     ├── process-website-submission.js # 处理网站审核 - POST /api/process-website-submission
     ├── upload-icon.js  # 上传图标 - POST /api/upload-icon
     ├── delete-icon.js  # 删除图标 - POST /api/delete-icon
+    ├── list-icons.js   # 获取图标列表 - GET /api/list-icons
     ├── debug-test.js   # 调试测试 - GET /api/debug-test
     └── test-submit.js  # 测试提交 - POST /api/test-submit
 ```
@@ -91,10 +92,32 @@ functions/
 ### 8. 删除图标
 - **端点**: `POST /api/delete-icon`
 - **用途**: 删除指定的图标文件
-- **请求体**: 
+- **请求体**:
   ```json
   {
     "filename": "图标文件名"
+  }
+  ```
+
+### 9. 获取图标列表
+- **端点**: `GET /api/list-icons`
+- **用途**: 获取GitHub仓库public/assets目录下的所有图标文件列表
+- **响应**:
+  ```json
+  {
+    "success": true,
+    "message": "成功获取图标文件",
+    "icons": [
+      {
+        "name": "icon.png",
+        "path": "/assets/icon.png",
+        "size": 1024,
+        "downloadUrl": "https://...",
+        "sha": "abc123",
+        "type": "file"
+      }
+    ],
+    "total": 1
   }
   ```
 

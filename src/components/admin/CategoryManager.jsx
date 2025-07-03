@@ -16,21 +16,50 @@ const IconSelector = ({ selectedIcon, onIconSelect, showMessage }) => {
   // 获取现有图标列表
   const fetchAvailableIcons = async () => {
     try {
-      const iconsData = [
+      const response = await fetch('/api/list-icons', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        // 提取图标文件名列表
+        const iconNames = result.icons.map(icon => icon.name)
+        setAvailableIcons(iconNames)
+      } else {
+        console.error('获取图标列表失败:', result.message)
+        // 如果API失败，使用默认图标列表作为后备
+        const fallbackIcons = [
+          'dev_tools_icon.png',
+          'education_icon.png',
+          'innovation_icon.png',
+          'network_icon.png',
+          'server_icon.png',
+          'social_icon.png',
+          'tech_blogger_avatar.png',
+          'tools_icon.png'
+        ]
+        setAvailableIcons(fallbackIcons)
+        showMessage('warning', '使用默认图标列表')
+      }
+    } catch (error) {
+      console.error('获取图标列表失败:', error)
+      // 如果请求失败，使用默认图标列表作为后备
+      const fallbackIcons = [
         'dev_tools_icon.png',
-        'education_icon.png', 
+        'education_icon.png',
         'innovation_icon.png',
-        'logo.png',
         'network_icon.png',
         'server_icon.png',
         'social_icon.png',
         'tech_blogger_avatar.png',
         'tools_icon.png'
       ]
-      setAvailableIcons(iconsData)
-    } catch (error) {
-      console.error('获取图标列表失败:', error)
-      showMessage('error', '获取图标列表失败')
+      setAvailableIcons(fallbackIcons)
+      showMessage('error', '获取图标列表失败，使用默认列表')
     }
   }
 
