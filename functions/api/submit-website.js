@@ -210,7 +210,7 @@ export async function onRequestPost({ request, env }) {
       if (ADMIN_EMAIL) {
         try {
           const adminEmailPayload = {
-            from: RESEND_FROM_DOMAIN || 'onboarding@resend.dev',
+            from: RESEND_FROM_DOMAIN ? `noreply@${RESEND_FROM_DOMAIN}` : 'onboarding@resend.dev',
             to: [ADMIN_EMAIL],
             subject: `[BinNav] 新站点提交 - ${name}`,
             html: `
@@ -300,7 +300,7 @@ export async function onRequestPost({ request, env }) {
       // 2. 发送给提交者的确认邮件
       try {
         const submitterEmailPayload = {
-          from: RESEND_FROM_DOMAIN || 'onboarding@resend.dev',
+          from: RESEND_FROM_DOMAIN ? `noreply@${RESEND_FROM_DOMAIN}` : 'onboarding@resend.dev',
           to: [contactEmail],
           subject: `[BinNav] 站点提交确认 - ${name}`,
           html: `

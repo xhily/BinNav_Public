@@ -393,7 +393,7 @@ export async function onRequestPost({ request, env }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: RESEND_FROM_DOMAIN || 'onboarding@resend.dev',
+            from: RESEND_FROM_DOMAIN ? `noreply@${RESEND_FROM_DOMAIN}` : 'onboarding@resend.dev',
             to: [website.contactEmail],
             subject: emailSubject,
             html: emailHtml

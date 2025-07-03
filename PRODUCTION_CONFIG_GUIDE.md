@@ -31,7 +31,7 @@
 | `GITHUB_REPO` | 仓库名称 | `username/binnav` |
 | `RESEND_API_KEY` | 邮件服务密钥 | `re_1234567890...` |
 | `ADMIN_EMAIL` | 管理员邮箱 | `admin@example.com` |
-| `RESEND_FROM_DOMAIN` | Resend发送域名 | `noreply@yourdomain.com` |
+| `RESEND_FROM_DOMAIN` | Resend发送域名（仅域名部分） | `yourdomain.com` |
 
 ### 环境变量名称对比
 

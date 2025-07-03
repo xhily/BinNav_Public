@@ -70,7 +70,7 @@ binnav/
 | `ADMIN_PASSWORD` | 管理后台密码 | `MySecurePassword123!` |
 | `RESEND_API_KEY` | Resend邮件服务密钥 | `re_1234567890...` |
 | `ADMIN_EMAIL` | 管理员邮箱 | `admin@example.com` |
-| `RESEND_FROM_DOMAIN` | Resend发送域名 | `noreply@yourdomain.com` |
+| `RESEND_FROM_DOMAIN` | Resend发送域名（仅域名部分） | `yourdomain.com` |
 
 #### 创建GitHub Token：
 1. 访问 https://github.com/settings/tokens
