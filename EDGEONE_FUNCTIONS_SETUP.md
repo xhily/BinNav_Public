@@ -68,6 +68,9 @@ binnav/
 | `GITHUB_TOKEN` | GitHub Personal Access Token | `ghp_1234567890...` |
 | `GITHUB_REPO` | GitHub仓库名称 | `username/binnav` |
 | `ADMIN_PASSWORD` | 管理后台密码 | `MySecurePassword123!` |
+| `RESEND_API_KEY` | Resend邮件服务密钥 | `re_1234567890...` |
+| `ADMIN_EMAIL` | 管理员邮箱 | `admin@example.com` |
+| `RESEND_FROM_DOMAIN` | Resend发送域名 | `noreply@yourdomain.com` |
 
 #### 创建GitHub Token：
 1. 访问 https://github.com/settings/tokens
@@ -287,7 +290,7 @@ console.log('GitHub response:', response.status);
 部署前请确认：
 - [ ] ✅ EdgeOne Pages项目已创建
 - [ ] ✅ Functions目录结构正确
-- [ ] ✅ 环境变量已配置（3个）
+- [ ] ✅ 环境变量已配置（6个）
 - [ ] ✅ GitHub Token权限正确
 - [ ] ✅ 本地构建测试通过
 - [ ] ✅ Functions健康检查通过

@@ -20,6 +20,7 @@
 - `GITHUB_REPO` = username/repository-name
 - `RESEND_API_KEY` = Resend邮件服务密钥
 - `ADMIN_EMAIL` = 管理员邮箱
+- `RESEND_FROM_DOMAIN` = Resend发送域名
 
 ### 完整环境变量列表
 
@@ -30,6 +31,7 @@
 | `GITHUB_REPO` | 仓库名称 | `username/binnav` |
 | `RESEND_API_KEY` | 邮件服务密钥 | `re_1234567890...` |
 | `ADMIN_EMAIL` | 管理员邮箱 | `admin@example.com` |
+| `RESEND_FROM_DOMAIN` | Resend发送域名 | `noreply@yourdomain.com` |
 
 ### 环境变量名称对比
 
@@ -40,7 +42,7 @@
 | GitHub仓库 | `VITE_GITHUB_REPO` | `GITHUB_REPO` |
 
 ### 检查步骤
-1. ✅ 确认所有5个环境变量都已配置
+1. ✅ 确认所有6个环境变量都已配置
 2. ✅ 变量名称完全匹配（区分大小写）
 3. ✅ GitHub Token权限包含 `repo`
 4. ✅ 仓库名格式为 `用户名/仓库名`

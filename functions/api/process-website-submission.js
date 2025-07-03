@@ -19,7 +19,7 @@ export async function onRequestOptions({ request }) {
 
 // 处理POST请求
 export async function onRequestPost({ request, env }) {
-  const { RESEND_API_KEY } = env;
+  const { RESEND_API_KEY, RESEND_FROM_DOMAIN } = env;
 
   try {
     // 解析请求数据
@@ -393,7 +393,7 @@ export async function onRequestPost({ request, env }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'onboarding@resend.dev',
+            from: RESEND_FROM_DOMAIN || 'onboarding@resend.dev',
             to: [website.contactEmail],
             subject: emailSubject,
             html: emailHtml

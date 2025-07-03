@@ -58,6 +58,12 @@ export async function onRequestGet({ request, env }) {
             value: env.ADMIN_EMAIL ? env.ADMIN_EMAIL : 'not configured',
             length: env.ADMIN_EMAIL ? env.ADMIN_EMAIL.length : 0,
             status: !!env.ADMIN_EMAIL ? '✅ 已配置' : '❌ 未配置'
+          },
+          RESEND_FROM_DOMAIN: {
+            exists: !!env.RESEND_FROM_DOMAIN,
+            value: env.RESEND_FROM_DOMAIN ? env.RESEND_FROM_DOMAIN : 'not configured (using default: onboarding@resend.dev)',
+            length: env.RESEND_FROM_DOMAIN ? env.RESEND_FROM_DOMAIN.length : 0,
+            status: !!env.RESEND_FROM_DOMAIN ? '✅ 已配置' : '⚠️ 未配置（使用默认域名）'
           }
         },
         all_env_keys: Object.keys(env),
@@ -115,7 +121,7 @@ export async function onRequestPost({ request, env }) {
     
     // 测试管理员邮件发送
     if (body.test === 'admin-email') {
-      const { RESEND_API_KEY, ADMIN_EMAIL } = env;
+      const { RESEND_API_KEY, ADMIN_EMAIL, RESEND_FROM_DOMAIN } = env;
       
       if (!RESEND_API_KEY) {
         return new Response(JSON.stringify({
@@ -145,7 +151,7 @@ export async function onRequestPost({ request, env }) {
       
       try {
         const testEmailPayload = {
-          from: 'onboarding@resend.dev',
+          from: RESEND_FROM_DOMAIN || 'onboarding@resend.dev',
           to: [ADMIN_EMAIL],
           subject: '[BinNav] 管理员邮件测试',
           html: `
@@ -217,7 +223,7 @@ export async function onRequestPost({ request, env }) {
             message: '管理员测试邮件发送成功',
             email_details: {
               to: ADMIN_EMAIL,
-              from: 'onboarding@resend.dev',
+              from: RESEND_FROM_DOMAIN || 'onboarding@resend.dev',
               subject: '[BinNav] 管理员邮件测试',
               email_id: emailId,
               response_status: emailResponse.status,

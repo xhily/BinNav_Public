@@ -22,6 +22,7 @@ export async function onRequestPost({ request, env }) {
   const { GITHUB_TOKEN, GITHUB_REPO } = env;
   const RESEND_API_KEY = env.RESEND_API_KEY;
   const ADMIN_EMAIL = env.ADMIN_EMAIL;
+  const RESEND_FROM_DOMAIN = env.RESEND_FROM_DOMAIN;
 
   // 检查GitHub配置
   if (!GITHUB_TOKEN) {
@@ -209,7 +210,7 @@ export async function onRequestPost({ request, env }) {
       if (ADMIN_EMAIL) {
         try {
           const adminEmailPayload = {
-            from: 'onboarding@resend.dev',
+            from: RESEND_FROM_DOMAIN || 'onboarding@resend.dev',
             to: [ADMIN_EMAIL],
             subject: `[BinNav] 新站点提交 - ${name}`,
             html: `
@@ -299,7 +300,7 @@ export async function onRequestPost({ request, env }) {
       // 2. 发送给提交者的确认邮件
       try {
         const submitterEmailPayload = {
-          from: 'onboarding@resend.dev',
+          from: RESEND_FROM_DOMAIN || 'onboarding@resend.dev',
           to: [contactEmail],
           subject: `[BinNav] 站点提交确认 - ${name}`,
           html: `
