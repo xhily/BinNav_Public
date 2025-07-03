@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/3 22:39:09
+// 网站数据 - 通过管理后台更新于 2025/7/3 22:59:22
 export const websiteData = [
   {
     "id": 40,
@@ -697,7 +697,9 @@ export const categories = [
       {
         "id": "design_resources",
         "name": "平面素材",
-        "icon": "/assets/tools_icon.png"
+        "icon": "/assets/tools_icon.png",
+        "special": false,
+        "subcategories": []
       }
     ]
   },
@@ -718,8 +720,7 @@ export const categories = [
         "id": "color_tools",
         "name": "配色",
         "icon": "/assets/tools_icon.png",
-        "special": true,
-        "subcategories": []
+        "special": false
       }
     ]
   },
