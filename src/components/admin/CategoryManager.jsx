@@ -279,35 +279,83 @@ const IconSelector = ({ selectedIcon, onIconSelect, showMessage }) => {
 /**
  * 内联编辑表单组件
  */
-const InlineEditForm = ({ 
-  category, 
-  isEditing, 
-  onSave, 
+const InlineEditForm = ({
+  category,
+  isEditing,
+  onSave,
   onCancel,
   showMessage,
   categories = [],
   isSubcategory = false,
   parentCategory = null
 }) => {
+  // 获取当前分类的父级分类ID（如果是编辑现有分类）
+  const getCurrentParentId = () => {
+    if (!isEditing || !category) return ''
+
+    // 如果是子分类编辑，返回父分类ID
+    if (isSubcategory && parentCategory) {
+      console.log('子分类编辑，父分类ID:', parentCategory.id)
+      return parentCategory.id
+    }
+
+    // 如果是一级分类编辑，检查是否实际上是某个分类的子分类
+    // 这种情况可能发生在分类结构不一致时
+    for (const cat of categories) {
+      if (cat.subcategories?.some(sub => sub.id === category.id)) {
+        console.log('发现分类实际是子分类，父分类:', cat.name, cat.id)
+        return cat.id
+      }
+    }
+
+    console.log('确认是一级分类')
+    return '' // 确实是一级分类
+  }
+
   const [formData, setFormData] = useState({
     name: category?.name || '',
     icon: category?.icon || '/assets/tools_icon.png',
     special: category?.special || false,
-    parentId: isSubcategory ? (parentCategory?.id || '') : (parentCategory?.id || '')
+    parentId: getCurrentParentId()
   })
+
+  // 添加调试日志
+  console.log('InlineEditForm 初始化:', {
+    category: category?.name,
+    isEditing,
+    isSubcategory,
+    parentCategory: parentCategory?.name,
+    initialParentId: getCurrentParentId(),
+    formData
+  })
+
+  // 调试：打印当前分类结构
+  console.log('当前分类结构:', categories.map(cat => ({
+    id: cat.id,
+    name: cat.name,
+    subcategories: cat.subcategories?.map(sub => ({ id: sub.id, name: sub.name })) || []
+  })))
 
   const handleSubmit = (e) => {
     e.preventDefault()
+
+    console.log('表单提交:', {
+      formData,
+      category: category?.name,
+      isEditing,
+      isSubcategory
+    })
+
     if (!formData.name.trim()) {
       showMessage('error', '分类名称不能为空')
       return
     }
-    
+
     if (!formData.icon.trim()) {
       showMessage('error', '图标路径不能为空')
       return
     }
-    
+
     const newCategory = {
       id: category?.id || `category_${Date.now()}`,
       name: formData.name.trim(),
@@ -315,7 +363,12 @@ const InlineEditForm = ({
       special: formData.special,
       subcategories: category?.subcategories || []
     }
-    
+
+    console.log('调用 onSave:', {
+      newCategory,
+      parentId: formData.parentId
+    })
+
     onSave(newCategory, formData.parentId)
   }
 
@@ -372,10 +425,20 @@ const InlineEditForm = ({
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">分类级别</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            分类级别
+            {isEditing && (
+              <span className="ml-2 text-xs text-gray-500">
+                (当前: {formData.parentId ? '子分类' : '一级分类'})
+              </span>
+            )}
+          </label>
           <select
             value={formData.parentId}
-            onChange={(e) => setFormData({...formData, parentId: e.target.value})}
+            onChange={(e) => {
+              console.log('分类级别变更:', e.target.value)
+              setFormData({...formData, parentId: e.target.value})
+            }}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
           >
             {isSubcategory ? (
@@ -572,6 +635,8 @@ const SortableCategoryItem = ({
             onCancel={onCancelEdit}
             showMessage={showMessage}
             categories={config.categories}
+            isSubcategory={false}
+            parentCategory={null}
           />
         )}
         
@@ -664,8 +729,16 @@ const SortableCategoryItem = ({
                       category={subcategory}
                       isEditing={true}
                       onSave={(subcategoryData, newParentId) => {
+                        console.log('子分类保存:', {
+                          subcategoryName: subcategoryData.name,
+                          subcategoryId: subcategoryData.id,
+                          newParentId,
+                          currentParentId: category.id
+                        })
+
                         if (newParentId === '') {
                           // 升级为一级分类
+                          console.log('升级子分类为一级分类')
                           const updatedCategories = config.categories.map(cat => {
                             if (cat.id === category.id) {
                               return {
@@ -675,12 +748,16 @@ const SortableCategoryItem = ({
                             }
                             return cat
                           })
-                          updatedCategories.push(subcategoryData)
+                          updatedCategories.push({
+                            ...subcategoryData,
+                            subcategories: subcategoryData.subcategories || []
+                          })
                           onUpdateCategories(updatedCategories)
                           showMessage('success', '已升级为一级分类')
                           onCancelEdit()
                         } else if (newParentId && newParentId !== category.id) {
                           // 移动到其他父分类下
+                          console.log('移动子分类到其他父分类:', newParentId)
                           const updatedCategories = config.categories.map(cat => {
                             if (cat.id === category.id) {
                               return {
@@ -690,7 +767,12 @@ const SortableCategoryItem = ({
                             } else if (cat.id === newParentId) {
                               return {
                                 ...cat,
-                                subcategories: [...(cat.subcategories || []), subcategoryData]
+                                subcategories: [...(cat.subcategories || []), {
+                                  id: subcategoryData.id,
+                                  name: subcategoryData.name,
+                                  icon: subcategoryData.icon,
+                                  special: subcategoryData.special
+                                }]
                               }
                             }
                             return cat
@@ -700,6 +782,7 @@ const SortableCategoryItem = ({
                           onCancelEdit()
                         } else {
                           // 保持在当前父分类下
+                          console.log('保持在当前父分类下，仅更新内容')
                           onEditSubcategory(category.id, subcategoryData, true)
                         }
                       }}
@@ -750,13 +833,31 @@ const CategoryManager = ({
 
   // 编辑分类
   const handleEditCategory = (category, shouldSave = false, parentId = null) => {
+    console.log('handleEditCategory 调用:', {
+      categoryName: category.name,
+      categoryId: category.id,
+      shouldSave,
+      parentId,
+      editingCategory
+    })
+
     if (shouldSave) {
-      // 如果指定了父级分类，需要重新组织分类结构
+      // 首先从所有位置移除该分类（包括子分类位置）
+      let updatedCategories = config.categories.map(cat => {
+        if (cat.id === category.id) {
+          // 如果是一级分类，直接移除
+          return null
+        } else {
+          // 从子分类中移除
+          return {
+            ...cat,
+            subcategories: (cat.subcategories || []).filter(sub => sub.id !== category.id)
+          }
+        }
+      }).filter(Boolean) // 移除null值
+
+      // 如果指定了父级分类，添加为子分类
       if (parentId && parentId !== '') {
-        // 从原位置移除分类
-        let updatedCategories = config.categories.filter(cat => cat.id !== category.id)
-        
-        // 添加到新的父级分类下
         updatedCategories = updatedCategories.map(cat => {
           if (cat.id === parentId) {
             return {
@@ -764,22 +865,24 @@ const CategoryManager = ({
               subcategories: [...(cat.subcategories || []), {
                 id: category.id,
                 name: category.name,
-                icon: category.icon
+                icon: category.icon,
+                special: category.special
               }]
             }
           }
           return cat
         })
-        
-        onUpdateCategories(updatedCategories)
+        console.log('移动到父分类下:', parentId)
       } else {
-        // 更新为一级分类
-        const updatedCategories = config.categories.map(cat => 
-          cat.id === editingCategory ? category : cat
-        )
-        onUpdateCategories(updatedCategories)
+        // 添加为一级分类
+        updatedCategories.push({
+          ...category,
+          subcategories: category.subcategories || []
+        })
+        console.log('升级为一级分类')
       }
-      
+
+      onUpdateCategories(updatedCategories)
       setEditingCategory(null)
       showMessage('success', '分类已更新')
     } else {
