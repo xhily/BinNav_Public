@@ -55,7 +55,7 @@ export const useAdminConfig = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          content: configContent,
+          config: configContent,
           sha: currentData.sha
         })
       })
