@@ -631,7 +631,14 @@ const SortableCategoryItem = ({
           <InlineEditForm
             category={category}
             isEditing={true}
-            onSave={(categoryData, parentId) => onEdit(categoryData, true, parentId)}
+            onSave={(categoryData, parentId) => {
+              console.log('一级分类保存调用:', {
+                categoryData,
+                parentId,
+                originalCategory: category
+              })
+              onEdit(categoryData, true, parentId)
+            }}
             onCancel={onCancelEdit}
             showMessage={showMessage}
             categories={config.categories}
@@ -842,19 +849,36 @@ const CategoryManager = ({
     })
 
     if (shouldSave) {
+      console.log('开始保存分类，当前分类结构:', config.categories.map(cat => ({
+        id: cat.id,
+        name: cat.name,
+        subcategories: cat.subcategories?.map(sub => ({ id: sub.id, name: sub.name })) || []
+      })))
+
       // 首先从所有位置移除该分类（包括子分类位置）
       let updatedCategories = config.categories.map(cat => {
         if (cat.id === category.id) {
           // 如果是一级分类，直接移除
+          console.log('移除一级分类:', category.name)
           return null
         } else {
           // 从子分类中移除
+          const filteredSubs = (cat.subcategories || []).filter(sub => sub.id !== category.id)
+          if (filteredSubs.length !== (cat.subcategories || []).length) {
+            console.log('从分类', cat.name, '中移除子分类:', category.name)
+          }
           return {
             ...cat,
-            subcategories: (cat.subcategories || []).filter(sub => sub.id !== category.id)
+            subcategories: filteredSubs
           }
         }
       }).filter(Boolean) // 移除null值
+
+      console.log('移除后的分类结构:', updatedCategories.map(cat => ({
+        id: cat.id,
+        name: cat.name,
+        subcategories: cat.subcategories?.map(sub => ({ id: sub.id, name: sub.name })) || []
+      })))
 
       // 如果指定了父级分类，添加为子分类
       if (parentId && parentId !== '') {
@@ -965,17 +989,31 @@ const CategoryManager = ({
   // 编辑子分类
   const handleEditSubcategory = (parentId, subcategory, shouldSave = false) => {
     if (shouldSave) {
+      console.log('保存子分类:', {
+        parentId,
+        subcategory,
+        editingSubcategory
+      })
+
       // 保存子分类
       const updatedCategories = config.categories.map(category => {
         if (category.id === parentId) {
-          const updatedSubcategories = (category.subcategories || []).map(sub => 
-            sub.id === editingSubcategory.subcategory.id ? subcategory : sub
+          const updatedSubcategories = (category.subcategories || []).map(sub =>
+            sub.id === editingSubcategory.subcategory.id ? {
+              ...subcategory,
+              // 确保所有属性都被正确传递
+              id: subcategory.id,
+              name: subcategory.name,
+              icon: subcategory.icon,
+              special: subcategory.special
+            } : sub
           )
+          console.log('更新后的子分类列表:', updatedSubcategories)
           return { ...category, subcategories: updatedSubcategories }
         }
         return category
       })
-      
+
       onUpdateCategories(updatedCategories)
       setEditingSubcategory(null)
       showMessage('success', '子分类已更新')
@@ -989,14 +1027,26 @@ const CategoryManager = ({
 
   // 保存新子分类
   const handleSaveSubcategory = (parentId, subcategoryData) => {
+    console.log('保存新子分类:', {
+      parentId,
+      subcategoryData
+    })
+
     const updatedCategories = config.categories.map(category => {
       if (category.id === parentId) {
-        const updatedSubcategories = [...(category.subcategories || []), subcategoryData]
+        const newSubcategory = {
+          id: subcategoryData.id,
+          name: subcategoryData.name,
+          icon: subcategoryData.icon,
+          special: subcategoryData.special || false
+        }
+        const updatedSubcategories = [...(category.subcategories || []), newSubcategory]
+        console.log('添加子分类到:', category.name, '新子分类:', newSubcategory)
         return { ...category, subcategories: updatedSubcategories }
       }
       return category
     })
-    
+
     onUpdateCategories(updatedCategories)
     setEditingSubcategory(null)
     showMessage('success', '子分类已添加')

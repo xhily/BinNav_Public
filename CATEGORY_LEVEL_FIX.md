@@ -137,9 +137,145 @@ onSave={(subcategoryData, newParentId) => {
 
 如果仍有问题，请查看控制台日志进行排查。
 
+## 最新修复 (第二轮)
+
+### 问题4：子分类专栏显示不生效
+
+**问题描述**：子分类设置为专栏后，在首页和侧边栏中不显示专栏标识。
+
+**修复内容**：
+
+1. **首页子分类专栏显示**：
+```javascript
+// 修复前：子分类标题没有专栏标识
+<div className="flex items-center mb-6">
+  <img src={subcat.icon} alt="" className="w-8 h-8 mr-4" />
+  <h2 className="text-xl font-bold text-gray-900">{subcat.name}</h2>
+</div>
+
+// 修复后：添加专栏标识和样式
+<div className="flex items-center mb-6">
+  <img
+    src={subcat.icon}
+    alt=""
+    className={`w-8 h-8 mr-4 ${subcat.special ? 'rounded-full ring-2 ring-purple-200' : ''}`}
+  />
+  <h2 className="text-xl font-bold text-gray-900">{subcat.name}</h2>
+  {subcat.special && (
+    <span className="ml-3 text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full font-medium">
+      专栏
+    </span>
+  )}
+</div>
+```
+
+2. **侧边栏子分类专栏显示**：
+```javascript
+// 修复前：侧边栏子分类没有专栏标识
+<div className="flex items-center">
+  <img src={subcat.icon} alt="" className="w-5 h-5 mr-3 opacity-70" />
+  <span className="font-medium">{subcat.name}</span>
+</div>
+
+// 修复后：添加专栏标识
+<div className="flex items-center">
+  <img
+    src={subcat.icon}
+    alt=""
+    className={`w-5 h-5 mr-3 opacity-70 ${subcat.special ? 'rounded-full' : ''}`}
+  />
+  <span className="font-medium">{subcat.name}</span>
+  {subcat.special && (
+    <span className="ml-2 text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-1.5 py-0.5 rounded-full">
+      专栏
+    </span>
+  )}
+</div>
+```
+
+### 问题5：子分类 special 属性保存问题
+
+**问题描述**：子分类的 `special` 属性在保存时可能丢失。
+
+**修复内容**：
+
+1. **修复 `handleEditSubcategory` 函数**：
+```javascript
+// 确保所有属性都被正确传递
+const updatedSubcategories = (category.subcategories || []).map(sub =>
+  sub.id === editingSubcategory.subcategory.id ? {
+    ...subcategory,
+    id: subcategory.id,
+    name: subcategory.name,
+    icon: subcategory.icon,
+    special: subcategory.special  // 确保 special 属性被保存
+  } : sub
+)
+```
+
+2. **修复 `handleSaveSubcategory` 函数**：
+```javascript
+// 新建子分类时确保所有属性正确设置
+const newSubcategory = {
+  id: subcategoryData.id,
+  name: subcategoryData.name,
+  icon: subcategoryData.icon,
+  special: subcategoryData.special || false  // 默认值为 false
+}
+```
+
+### 问题6：增强调试信息
+
+**添加的调试日志**：
+
+1. 分类保存过程的详细日志
+2. 子分类保存时的属性检查
+3. 分类结构变化的追踪
+4. 一级分类编辑表单的调用日志
+
+## 测试方法 (更新)
+
+### 测试子分类专栏功能：
+
+1. **创建专栏子分类**：
+   - 在任意一级分类下添加子分类
+   - 勾选"标记为专栏分类"
+   - 保存后检查管理界面是否显示专栏标识
+
+2. **检查首页显示**：
+   - 刷新首页
+   - 找到新创建的子分类区域
+   - 确认标题旁边显示紫色"专栏"标识
+   - 确认图标有紫色圆形边框
+
+3. **检查侧边栏显示**：
+   - 在侧边栏中找到对应的子分类
+   - 确认子分类名称后显示小的"专栏"标识
+
+4. **编辑专栏子分类**：
+   - 编辑已有的专栏子分类
+   - 修改名称或图标
+   - 保存后确认专栏标识仍然存在
+
+### 测试分类级别修改：
+
+1. **一级分类降级为子分类**：
+   - 编辑一个一级分类
+   - 在"分类级别"中选择一个父分类
+   - 保存，检查控制台日志
+   - 确认分类移动到选定父分类下
+
+2. **子分类升级为一级分类**：
+   - 编辑一个子分类
+   - 选择"升级为一级分类"
+   - 保存，检查控制台日志
+   - 确认分类出现在一级分类列表中
+
 ## 注意事项
 
 1. 修改分类级别时，确保不会创建循环引用
 2. 分类移动后，相关网站的分类归属会自动保持
 3. 所有操作都有确认提示，避免误操作
 4. 调试日志仅在开发环境中显示，生产环境会自动移除
+5. **新增**：子分类的专栏标识现在会在所有界面正确显示
+6. **新增**：子分类的 `special` 属性现在会被正确保存和传递

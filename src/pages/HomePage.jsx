@@ -211,14 +211,21 @@ function HomePage() {
                             <button
                               key={subcat.id}
                               onClick={() => scrollToCategory(subcat.id)}
-                              className="flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-800"
+                              className="flex items-center justify-between w-full px-3 py-2 text-sm rounded-md transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-800"
                             >
-                              <img 
-                                src={subcat.icon} 
-                                alt="" 
-                                className="w-5 h-5 mr-3 opacity-70" 
-                              />
-                              <span className="font-medium">{subcat.name}</span>
+                              <div className="flex items-center">
+                                <img
+                                  src={subcat.icon}
+                                  alt=""
+                                  className={`w-5 h-5 mr-3 opacity-70 ${subcat.special ? 'rounded-full' : ''}`}
+                                />
+                                <span className="font-medium">{subcat.name}</span>
+                                {subcat.special && (
+                                  <span className="ml-2 text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-1.5 py-0.5 rounded-full">
+                                    专栏
+                                  </span>
+                                )}
+                              </div>
                             </button>
                           ))}
                         </div>
@@ -299,8 +306,17 @@ function HomePage() {
                         return (
                           <section key={subcat.id} ref={el => sectionRefs.current[subcat.id] = el} className="scroll-mt-20">
                             <div className="flex items-center mb-6">
-                              <img src={subcat.icon} alt="" className="w-8 h-8 mr-4" />
+                              <img
+                                src={subcat.icon}
+                                alt=""
+                                className={`w-8 h-8 mr-4 ${subcat.special ? 'rounded-full ring-2 ring-purple-200' : ''}`}
+                              />
                               <h2 className="text-xl font-bold text-gray-900">{subcat.name}</h2>
+                              {subcat.special && (
+                                <span className="ml-3 text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full font-medium">
+                                  专栏
+                                </span>
+                              )}
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                               {categoryWebsites.map((website) => (
