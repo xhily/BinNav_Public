@@ -1,5 +1,74 @@
-// 网站数据 - 通过管理后台更新于 2025/6/25 16:41:05
+// 网站数据 - 通过管理后台更新于 2025/7/3 18:10:08
 export const websiteData = [
+  {
+    "id": 40,
+    "name": "Navigator Blog",
+    "description": "技术分享与前端开发心得",
+    "url": "https://navigator-blog.dev",
+    "category": "author",
+    "tags": [
+      "个人博客",
+      "前端技术",
+      "开发心得"
+    ],
+    "icon": "/assets/tech_blogger_avatar.png",
+    "popularity": 95,
+    "featured": true
+  },
+  {
+    "id": 41,
+    "name": "GitHub Projects",
+    "description": "开源项目集合 | React & Vue 组件库",
+    "url": "https://github.com/navigator-dev",
+    "category": "author",
+    "tags": [
+      "开源项目",
+      "React",
+      "Vue",
+      "组件库"
+    ],
+    "icon": "/assets/dev_tools_icon.png",
+    "popularity": 92,
+    "featured": true
+  },
+  {
+    "id": 43,
+    "name": "微信公众号",
+    "description": "「前端导航」| 每日推荐优质技术资源",
+    "url": "https://mp.weixin.qq.com/navigator",
+    "category": "author",
+    "tags": [
+      "微信公众号",
+      "技术分享",
+      "前端资源"
+    ],
+    "icon": "/assets/social_icon.png",
+    "popularity": 88
+  },
+  {
+    "id": 45,
+    "name": "知乎专栏",
+    "description": "「现代前端开发」专栏作者",
+    "url": "https://zhuanlan.zhihu.com/navigator-dev",
+    "category": "author",
+    "tags": [
+      "知乎专栏",
+      "前端开发",
+      "技术文章"
+    ],
+    "icon": "/assets/social_icon.png",
+    "popularity": 87
+  },
+  {
+    "id": 52,
+    "name": "test",
+    "description": "gg",
+    "url": "https://pan.nbvil.com",
+    "category": "author",
+    "tags": [],
+    "icon": "/assets/tools_icon.png",
+    "popularity": 50
+  },
   {
     "id": 1,
     "name": "Dribbble",
@@ -547,65 +616,6 @@ export const websiteData = [
     "popularity": 92
   },
   {
-    "id": 40,
-    "name": "Navigator Blog",
-    "description": "技术分享与前端开发心得",
-    "url": "https://navigator-blog.dev",
-    "category": "author",
-    "tags": [
-      "个人博客",
-      "前端技术",
-      "开发心得"
-    ],
-    "icon": "/assets/tech_blogger_avatar.png",
-    "popularity": 95,
-    "featured": true
-  },
-  {
-    "id": 41,
-    "name": "GitHub Projects",
-    "description": "开源项目集合 | React & Vue 组件库",
-    "url": "https://github.com/navigator-dev",
-    "category": "author",
-    "tags": [
-      "开源项目",
-      "React",
-      "Vue",
-      "组件库"
-    ],
-    "icon": "/assets/dev_tools_icon.png",
-    "popularity": 92,
-    "featured": true
-  },
-  {
-    "id": 43,
-    "name": "微信公众号",
-    "description": "「前端导航」| 每日推荐优质技术资源",
-    "url": "https://mp.weixin.qq.com/navigator",
-    "category": "author",
-    "tags": [
-      "微信公众号",
-      "技术分享",
-      "前端资源"
-    ],
-    "icon": "/assets/social_icon.png",
-    "popularity": 88
-  },
-  {
-    "id": 45,
-    "name": "知乎专栏",
-    "description": "「现代前端开发」专栏作者",
-    "url": "https://zhuanlan.zhihu.com/navigator-dev",
-    "category": "author",
-    "tags": [
-      "知乎专栏",
-      "前端开发",
-      "技术文章"
-    ],
-    "icon": "/assets/social_icon.png",
-    "popularity": 87
-  },
-  {
     "id": 46,
     "name": "Nbvil's Blog",
     "description": "技术分享与编程心得",
@@ -674,26 +684,6 @@ export const websiteData = [
     ],
     "icon": "/assets/dev_tools_icon.png",
     "popularity": 92
-  },
-  {
-    "id": 51,
-    "name": "nbvil",
-    "description": "yy",
-    "url": "https://blog.nbvil.com",
-    "category": "author",
-    "tags": [],
-    "icon": "/assets/tools_icon.png",
-    "popularity": 50
-  },
-  {
-    "id": 52,
-    "name": "test",
-    "description": "gg",
-    "url": "https://pan.nbvil.com",
-    "category": "author",
-    "tags": [],
-    "icon": "/assets/tools_icon.png",
-    "popularity": 50
   }
 ];
 
@@ -842,5 +832,5 @@ export const siteStats = {
   totalSites: websiteData.length,
   totalCategories: categories.length,
   totalTags: [...new Set(websiteData.flatMap(site => site.tags || []))].length,
-  lastUpdated: "2025-06-25"
+  lastUpdated: "2025-07-03"
 };
