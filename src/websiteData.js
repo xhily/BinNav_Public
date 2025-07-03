@@ -674,6 +674,16 @@ export const websiteData = [
     ],
     "icon": "/assets/dev_tools_icon.png",
     "popularity": 92
+  },
+  {
+    "id": 51,
+    "name": "nbvil",
+    "description": "gg",
+    "url": "https://blog.nbvil.com",
+    "category": "friend_links",
+    "tags": [],
+    "icon": "/assets/tools_icon.png",
+    "popularity": 50
   }
 ];
 
