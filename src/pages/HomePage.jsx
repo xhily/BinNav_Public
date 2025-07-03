@@ -376,12 +376,17 @@ function HomePage() {
       <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="text-center">
-            <div className="flex items-center justify-center space-x-2 mb-2">
-              <img src={logoImg} alt="Logo" className="h-5 w-5" />
-              <span className="font-bold text-gray-900">BinNav</span>
-            </div>
             <div className="text-sm text-gray-500">
               <span>© 2025 BinNav Navigator. All rights reserved.</span>
+              <span className="mx-2">•</span>
+              <a
+                href="https://github.com/sindricn/BinNav"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                GitHub
+              </a>
             </div>
           </div>
         </div>

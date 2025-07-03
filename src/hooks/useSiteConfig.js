@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 const defaultSiteConfig = {
   siteName: 'BinNav',
   siteTitle: 'BinNav - 精选网站导航',
-  siteLogo: '/logo.png',
+  siteLogo: '/assets/logo.png',
   siteDescription: '发现优质网站，提升工作效率。汇聚设计、开发、工具等各类精选网站资源。'
 }
 
@@ -51,7 +51,7 @@ export const updateSiteConfig = (newConfig) => {
   // 更新favicon
   if (newConfig.siteLogo) {
     const favicon = document.querySelector('link[rel="icon"]')
-    if (favicon && newConfig.siteLogo !== '/logo.png') {
+    if (favicon && newConfig.siteLogo !== '/assets/logo.png') {
       favicon.setAttribute('href', newConfig.siteLogo)
     }
   }

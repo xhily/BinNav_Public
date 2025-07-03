@@ -50,7 +50,7 @@ const SortableWebsiteItem = ({
             src={`https://www.google.com/s2/favicons?domain=${new URL(website.url).hostname}&sz=32`}
             alt={website.name}
             className="w-10 h-10 rounded-lg flex-shrink-0 bg-gray-50 p-1"
-            onError={(e) => { e.target.src = '/logo.png' }}
+            onError={(e) => { e.target.src = '/assets/logo.png' }}
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-1">

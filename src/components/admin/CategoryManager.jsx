@@ -291,7 +291,19 @@ const InlineEditForm = ({
 }) => {
   // 获取当前分类的父级分类ID（如果是编辑现有分类）
   const getCurrentParentId = () => {
-    if (!isEditing || !category) return ''
+    console.log('getCurrentParentId 调用:', {
+      isEditing,
+      category: category?.name,
+      categoryId: category?.id,
+      isSubcategory,
+      parentCategory: parentCategory?.name,
+      parentCategoryId: parentCategory?.id
+    })
+
+    if (!isEditing || !category) {
+      console.log('不是编辑模式或没有分类，返回空字符串')
+      return ''
+    }
 
     // 如果是子分类编辑，返回父分类ID
     if (isSubcategory && parentCategory) {
@@ -318,6 +330,26 @@ const InlineEditForm = ({
     special: category?.special || false,
     parentId: getCurrentParentId()
   })
+
+  // 监听 props 变化，更新 formData
+  useEffect(() => {
+    const newParentId = getCurrentParentId()
+    console.log('Props 变化，更新 parentId:', {
+      oldParentId: formData.parentId,
+      newParentId,
+      category: category?.name,
+      isSubcategory,
+      parentCategory: parentCategory?.name
+    })
+
+    setFormData(prev => ({
+      ...prev,
+      name: category?.name || '',
+      icon: category?.icon || '/assets/tools_icon.png',
+      special: category?.special || false,
+      parentId: newParentId
+    }))
+  }, [category, isSubcategory, parentCategory, categories])
 
   // 添加调试日志
   console.log('InlineEditForm 初始化:', {

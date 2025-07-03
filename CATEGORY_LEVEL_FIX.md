@@ -200,6 +200,53 @@ const SortableCategoryItem = ({
 - 子分类移动到其他父分类
 - 添加子分类时选择不同的父分类
 
+### 问题8：子分类编辑时分类级别默认值不正确
+
+**问题描述**：编辑子分类时，分类级别选择器显示为"一级分类"而不是当前的父分类。
+
+**根本原因**：`InlineEditForm` 组件中的 `formData` 状态只在组件初始化时设置一次，当 props 变化时（如从编辑一级分类切换到编辑子分类），状态不会自动更新。
+
+**修复内容**：
+
+1. **添加 useEffect 监听 props 变化**：
+```javascript
+// 修复前：只在初始化时设置一次
+const [formData, setFormData] = useState({
+  name: category?.name || '',
+  icon: category?.icon || '/assets/tools_icon.png',
+  special: category?.special || false,
+  parentId: getCurrentParentId()
+})
+
+// 修复后：监听 props 变化并更新状态
+useEffect(() => {
+  const newParentId = getCurrentParentId()
+  setFormData(prev => ({
+    ...prev,
+    name: category?.name || '',
+    icon: category?.icon || '/assets/tools_icon.png',
+    special: category?.special || false,
+    parentId: newParentId
+  }))
+}, [category, isSubcategory, parentCategory, categories])
+```
+
+2. **增强调试信息**：
+```javascript
+console.log('Props 变化，更新 parentId:', {
+  oldParentId: formData.parentId,
+  newParentId,
+  category: category?.name,
+  isSubcategory,
+  parentCategory: parentCategory?.name
+})
+```
+
+**修复效果**：
+- 编辑子分类时，分类级别选择器会正确显示当前的父分类
+- 从编辑一级分类切换到编辑子分类时，表单状态会正确更新
+- 所有分类级别相关的操作都会有正确的默认值
+
 ## 最新修复 (第二轮)
 
 ### 问题4：子分类专栏显示不生效
@@ -311,6 +358,25 @@ const newSubcategory = {
    - 确认不再出现 "onUpdateCategories is not defined" 错误
 
 ## 测试方法 (更新)
+
+### 🔍 测试子分类默认级别显示：
+
+1. **测试子分类编辑的默认值**：
+   - 展开任意一级分类的子分类列表
+   - 点击任意子分类的"编辑"按钮
+   - 检查"分类级别"选择器是否显示当前的父分类名称
+   - 确认不是显示"升级为一级分类"
+
+2. **测试级别切换**：
+   - 先编辑一个一级分类（应该显示"升级为一级分类"）
+   - 然后编辑一个子分类（应该显示父分类名称）
+   - 确认两次编辑的默认值都正确
+
+3. **检查调试日志**：
+   - 打开控制台
+   - 执行上述操作
+   - 查看 "Props 变化，更新 parentId" 的日志
+   - 确认 parentId 值的变化正确
 
 ### 测试子分类专栏功能：
 
