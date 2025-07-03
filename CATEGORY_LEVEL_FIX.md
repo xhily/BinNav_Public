@@ -137,6 +137,69 @@ onSave={(subcategoryData, newParentId) => {
 
 如果仍有问题，请查看控制台日志进行排查。
 
+## 最新修复 (第三轮) - 修复 onUpdateCategories 未定义错误
+
+### 问题7：控制台报错 "onUpdateCategories is not defined"
+
+**问题描述**：编辑分类修改级别时，控制台报错 `ReferenceError: onUpdateCategories is not defined`。
+
+**根本原因**：在 `SortableCategoryItem` 组件中，多个地方直接调用了 `onUpdateCategories` 函数，但该函数没有作为 props 传递给组件。
+
+**修复内容**：
+
+1. **修改 SortableCategoryItem 组件的 props 定义**：
+```javascript
+// 修复前：缺少 onUpdateCategories 参数
+const SortableCategoryItem = ({
+  category,
+  onEdit,
+  onDelete,
+  // ... 其他参数
+  showMessage
+}) => {
+
+// 修复后：添加 onUpdateCategories 参数
+const SortableCategoryItem = ({
+  category,
+  onEdit,
+  onDelete,
+  // ... 其他参数
+  onUpdateCategories,  // 新增
+  config,
+  // ... 其他参数
+  showMessage
+}) => {
+```
+
+2. **修改组件调用处传递参数**：
+```javascript
+// 修复前：缺少 onUpdateCategories 传递
+<SortableCategoryItem
+  key={category.id}
+  category={category}
+  onEdit={handleEditCategory}
+  // ... 其他参数
+  showMessage={showMessage}
+/>
+
+// 修复后：添加 onUpdateCategories 传递
+<SortableCategoryItem
+  key={category.id}
+  category={category}
+  onEdit={handleEditCategory}
+  // ... 其他参数
+  onUpdateCategories={onUpdateCategories}  // 新增
+  config={config}
+  // ... 其他参数
+  showMessage={showMessage}
+/>
+```
+
+**影响的功能**：
+- 子分类升级为一级分类
+- 子分类移动到其他父分类
+- 添加子分类时选择不同的父分类
+
 ## 最新修复 (第二轮)
 
 ### 问题4：子分类专栏显示不生效
@@ -232,6 +295,20 @@ const newSubcategory = {
 2. 子分类保存时的属性检查
 3. 分类结构变化的追踪
 4. 一级分类编辑表单的调用日志
+
+## 测试方法 (第三轮更新)
+
+### 🔧 修复验证步骤：
+
+1. **清除浏览器缓存**：
+   - 按 Ctrl+Shift+R (Windows) 或 Cmd+Shift+R (Mac) 强制刷新
+   - 或者在开发者工具中右键刷新按钮选择"清空缓存并硬性重新加载"
+
+2. **检查控制台错误**：
+   - 打开浏览器开发者工具 (F12)
+   - 切换到 Console 标签
+   - 执行分类编辑操作
+   - 确认不再出现 "onUpdateCategories is not defined" 错误
 
 ## 测试方法 (更新)
 

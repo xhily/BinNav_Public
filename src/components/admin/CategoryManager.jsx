@@ -503,16 +503,17 @@ const InlineEditForm = ({
 /**
  * 可拖拽的分类项组件
  */
-const SortableCategoryItem = ({ 
-  category, 
-  onEdit, 
-  onDelete, 
+const SortableCategoryItem = ({
+  category,
+  onEdit,
+  onDelete,
   onToggleSubcategories,
   expandedCategories,
   onAddSubcategory,
   onEditSubcategory,
   onDeleteSubcategory,
   onSaveSubcategory,
+  onUpdateCategories,
   config,
   editingCategory,
   editingSubcategory,
@@ -1147,8 +1148,8 @@ const CategoryManager = ({
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={config.categories.map(cat => cat.id)} strategy={verticalListSortingStrategy}>
               {config.categories.map((category) => (
-                <SortableCategoryItem 
-                  key={category.id} 
+                <SortableCategoryItem
+                  key={category.id}
                   category={category}
                   onEdit={handleEditCategory}
                   onDelete={handleDeleteCategory}
@@ -1158,6 +1159,7 @@ const CategoryManager = ({
                   onEditSubcategory={handleEditSubcategory}
                   onDeleteSubcategory={handleDeleteSubcategory}
                   onSaveSubcategory={handleSaveSubcategory}
+                  onUpdateCategories={onUpdateCategories}
                   config={config}
                   editingCategory={editingCategory}
                   editingSubcategory={editingSubcategory}
