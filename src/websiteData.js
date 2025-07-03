@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/3 18:10:08
+// 网站数据 - 通过管理后台更新于 2025/7/3 18:12:12
 export const websiteData = [
   {
     "id": 40,
@@ -58,16 +58,6 @@ export const websiteData = [
     ],
     "icon": "/assets/social_icon.png",
     "popularity": 87
-  },
-  {
-    "id": 52,
-    "name": "test",
-    "description": "gg",
-    "url": "https://pan.nbvil.com",
-    "category": "author",
-    "tags": [],
-    "icon": "/assets/tools_icon.png",
-    "popularity": 50
   },
   {
     "id": 1,
