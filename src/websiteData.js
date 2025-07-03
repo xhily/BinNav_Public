@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/3 21:06:03
+// 网站数据 - 通过管理后台更新于 2025/7/3 21:45:46
 export const websiteData = [
   {
     "id": 40,
@@ -37,11 +37,22 @@ export const websiteData = [
     "category": "author",
     "tags": [
       "知乎专栏",
-      "前端开发",
       "技术文章"
     ],
-    "icon": "/assets/social_icon.png",
-    "popularity": 87
+    "icon": "/default_icon.png"
+  },
+  {
+    "id": 50,
+    "name": "Vue.js",
+    "description": "渐进式JavaScript框架",
+    "url": "https://vuejs.org",
+    "category": "category_1751550177044",
+    "tags": [
+      "JavaScript",
+      "框架",
+      "前端"
+    ],
+    "icon": "/default_icon.png"
   },
   {
     "id": 41,
@@ -630,20 +641,6 @@ export const websiteData = [
     ],
     "icon": "/assets/tools_icon.png",
     "popularity": 88
-  },
-  {
-    "id": 50,
-    "name": "Vue.js",
-    "description": "渐进式JavaScript框架",
-    "url": "https://vuejs.org",
-    "category": "friend_links",
-    "tags": [
-      "JavaScript",
-      "框架",
-      "前端"
-    ],
-    "icon": "/assets/dev_tools_icon.png",
-    "popularity": 92
   }
 ];
 
@@ -717,8 +714,10 @@ export const categories = [
       },
       {
         "id": "color_tools",
-        "name": "在线配色",
-        "icon": "/assets/tools_icon.png"
+        "name": "配色",
+        "icon": "/assets/tools_icon.png",
+        "special": true,
+        "subcategories": []
       }
     ]
   },
@@ -748,6 +747,13 @@ export const categories = [
     "name": "友情链接",
     "icon": "/assets/network_icon.png",
     "color": "bg-pink-500",
+    "subcategories": []
+  },
+  {
+    "id": "category_1751550177044",
+    "name": "test",
+    "icon": "/assets/tools_icon.png",
+    "special": true,
     "subcategories": []
   }
 ];
