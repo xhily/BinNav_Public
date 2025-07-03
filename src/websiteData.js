@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/3 22:57:02
+// 网站数据 - 通过管理后台更新于 2025/7/3 22:59:22
 export const websiteData = [
   {
     "id": 40,
@@ -715,6 +715,12 @@ export const categories = [
         "icon": "/assets/tools_icon.png",
         "special": false,
         "subcategories": []
+      },
+      {
+        "id": "color_tools",
+        "name": "配色",
+        "icon": "/assets/tools_icon.png",
+        "special": false
       }
     ]
   },
@@ -744,13 +750,6 @@ export const categories = [
     "name": "友情链接",
     "icon": "/assets/network_icon.png",
     "color": "bg-pink-500",
-    "subcategories": []
-  },
-  {
-    "id": "color_tools",
-    "name": "配色",
-    "icon": "/assets/tools_icon.png",
-    "special": true,
     "subcategories": []
   }
 ];
