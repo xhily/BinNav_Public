@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/3 21:39:18
+// 网站数据 - 通过管理后台更新于 2025/7/3 21:42:20
 export const websiteData = [
   {
     "id": 40,
@@ -37,11 +37,9 @@ export const websiteData = [
     "category": "author",
     "tags": [
       "知乎专栏",
-      "前端开发",
       "技术文章"
     ],
-    "icon": "/assets/social_icon.png",
-    "popularity": 87
+    "icon": "/default_icon.png"
   },
   {
     "id": 41,
@@ -717,8 +715,10 @@ export const categories = [
       },
       {
         "id": "color_tools",
-        "name": "在线配色",
-        "icon": "/assets/tools_icon.png"
+        "name": "配色",
+        "icon": "/assets/tools_icon.png",
+        "special": true,
+        "subcategories": []
       }
     ]
   },
