@@ -387,6 +387,35 @@ console.log('🎯 Select 当前值:', {
    - 查找 `🎯 Select 当前值:` 确认 `formDataParentId` 等于"灵感采集"的ID
    - 查找 `isCurrentParentInList: true` 确认当前父分类在可选列表中
 
+### 问题11：修复代码错误导致所有子分类都显示"升级为一级分类"（紧急修复）
+
+**问题描述**：上一次修复后，所有子分类编辑时都默认显示"升级为一级分类"，而不是正确的父分类。
+
+**错误原因**：在 `getAvailableParentCategories` 函数中，错误地排除了包含当前子分类的父分类：
+```javascript
+// 错误的代码：
+!cat.subcategories?.some(sub => sub.id === category.id) // 这会排除当前父分类！
+```
+
+**正确修复**：
+```javascript
+// 修复前：错误地排除了当前父分类
+if (isSubcategory) {
+  return categories.filter(cat =>
+    cat.id !== category.id &&
+    !cat.subcategories?.some(sub => sub.id === category.id) // ❌ 错误：排除了父分类
+  )
+}
+
+// 修复后：包含所有一级分类
+if (isSubcategory) {
+  return categories.filter(cat => {
+    // 子分类可以移动到任何一级分类下，包括当前父分类
+    return true // ✅ 正确：包含所有一级分类
+  })
+}
+```
+
 **预期修复效果**：
 - ✅ "发现产品"编辑时默认显示"保持在 '灵感采集' 下（当前）"
 - ✅ 所有子分类编辑时都正确显示当前父分类

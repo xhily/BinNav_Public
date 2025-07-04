@@ -416,11 +416,13 @@ const InlineEditForm = ({
   const getAvailableParentCategories = () => {
     if (isEditing && category) {
       if (isSubcategory) {
-        // 如果是子分类编辑，排除当前子分类本身，但保留所有一级分类（包括当前父分类）
-        return categories.filter(cat =>
-          cat.id !== category.id && // 排除当前子分类（虽然子分类不在一级分类列表中，但为了安全）
-          !cat.subcategories?.some(sub => sub.id === category.id) // 排除包含当前子分类的分类（避免循环）
-        )
+        // 如果是子分类编辑，包含所有一级分类（包括当前父分类）
+        // 只需要排除那些会造成循环引用的分类
+        return categories.filter(cat => {
+          // 不排除任何一级分类，因为子分类可以移动到任何一级分类下
+          // 子分类本身不在 categories 列表中，所以不需要特别排除
+          return true
+        })
       } else {
         // 如果是一级分类编辑，排除当前分类及其子分类
         return categories.filter(cat =>
