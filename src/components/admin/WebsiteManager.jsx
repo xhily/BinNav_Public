@@ -213,7 +213,7 @@ const WebsiteManager = ({
     name: '',
     description: '',
     url: '',
-    category: 'recommended',
+    category: config.categories.length > 0 ? config.categories[0].id : '',
     tags: ''
   })
 
@@ -227,11 +227,14 @@ const WebsiteManager = ({
 
   // 重置表单
   const resetWebsiteForm = () => {
+    // 获取第一个可用分类作为默认值
+    const defaultCategory = config.categories.length > 0 ? config.categories[0].id : ''
+
     setWebsiteForm({
       name: '',
       description: '',
       url: '',
-      category: 'recommended',
+      category: defaultCategory,
       tags: ''
     })
   }
@@ -261,6 +264,17 @@ const WebsiteManager = ({
     }
   }
 
+  // 获取网站图标
+  const getWebsiteIcon = (url) => {
+    try {
+      const domain = new URL(url).hostname
+      return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
+    } catch (error) {
+      console.warn('无法解析网站URL，使用默认图标:', error)
+      return '/assets/logo.png'
+    }
+  }
+
   // 保存网站
   const handleSaveWebsite = () => {
     const newWebsite = {
@@ -270,8 +284,15 @@ const WebsiteManager = ({
       url: websiteForm.url.trim(),
       category: websiteForm.category,
       tags: websiteForm.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-      icon: `/default_icon.png`
+      icon: getWebsiteIcon(websiteForm.url.trim()) // 自动获取网站图标
     }
+
+    console.log('💾 保存网站:', {
+      name: newWebsite.name,
+      url: newWebsite.url,
+      icon: newWebsite.icon,
+      category: newWebsite.category
+    })
 
     if (editingWebsite === 'new') {
       // 添加新网站
@@ -344,6 +365,7 @@ const WebsiteManager = ({
           onSave={handleSaveWebsite}
           onCancel={handleCancelEdit}
           isEditing={false}
+          categories={config.categories}
         />
       )}
 

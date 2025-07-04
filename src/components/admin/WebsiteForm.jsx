@@ -3,12 +3,13 @@ import React from 'react'
 /**
  * 网站表单组件
  */
-const WebsiteForm = ({ 
-  websiteForm, 
-  setWebsiteForm, 
-  onSave, 
-  onCancel, 
-  isEditing = false 
+const WebsiteForm = ({
+  websiteForm,
+  setWebsiteForm,
+  onSave,
+  onCancel,
+  isEditing = false,
+  categories = [] // 添加分类数据
 }) => {
   return (
     <div className={`border rounded-lg p-6 mb-6 ${
@@ -59,10 +60,17 @@ const WebsiteForm = ({
             onChange={(e) => setWebsiteForm({...websiteForm, category: e.target.value})}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="recommended">常用推荐</option>
-            <option value="design_tools">设计工具</option>
-            <option value="developer_tools">开发工具</option>
-            <option value="learning">学习教程</option>
+            <option value="">请选择分类</option>
+            {categories.map(category => (
+              <optgroup key={category.id} label={category.name}>
+                <option value={category.id}>{category.name}</option>
+                {category.subcategories && category.subcategories.map(subcategory => (
+                  <option key={subcategory.id} value={subcategory.id}>
+                    　└ {subcategory.name}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
           </select>
         </div>
         
