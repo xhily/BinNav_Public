@@ -282,10 +282,17 @@ const WebsiteManager = ({
   }
 
   // 获取网站图标
-  const getWebsiteIcon = (url) => {
+  const getWebsiteIcon = (url, forceRefresh = false) => {
     try {
       const domain = new URL(url).hostname
-      return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
+      const baseUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
+
+      // 如果是强制刷新，添加时间戳防止缓存
+      if (forceRefresh) {
+        return `${baseUrl}&t=${Date.now()}`
+      }
+
+      return baseUrl
     } catch (error) {
       console.warn('无法解析网站URL，使用默认图标:', error)
       return '/assets/logo.png'
@@ -313,7 +320,7 @@ const WebsiteManager = ({
       currentIcon: website.icon
     })
 
-    const newIcon = getWebsiteIcon(website.url)
+    const newIcon = getWebsiteIcon(website.url, true) // 强制刷新图标
     console.log('🎯 生成新图标:', newIcon)
 
     const updatedWebsites = config.websiteData.map(w =>
@@ -327,6 +334,16 @@ const WebsiteManager = ({
 
     onUpdateWebsiteData(updatedWebsites)
     showMessage('success', `已更新 "${website.name}" 的图标`)
+
+    // 强制刷新页面上的图片缓存
+    setTimeout(() => {
+      const images = document.querySelectorAll(`img[alt="${website.name}"]`)
+      images.forEach(img => {
+        const src = img.src
+        img.src = ''
+        img.src = src
+      })
+    }, 100)
 
     console.log('✅ 图标更新完成:', {
       websiteName: website.name,
@@ -343,7 +360,7 @@ const WebsiteManager = ({
     })
 
     const updatedWebsites = config.websiteData.map(website => {
-      const newIcon = getWebsiteIcon(website.url)
+      const newIcon = getWebsiteIcon(website.url, true) // 强制刷新图标
       console.log(`🎯 更新 "${website.name}":`, {
         oldIcon: website.icon,
         newIcon: newIcon
@@ -361,6 +378,18 @@ const WebsiteManager = ({
 
     onUpdateWebsiteData(updatedWebsites)
     showMessage('success', `已更新 ${config.websiteData.length} 个网站的图标`)
+
+    // 强制刷新页面上所有网站图片的缓存
+    setTimeout(() => {
+      const images = document.querySelectorAll('img[alt]')
+      images.forEach(img => {
+        if (img.src.includes('favicons')) {
+          const src = img.src
+          img.src = ''
+          img.src = src
+        }
+      })
+    }, 100)
 
     console.log('✅ 批量更新完成')
   }
