@@ -326,15 +326,14 @@ const WebsiteManager = ({
         resolve(false)
       }
 
-      // 设置crossOrigin以避免CORS问题
-      img.crossOrigin = 'anonymous'
+      // 不设置crossOrigin，避免CORS问题
       img.src = url
 
-      // 5秒超时（增加超时时间）
+      // 3秒超时
       setTimeout(() => {
         console.log(`⏰ 图标加载超时: ${url}`)
         resolve(false)
-      }, 5000)
+      }, 3000)
     })
   }
 
@@ -343,53 +342,73 @@ const WebsiteManager = ({
     try {
       console.log('🔍 尝试从HTML解析图标:', url)
 
-      // 使用代理服务避免CORS问题
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
-      const response = await fetch(proxyUrl)
-
-      if (!response.ok) {
-        console.log('❌ HTML获取失败')
-        return []
-      }
-
-      const data = await response.json()
-      const html = data.contents
-
-      // 创建临时DOM来解析HTML
-      const parser = new DOMParser()
-      const doc = parser.parseFromString(html, 'text/html')
-
-      const iconUrls = []
-      const origin = new URL(url).origin
-
-      // 查找各种图标链接
-      const iconSelectors = [
-        'link[rel="icon"]',
-        'link[rel="shortcut icon"]',
-        'link[rel="apple-touch-icon"]',
-        'link[rel="apple-touch-icon-precomposed"]',
-        'link[rel="mask-icon"]',
-        'meta[property="og:image"]'
+      // 尝试多个代理服务
+      const proxyServices = [
+        `https://corsproxy.io/?${encodeURIComponent(url)}`,
+        `https://cors-anywhere.herokuapp.com/${url}`,
+        // 如果代理都失败，尝试直接访问（可能会有CORS问题，但值得一试）
+        url
       ]
 
-      iconSelectors.forEach(selector => {
-        const elements = doc.querySelectorAll(selector)
-        elements.forEach(element => {
-          let iconUrl = element.getAttribute('href') || element.getAttribute('content')
-          if (iconUrl) {
-            // 处理相对路径
-            if (iconUrl.startsWith('/')) {
-              iconUrl = origin + iconUrl
-            } else if (!iconUrl.startsWith('http')) {
-              iconUrl = origin + '/' + iconUrl
+      for (const proxyUrl of proxyServices) {
+        try {
+          console.log(`🔄 尝试代理: ${proxyUrl}`)
+          const response = await fetch(proxyUrl, {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
-            iconUrls.push(iconUrl)
-          }
-        })
-      })
+          })
 
-      console.log('🎯 从HTML解析到的图标:', iconUrls)
-      return iconUrls
+          if (!response.ok) {
+            console.log(`❌ 代理失败: ${proxyUrl}`)
+            continue
+          }
+
+          const html = await response.text()
+
+          // 创建临时DOM来解析HTML
+          const parser = new DOMParser()
+          const doc = parser.parseFromString(html, 'text/html')
+
+          const iconUrls = []
+          const origin = new URL(url).origin
+
+          // 查找各种图标链接
+          const iconSelectors = [
+            'link[rel="icon"]',
+            'link[rel="shortcut icon"]',
+            'link[rel="apple-touch-icon"]',
+            'link[rel="apple-touch-icon-precomposed"]',
+            'link[rel="mask-icon"]'
+          ]
+
+          iconSelectors.forEach(selector => {
+            const elements = doc.querySelectorAll(selector)
+            elements.forEach(element => {
+              let iconUrl = element.getAttribute('href')
+              if (iconUrl) {
+                // 处理相对路径
+                if (iconUrl.startsWith('/')) {
+                  iconUrl = origin + iconUrl
+                } else if (!iconUrl.startsWith('http')) {
+                  iconUrl = origin + '/' + iconUrl
+                }
+                iconUrls.push(iconUrl)
+              }
+            })
+          })
+
+          console.log('🎯 从HTML解析到的图标:', iconUrls)
+          return iconUrls
+
+        } catch (error) {
+          console.log(`❌ 代理服务失败: ${proxyUrl}`, error)
+          continue
+        }
+      }
+
+      console.log('❌ 所有代理服务都失败')
+      return []
 
     } catch (error) {
       console.log('❌ HTML解析失败:', error)
@@ -411,17 +430,35 @@ const WebsiteManager = ({
         forceRefresh: forceRefresh
       })
 
-      // 1. 首先尝试Google Favicon API（原本的默认逻辑）
-      const googleFaviconUrl = `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32${forceRefresh ? '&t=' + Date.now() : ''}`
-      console.log('🔍 测试Google Favicon API:', googleFaviconUrl)
+      // 1. 尝试多个Favicon API服务
+      const faviconAPIs = [
+        // Google Favicon API
+        `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32${forceRefresh ? '&t=' + Date.now() : ''}`,
 
-      const isGoogleValid = await testIconUrl(googleFaviconUrl)
-      if (isGoogleValid) {
-        console.log('✅ Google Favicon API成功')
-        return googleFaviconUrl
+        // DuckDuckGo图标API
+        `https://icons.duckduckgo.com/ip3/${mainDomain}.ico`,
+
+        // Favicon.io API
+        `https://favicons.githubusercontent.com/${mainDomain}`,
+
+        // 网站自己的标准favicon
+        `https://${mainDomain}/favicon.ico`
+      ]
+
+      console.log('🔍 测试Favicon API服务:', faviconAPIs)
+
+      for (const apiUrl of faviconAPIs) {
+        console.log(`🔍 测试API: ${apiUrl}`)
+        const isValid = await testIconUrl(apiUrl)
+        if (isValid) {
+          console.log(`✅ API成功: ${apiUrl}`)
+          return apiUrl
+        } else {
+          console.log(`❌ API失败: ${apiUrl}`)
+        }
       }
 
-      console.log('❌ Google Favicon API失败，尝试解析HTML')
+      console.log('❌ 所有Favicon API都失败，尝试解析HTML')
 
       // 2. 如果Google API失败，解析HTML查找图标
       const htmlIcons = await parseIconFromHTML(url)
