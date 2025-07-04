@@ -304,6 +304,94 @@ console.log('🔄 Props 变化，更新 parentId:', {
    - `📝 更新后的 formData:` - 显示最终的表单数据
 4. 确认分类级别选择器显示正确的父分类名称
 
+### 问题10：子分类编辑时默认选项错误（第五轮修复）
+
+**问题具体描述**：
+- 子分类"发现产品"编辑时，分类级别默认显示"升级为一级分类"
+- 正确应该像"界面灵感"一样，默认显示"保持在灵感采集下（当前）"
+
+**根本原因**：
+1. **可用父分类过滤逻辑错误**：`getAvailableParentCategories` 函数对子分类和一级分类使用了相同的过滤逻辑
+2. **选项匹配问题**：`formData.parentId` 的值可能与选项的 `value` 不匹配
+3. **调试信息不足**：无法确定具体是哪个环节出现问题
+
+**修复方案**：
+
+1. **区分子分类和一级分类的过滤逻辑**：
+```javascript
+// 修复前：统一的过滤逻辑
+const getAvailableParentCategories = () => {
+  if (isEditing && category) {
+    return categories.filter(cat =>
+      cat.id !== category.id &&
+      !category.subcategories?.some(sub => sub.id === cat.id)
+    )
+  }
+  return categories
+}
+
+// 修复后：区分处理
+const getAvailableParentCategories = () => {
+  if (isEditing && category) {
+    if (isSubcategory) {
+      // 子分类编辑：保留所有一级分类（包括当前父分类）
+      return categories.filter(cat =>
+        cat.id !== category.id &&
+        !cat.subcategories?.some(sub => sub.id === category.id)
+      )
+    } else {
+      // 一级分类编辑：排除当前分类及其子分类
+      return categories.filter(cat =>
+        cat.id !== category.id &&
+        !category.subcategories?.some(sub => sub.id === cat.id)
+      )
+    }
+  }
+  return categories
+}
+```
+
+2. **增强调试信息**：
+```javascript
+// 添加可用父分类列表的调试
+console.log('🏷️ 可用父分类列表:', {
+  category: category?.name,
+  isSubcategory,
+  parentCategory: parentCategory?.name,
+  currentParentId: formData.parentId,
+  availableParents: availableParents.map(cat => ({ id: cat.id, name: cat.name })),
+  isCurrentParentInList: availableParents.some(cat => cat.id === formData.parentId)
+})
+
+// 添加选择器当前值的调试
+console.log('🎯 Select 当前值:', {
+  formDataParentId: formData.parentId,
+  selectValue: formData.parentId,
+  isSubcategory,
+  parentCategoryId: parentCategory?.id,
+  availableParentsIds: availableParents.map(p => p.id)
+})
+```
+
+**测试验证**：
+
+1. **清除浏览器缓存**并刷新页面
+2. **打开开发者工具控制台**
+3. **测试"发现产品"子分类**：
+   - 找到"灵感采集"分类
+   - 展开子分类列表
+   - 点击"发现产品"的编辑按钮
+   - **预期结果**：分类级别应该默认选中"保持在 '灵感采集' 下（当前）"
+4. **查看控制台调试信息**：
+   - 查找 `🏷️ 可用父分类列表:` 确认"灵感采集"在列表中
+   - 查找 `🎯 Select 当前值:` 确认 `formDataParentId` 等于"灵感采集"的ID
+   - 查找 `isCurrentParentInList: true` 确认当前父分类在可选列表中
+
+**预期修复效果**：
+- ✅ "发现产品"编辑时默认显示"保持在 '灵感采集' 下（当前）"
+- ✅ 所有子分类编辑时都正确显示当前父分类
+- ✅ 一级分类编辑时仍然正常工作
+
 ## 最新修复 (第二轮)
 
 ### 问题4：子分类专栏显示不生效

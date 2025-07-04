@@ -415,15 +415,34 @@ const InlineEditForm = ({
   // 获取可选的父级分类（排除当前分类及其子分类）
   const getAvailableParentCategories = () => {
     if (isEditing && category) {
-      return categories.filter(cat => 
-        cat.id !== category.id && 
-        !category.subcategories?.some(sub => sub.id === cat.id)
-      )
+      if (isSubcategory) {
+        // 如果是子分类编辑，排除当前子分类本身，但保留所有一级分类（包括当前父分类）
+        return categories.filter(cat =>
+          cat.id !== category.id && // 排除当前子分类（虽然子分类不在一级分类列表中，但为了安全）
+          !cat.subcategories?.some(sub => sub.id === category.id) // 排除包含当前子分类的分类（避免循环）
+        )
+      } else {
+        // 如果是一级分类编辑，排除当前分类及其子分类
+        return categories.filter(cat =>
+          cat.id !== category.id &&
+          !category.subcategories?.some(sub => sub.id === cat.id)
+        )
+      }
     }
     return categories
   }
 
   const availableParents = getAvailableParentCategories()
+
+  // 调试：打印可用父分类列表
+  console.log('🏷️ 可用父分类列表:', {
+    category: category?.name,
+    isSubcategory,
+    parentCategory: parentCategory?.name,
+    currentParentId: formData.parentId,
+    availableParents: availableParents.map(cat => ({ id: cat.id, name: cat.name })),
+    isCurrentParentInList: availableParents.some(cat => cat.id === formData.parentId)
+  })
 
   return (
     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-3 animate-in slide-in-from-top-2 duration-200">
@@ -487,6 +506,14 @@ const InlineEditForm = ({
             }}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
           >
+            {/* 调试：显示当前选中值 */}
+            {console.log('🎯 Select 当前值:', {
+              formDataParentId: formData.parentId,
+              selectValue: formData.parentId,
+              isSubcategory,
+              parentCategoryId: parentCategory?.id,
+              availableParentsIds: availableParents.map(p => p.id)
+            })}
             {isSubcategory ? (
               <>
                 <option value="">升级为一级分类</option>
