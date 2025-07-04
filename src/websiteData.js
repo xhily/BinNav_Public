@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/3 23:21:19
+// 网站数据 - 通过管理后台更新于 2025/7/4 09:41:43
 export const websiteData = [
   {
     "id": 40,
@@ -647,6 +647,13 @@ export const websiteData = [
 // 分类定义 - 支持二级分类
 export const categories = [
   {
+    "id": "author",
+    "name": "作者专栏",
+    "icon": "/assets/tech_blogger_avatar.png",
+    "special": true,
+    "subcategories": []
+  },
+  {
     "id": "recommended",
     "name": "常用推荐",
     "icon": "/assets/tools_icon.png",
@@ -744,13 +751,6 @@ export const categories = [
     "icon": "/assets/network_icon.png",
     "color": "bg-pink-500",
     "subcategories": []
-  },
-  {
-    "id": "author",
-    "name": "作者专栏",
-    "icon": "/assets/tech_blogger_avatar.png",
-    "special": true,
-    "subcategories": []
   }
 ];
 
@@ -793,5 +793,5 @@ export const siteStats = {
   totalSites: websiteData.length,
   totalCategories: categories.length,
   totalTags: [...new Set(websiteData.flatMap(site => site.tags || []))].length,
-  lastUpdated: "2025-07-03"
+  lastUpdated: "2025-07-04"
 };
