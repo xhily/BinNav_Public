@@ -227,4 +227,136 @@ const resetWebsiteForm = () => {
    - 修复默认分类选择逻辑
    - 添加调试日志
 
-这次修复解决了网站管理中的两个重要用户体验问题，使添加网站的流程更加完善和用户友好。
+## 补充修复：已有网站图标更新功能
+
+### 🐛 **新发现的问题**
+
+用户反馈：新添加的站点可以自动获取图标，但已经存在的站点无法根据站点链接更新图标。
+
+### 🔍 **问题分析**
+
+1. **已有网站使用旧图标**：现有网站可能使用 `/default_icon.png` 等旧路径
+2. **缺少更新机制**：没有为已有网站提供图标更新功能
+3. **批量更新需求**：用户希望能一次性更新所有网站的图标
+
+### ✅ **解决方案**
+
+#### 1. **单个网站图标更新**
+
+在每个网站卡片中添加更新图标按钮：
+
+```javascript
+// 更新单个网站图标
+const handleUpdateSingleIcon = (websiteId) => {
+  const website = config.websiteData.find(w => w.id === websiteId)
+  if (!website) return
+
+  const newIcon = getWebsiteIcon(website.url)
+  const updatedWebsites = config.websiteData.map(w =>
+    w.id === websiteId ? { ...w, icon: newIcon } : w
+  )
+
+  onUpdateWebsiteData(updatedWebsites)
+  showMessage('success', `已更新 "${website.name}" 的图标`)
+}
+```
+
+#### 2. **批量图标更新**
+
+在网站管理页面添加批量更新按钮：
+
+```javascript
+// 批量更新所有网站图标
+const handleUpdateAllIcons = () => {
+  const updatedWebsites = config.websiteData.map(website => ({
+    ...website,
+    icon: getWebsiteIcon(website.url)
+  }))
+
+  onUpdateWebsiteData(updatedWebsites)
+  showMessage('success', `已更新 ${config.websiteData.length} 个网站的图标`)
+}
+```
+
+#### 3. **用户界面改进**
+
+**网站卡片按钮布局**：
+```javascript
+<div className="flex items-center space-x-2 mt-auto">
+  <button onClick={() => onEdit(website)}>编辑</button>
+  <button onClick={() => onUpdateIcon(website.id)} title="更新图标">
+    🔄 {/* 刷新图标 */}
+  </button>
+  <button onClick={() => onDelete(website.id)}>删除</button>
+</div>
+```
+
+**页面顶部批量操作**：
+```javascript
+<div className="flex items-center gap-3">
+  <button onClick={handleUpdateAllIcons}>
+    🔄 更新图标
+  </button>
+  <button onClick={handleAddWebsite}>
+    ➕ 添加网站
+  </button>
+</div>
+```
+
+### 🎯 **功能特性**
+
+#### ✅ **单个更新**
+- 每个网站卡片都有独立的更新图标按钮
+- 点击后立即更新该网站的图标
+- 显示更新成功的提示消息
+- 提供详细的调试日志
+
+#### ✅ **批量更新**
+- 一键更新所有网站的图标
+- 显示更新数量的反馈
+- 适合初次使用或大量网站的场景
+
+#### ✅ **智能图标获取**
+- 使用Google Favicon API获取高质量图标
+- 自动处理URL解析错误
+- 提供默认图标作为回退
+
+#### ✅ **用户体验优化**
+- 清晰的按钮图标和提示文字
+- 即时的成功反馈
+- 详细的操作日志
+
+### 🧪 **测试步骤**
+
+1. **测试单个图标更新**：
+   - 找到一个使用默认图标的网站
+   - 点击该网站卡片上的刷新图标按钮
+   - 确认图标更新为网站的实际favicon
+
+2. **测试批量图标更新**：
+   - 点击页面顶部的"更新图标"按钮
+   - 确认所有网站的图标都更新了
+   - 查看成功提示消息
+
+3. **测试错误处理**：
+   - 对于无效URL的网站，确认使用默认图标
+   - 查看控制台的调试日志
+
+### 📍 **修改的文件**
+
+**src/components/admin/WebsiteManager.jsx**：
+- 添加 `handleUpdateSingleIcon` 函数
+- 添加 `handleUpdateAllIcons` 函数
+- 在网站卡片中添加更新图标按钮
+- 在页面顶部添加批量更新按钮
+- 传递 `onUpdateIcon` 参数给子组件
+
+### 🎉 **最终效果**
+
+现在用户可以：
+- ✅ **单独更新**任意网站的图标
+- ✅ **批量更新**所有网站的图标
+- ✅ **自动获取**新添加网站的图标
+- ✅ **智能处理**图标获取失败的情况
+
+这次修复解决了网站管理中的两个重要用户体验问题，并新增了已有网站图标更新功能，使整个网站管理系统更加完善和用户友好。

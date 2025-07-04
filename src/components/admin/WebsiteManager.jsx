@@ -8,14 +8,15 @@ import WebsiteForm from './WebsiteForm'
 /**
  * 可拖拽的网站项组件
  */
-const SortableWebsiteItem = ({ 
-  website, 
-  onEdit, 
-  onDelete, 
-  editingWebsite, 
-  websiteForm, 
-  setWebsiteForm, 
-  onSaveWebsite, 
+const SortableWebsiteItem = ({
+  website,
+  onEdit,
+  onDelete,
+  onUpdateIcon,
+  editingWebsite,
+  websiteForm,
+  setWebsiteForm,
+  onSaveWebsite,
   onCancelEdit,
   getCategoryName,
   config
@@ -90,13 +91,22 @@ const SortableWebsiteItem = ({
           <button
             onClick={() => onEdit(website)}
             className={`flex items-center space-x-1 px-2 py-1 rounded text-xs transition-colors flex-1 justify-center ${
-              editingWebsite === website.id 
-                ? 'bg-blue-100 text-blue-700' 
+              editingWebsite === website.id
+                ? 'bg-blue-100 text-blue-700'
                 : 'text-blue-600 hover:bg-blue-50'
             }`}
           >
             {editingWebsite === website.id ? <ChevronUp size={14} /> : <Edit3 size={14} />}
             <span>{editingWebsite === website.id ? '收起' : '编辑'}</span>
+          </button>
+          <button
+            onClick={() => onUpdateIcon(website.id)}
+            className="text-green-600 hover:text-green-800 p-1"
+            title="更新图标"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
           </button>
           <button
             onClick={() => onDelete(website.id)}
@@ -275,6 +285,42 @@ const WebsiteManager = ({
     }
   }
 
+  // 更新单个网站图标
+  const handleUpdateSingleIcon = (websiteId) => {
+    const website = config.websiteData.find(w => w.id === websiteId)
+    if (!website) return
+
+    const newIcon = getWebsiteIcon(website.url)
+    const updatedWebsites = config.websiteData.map(w =>
+      w.id === websiteId ? { ...w, icon: newIcon } : w
+    )
+
+    onUpdateWebsiteData(updatedWebsites)
+    showMessage('success', `已更新 "${website.name}" 的图标`)
+
+    console.log('🔄 更新单个图标:', {
+      websiteName: website.name,
+      oldIcon: website.icon,
+      newIcon: newIcon
+    })
+  }
+
+  // 批量更新所有网站图标
+  const handleUpdateAllIcons = () => {
+    const updatedWebsites = config.websiteData.map(website => ({
+      ...website,
+      icon: getWebsiteIcon(website.url)
+    }))
+
+    onUpdateWebsiteData(updatedWebsites)
+    showMessage('success', `已更新 ${config.websiteData.length} 个网站的图标`)
+
+    console.log('🔄 批量更新图标完成:', {
+      totalWebsites: config.websiteData.length,
+      updatedWebsites: updatedWebsites.map(w => ({ name: w.name, icon: w.icon }))
+    })
+  }
+
   // 保存网站
   const handleSaveWebsite = () => {
     const newWebsite = {
@@ -348,13 +394,25 @@ const WebsiteManager = ({
     <div>
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold text-gray-900">网站管理</h3>
-        <button
-          onClick={handleAddWebsite}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          添加网站
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleUpdateAllIcons}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+            title="为所有网站重新获取图标"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            更新图标
+          </button>
+          <button
+            onClick={handleAddWebsite}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            添加网站
+          </button>
+        </div>
       </div>
 
       {/* 添加网站表单 */}
@@ -407,11 +465,12 @@ const WebsiteManager = ({
                     return 0
                   })
                   .map((website) => (
-                  <SortableWebsiteItem 
-                    key={website.id} 
+                  <SortableWebsiteItem
+                    key={website.id}
                     website={website}
                     onEdit={handleEditWebsite}
                     onDelete={handleDeleteWebsite}
+                    onUpdateIcon={handleUpdateSingleIcon}
                     editingWebsite={editingWebsite}
                     websiteForm={websiteForm}
                     setWebsiteForm={setWebsiteForm}
