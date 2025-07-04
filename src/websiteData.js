@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/4 10:20:27
+// 网站数据 - 通过管理后台更新于 2025/7/4 10:29:00
 export const websiteData = [
   {
     "id": 40,
@@ -109,62 +109,6 @@ export const websiteData = [
     ],
     "icon": "/assets/social_icon.png",
     "popularity": 90
-  },
-  {
-    "id": 6,
-    "name": "Product Hunt",
-    "description": "发现新鲜有趣的产品",
-    "url": "https://producthunt.com",
-    "category": "inspiration",
-    "tags": [
-      "产品",
-      "创新",
-      "发现"
-    ],
-    "icon": "/assets/innovation_icon.png",
-    "popularity": 92
-  },
-  {
-    "id": 7,
-    "name": "NEXT",
-    "description": "不错过任何一个新产品",
-    "url": "https://next.36kr.com",
-    "category": "inspiration",
-    "tags": [
-      "产品",
-      "创业",
-      "36氪"
-    ],
-    "icon": "/assets/innovation_icon.png",
-    "popularity": 85
-  },
-  {
-    "id": 8,
-    "name": "少数派",
-    "description": "高品质数字消费指南",
-    "url": "https://sspai.com",
-    "category": "inspiration",
-    "tags": [
-      "数字生活",
-      "应用",
-      "效率"
-    ],
-    "icon": "/assets/tools_icon.png",
-    "popularity": 88
-  },
-  {
-    "id": 9,
-    "name": "Pttrns",
-    "description": "移动应用界面设计模式收集",
-    "url": "https://pttrns.com",
-    "category": "ui_inspiration",
-    "tags": [
-      "移动应用",
-      "UI模式",
-      "界面设计"
-    ],
-    "icon": "/assets/tools_icon.png",
-    "popularity": 85
   },
   {
     "id": 10,
@@ -349,104 +293,6 @@ export const websiteData = [
     "popularity": 88
   },
   {
-    "id": 23,
-    "name": "Figma",
-    "description": "协作式设计工具",
-    "url": "https://figma.com",
-    "category": "design_tools",
-    "tags": [
-      "设计工具",
-      "协作",
-      "原型"
-    ],
-    "icon": "/assets/.png",
-    "popularity": 95
-  },
-  {
-    "id": 24,
-    "name": "Sketch",
-    "description": "Mac平台专业界面设计工具",
-    "url": "https://sketch.com",
-    "category": "design_tools",
-    "tags": [
-      "Mac设计",
-      "界面设计",
-      "专业工具"
-    ],
-    "icon": "/assets/.png",
-    "popularity": 88
-  },
-  {
-    "id": 25,
-    "name": "Adobe XD",
-    "description": "Adobe用户体验设计工具",
-    "url": "https://adobe.com/products/xd.html",
-    "category": "design_tools",
-    "tags": [
-      "Adobe",
-      "UX设计",
-      "原型"
-    ],
-    "icon": "/assets/.png",
-    "popularity": 85
-  },
-  {
-    "id": 26,
-    "name": "InVision",
-    "description": "强大的设计原型工具",
-    "url": "https://invisionapp.com",
-    "category": "design_tools",
-    "tags": [
-      "原型设计",
-      "协作",
-      "用户体验"
-    ],
-    "icon": "/assets/.png",
-    "popularity": 82
-  },
-  {
-    "id": 27,
-    "name": "Coolors",
-    "description": "超快速配色方案生成器",
-    "url": "https://coolors.co",
-    "category": "color_tools",
-    "tags": [
-      "配色",
-      "色彩",
-      "生成器"
-    ],
-    "icon": "/assets/.png",
-    "popularity": 92
-  },
-  {
-    "id": 28,
-    "name": "Adobe Color",
-    "description": "使用色轮创建配色方案",
-    "url": "https://color.adobe.com",
-    "category": "color_tools",
-    "tags": [
-      "Adobe",
-      "色轮",
-      "配色"
-    ],
-    "icon": "/assets/.png",
-    "popularity": 88
-  },
-  {
-    "id": 29,
-    "name": "Flat UI Colors",
-    "description": "扁平化UI配色方案",
-    "url": "https://flatuicolors.com",
-    "category": "color_tools",
-    "tags": [
-      "扁平化",
-      "UI配色",
-      "色彩"
-    ],
-    "icon": "/assets/.png",
-    "popularity": 85
-  },
-  {
     "id": 30,
     "name": "GitHub",
     "description": "全球最大的代码托管平台",
@@ -503,104 +349,6 @@ export const websiteData = [
     "popularity": 93
   },
   {
-    "id": 34,
-    "name": "优设网",
-    "description": "设计师交流学习平台",
-    "url": "https://uisdc.com",
-    "category": "learning",
-    "tags": [
-      "设计教程",
-      "学习",
-      "中文"
-    ],
-    "icon": "/assets/.png",
-    "popularity": 88
-  },
-  {
-    "id": 35,
-    "name": "慕课网",
-    "description": "程序员的梦工厂",
-    "url": "https://imooc.com",
-    "category": "learning",
-    "tags": [
-      "编程教程",
-      "在线学习",
-      "技术"
-    ],
-    "icon": "/assets/.png",
-    "popularity": 90
-  },
-  {
-    "id": 36,
-    "name": "Medium",
-    "description": "高质量设计文章",
-    "url": "https://medium.com",
-    "category": "learning",
-    "tags": [
-      "文章",
-      "设计",
-      "高质量"
-    ],
-    "icon": "/assets/.png",
-    "popularity": 85
-  },
-  {
-    "id": 37,
-    "name": "36氪",
-    "description": "创业资讯、科技新闻",
-    "url": "https://36kr.com",
-    "category": "community",
-    "tags": [
-      "创业",
-      "科技新闻",
-      "资讯"
-    ],
-    "icon": "/assets/.png",
-    "popularity": 88
-  },
-  {
-    "id": 38,
-    "name": "人人都是产品经理",
-    "description": "产品经理、产品爱好者学习交流平台",
-    "url": "https://woshipm.com",
-    "category": "community",
-    "tags": [
-      "产品经理",
-      "学习",
-      "交流"
-    ],
-    "icon": "/assets/.png",
-    "popularity": 85
-  },
-  {
-    "id": 39,
-    "name": "知乎",
-    "description": "中文问答知识社区",
-    "url": "https://zhihu.com",
-    "category": "community",
-    "tags": [
-      "问答",
-      "知识分享",
-      "社区"
-    ],
-    "icon": "/assets/.png",
-    "popularity": 92
-  },
-  {
-    "id": 46,
-    "name": "Nbvil's Blog",
-    "description": "技术分享与编程心得",
-    "url": "https://blog.nbvil.com",
-    "category": "friend_links",
-    "tags": [
-      "个人博客",
-      "技术分享",
-      "编程"
-    ],
-    "icon": "/assets/tech_blogger_avatar.png",
-    "popularity": 85
-  },
-  {
     "id": 47,
     "name": "GitHub",
     "description": "全球最大的代码托管平台",
@@ -613,34 +361,6 @@ export const websiteData = [
     ],
     "icon": "/assets/dev_tools_icon.png",
     "popularity": 95
-  },
-  {
-    "id": 48,
-    "name": "MDN Web Docs",
-    "description": "权威的Web开发文档",
-    "url": "https://developer.mozilla.org",
-    "category": "friend_links",
-    "tags": [
-      "文档",
-      "Web开发",
-      "学习"
-    ],
-    "icon": "/assets/education_icon.png",
-    "popularity": 90
-  },
-  {
-    "id": 49,
-    "name": "Unsplash",
-    "description": "免费高质量图片素材",
-    "url": "https://unsplash.com",
-    "category": "friend_links",
-    "tags": [
-      "图片",
-      "素材",
-      "免费"
-    ],
-    "icon": "/assets/tools_icon.png",
-    "popularity": 88
   }
 ];
 
@@ -661,88 +381,17 @@ export const categories = [
     "subcategories": []
   },
   {
-    "id": "inspiration",
-    "name": "灵感采集",
-    "icon": "/assets/innovation_icon.png",
-    "color": "bg-purple-500",
-    "subcategories": [
-      {
-        "id": "inspiration",
-        "name": "发现产品",
-        "icon": "/assets/innovation_icon.png"
-      },
-      {
-        "id": "ui_inspiration",
-        "name": "界面灵感",
-        "icon": "/assets/tools_icon.png"
-      },
-      {
-        "id": "web_inspiration",
-        "name": "网页灵感",
-        "icon": "/assets/network_icon.png"
-      }
-    ]
-  },
-  {
     "id": "design_resources",
     "name": "素材资源",
     "icon": "/assets/tools_icon.png",
     "color": "bg-pink-500",
-    "subcategories": [
-      {
-        "id": "icons",
-        "name": "图标素材",
-        "icon": "/assets/tools_icon.png"
-      },
-      {
-        "id": "design_resources",
-        "name": "平面素材",
-        "icon": "/assets/tools_icon.png",
-        "special": false,
-        "subcategories": []
-      }
-    ]
-  },
-  {
-    "id": "design_tools",
-    "name": "设计工具",
-    "icon": "/assets/tools_icon.png",
-    "color": "bg-indigo-500",
-    "subcategories": [
-      {
-        "id": "design_tools",
-        "name": "界面设计",
-        "icon": "/assets/tools_icon.png",
-        "special": false,
-        "subcategories": []
-      },
-      {
-        "id": "color_tools",
-        "name": "配色",
-        "icon": "/assets/tools_icon.png",
-        "special": false
-      }
-    ]
+    "subcategories": []
   },
   {
     "id": "dev_tools",
     "name": "开发工具",
     "icon": "/assets/dev_tools_icon.png",
     "color": "bg-gray-500",
-    "subcategories": []
-  },
-  {
-    "id": "learning",
-    "name": "学习教程",
-    "icon": "/assets/education_icon.png",
-    "color": "bg-emerald-500",
-    "subcategories": []
-  },
-  {
-    "id": "community",
-    "name": "社区资讯",
-    "icon": "/assets/social_icon.png",
-    "color": "bg-cyan-500",
     "subcategories": []
   },
   {
