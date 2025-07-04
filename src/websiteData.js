@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/4 10:42:06
+// 网站数据 - 通过管理后台更新于 2025/7/4 11:10:12
 export const websiteData = [
   {
     "id": 40,
@@ -11,7 +11,7 @@ export const websiteData = [
       "教程分享",
       "开发心得"
     ],
-    "icon": "/default_icon.png"
+    "icon": "https://www.google.com/s2/favicons?domain=blog.nbvil.com&sz=32"
   },
   {
     "id": 45,
@@ -34,7 +34,18 @@ export const websiteData = [
     "tags": [
       "视频"
     ],
-    "icon": "/default_icon.png"
+    "icon": "https://www.google.com/s2/favicons?domain=space.bilibili.com&sz=32"
+  },
+  {
+    "id": 1751598590526,
+    "name": "YouTube频道",
+    "description": "作者YouTube频道，定期上传视频教程",
+    "url": "https://www.youtube.com/@nbvil.sindri",
+    "category": "author",
+    "tags": [
+      "视频"
+    ],
+    "icon": "https://www.google.com/s2/favicons?domain=www.youtube.com&sz=32"
   },
   {
     "id": 41,
