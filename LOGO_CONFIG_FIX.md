@@ -147,6 +147,135 @@ onLogoUpdate('/assets/logo.png')
 3. **路径一致性**：所有logo相关路径现在都统一使用 `/assets/` 前缀
 4. **向后兼容**：现有的logo配置会自动迁移到新的路径格式
 
+## 最新修复 (第二轮) - 解决Logo不立即生效问题
+
+### 🐛 **新发现的问题**
+
+用户反馈：上传Logo后，标签页图标（favicon）和主页左上角图标没有立即更新。
+
+### 🔍 **问题根源分析**
+
+1. **Favicon更新条件错误**：
+   ```javascript
+   // 错误的条件判断
+   if (favicon && newConfig.siteLogo !== '/assets/logo.png') {
+     favicon.setAttribute('href', newConfig.siteLogo)
+   }
+   ```
+   这导致当用户上传的logo路径是 `/assets/logo.png` 时，favicon不会更新。
+
+2. **HTML中favicon路径不一致**：
+   ```html
+   <!-- index.html 中的路径 -->
+   <link rel="icon" type="image/svg+xml" href="/logo.png" />
+
+   <!-- 但默认配置是 -->
+   siteLogo: '/assets/logo.png'
+   ```
+
+3. **Logo上传后不立即生效**：
+   ```javascript
+   // 只更新本地状态，不更新全局配置
+   onLogoUpdate={(logoPath) => {
+     setSiteSettings({...siteSettings, siteLogo: logoPath})
+   }}
+   ```
+
+4. **浏览器缓存问题**：favicon和图片可能被浏览器缓存。
+
+### ✅ **完整修复方案**
+
+#### 1. **修复favicon更新逻辑**
+```javascript
+// 修复前：条件判断错误
+if (favicon && newConfig.siteLogo !== '/assets/logo.png') {
+  favicon.setAttribute('href', newConfig.siteLogo)
+}
+
+// 修复后：移除错误条件，添加防缓存机制
+if (favicon) {
+  const logoUrl = newConfig.siteLogo.includes('?')
+    ? `${newConfig.siteLogo}&t=${Date.now()}`
+    : `${newConfig.siteLogo}?t=${Date.now()}`
+  favicon.setAttribute('href', logoUrl)
+}
+```
+
+#### 2. **统一HTML中的favicon路径**
+```html
+<!-- 修复前 -->
+<link rel="icon" type="image/svg+xml" href="/logo.png" />
+
+<!-- 修复后 -->
+<link rel="icon" type="image/png" href="/assets/logo.png" />
+```
+
+#### 3. **Logo上传后立即生效**
+```javascript
+// 修复前：只更新本地状态
+onLogoUpdate={(logoPath) => {
+  setSiteSettings({...siteSettings, siteLogo: logoPath})
+}}
+
+// 修复后：立即更新全局配置
+onLogoUpdate={(logoPath) => {
+  const newSettings = {...siteSettings, siteLogo: logoPath}
+  setSiteSettings(newSettings)
+  updateSiteConfig(newSettings) // 立即生效
+}}
+```
+
+#### 4. **添加防缓存机制**
+```javascript
+// 主页logo添加key属性强制重新渲染
+<img
+  src={siteConfig.siteLogo}
+  alt="Logo"
+  className="h-8 w-8 rounded-lg shadow-sm"
+  onError={(e) => { e.target.src = logoImg }}
+  key={siteConfig.siteLogo} // 强制重新渲染
+/>
+```
+
+### 🧪 **测试验证步骤**
+
+1. **清除浏览器缓存**：
+   - 按 Ctrl+Shift+R (Windows) 或 Cmd+Shift+R (Mac)
+   - 或在开发者工具中右键刷新按钮选择"清空缓存并硬性重新加载"
+
+2. **测试favicon更新**：
+   - 进入后台系统设置
+   - 上传新的logo
+   - **立即检查**：浏览器标签页图标是否更新
+   - 查看控制台是否有 `🔄 更新favicon:` 日志
+
+3. **测试主页logo更新**：
+   - 上传logo后立即切换到首页
+   - **立即检查**：左上角logo是否更新
+   - 查看控制台是否有 `🎯 Logo上传完成，立即更新配置:` 日志
+
+4. **测试缓存处理**：
+   - 多次上传不同的logo
+   - 确认每次都能立即看到变化
+
+### 📍 **修复的文件清单**
+
+1. **src/hooks/useSiteConfig.js**：
+   - 移除错误的favicon更新条件
+   - 添加时间戳防缓存机制
+   - 增加调试日志
+
+2. **index.html**：
+   - 统一favicon路径为 `/assets/logo.png`
+   - 修正文件类型为 `image/png`
+
+3. **src/pages/Admin.jsx**：
+   - Logo上传后立即调用 `updateSiteConfig`
+   - 添加调试日志
+
+4. **src/pages/HomePage.jsx**：
+   - 添加 `key` 属性强制重新渲染
+
 ## 预期效果
 
 修复后，用户将看到：
@@ -154,3 +283,7 @@ onLogoUpdate('/assets/logo.png')
 - ✅ 导航栏、页脚、后台预览使用相同的Logo
 - ✅ Logo加载失败时有合理的回退机制
 - ✅ 站点名称在所有位置保持一致
+- ✅ **Logo上传后立即在所有位置生效**
+- ✅ **标签页图标（favicon）立即更新**
+- ✅ **主页左上角图标立即更新**
+- ✅ **有效的缓存处理机制**

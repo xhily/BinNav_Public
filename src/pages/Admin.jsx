@@ -395,7 +395,14 @@ function Admin() {
         <LogoUploader
           currentLogo={siteSettings.siteLogo}
           onLogoUpdate={(logoPath) => {
-            setSiteSettings({...siteSettings, siteLogo: logoPath})
+            const newSettings = {...siteSettings, siteLogo: logoPath}
+            setSiteSettings(newSettings)
+            // 立即更新全局配置，使logo立即生效
+            updateSiteConfig(newSettings)
+            console.log('🎯 Logo上传完成，立即更新配置:', {
+              logoPath,
+              newSettings
+            })
           }}
           onClose={() => setShowLogoManager(false)}
           showMessage={showMessage}

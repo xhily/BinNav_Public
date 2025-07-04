@@ -51,8 +51,19 @@ export const updateSiteConfig = (newConfig) => {
   // 更新favicon
   if (newConfig.siteLogo) {
     const favicon = document.querySelector('link[rel="icon"]')
-    if (favicon && newConfig.siteLogo !== '/assets/logo.png') {
-      favicon.setAttribute('href', newConfig.siteLogo)
+    if (favicon) {
+      // 添加时间戳防止缓存
+      const logoUrl = newConfig.siteLogo.includes('?')
+        ? `${newConfig.siteLogo}&t=${Date.now()}`
+        : `${newConfig.siteLogo}?t=${Date.now()}`
+
+      console.log('🔄 更新favicon:', {
+        oldHref: favicon.getAttribute('href'),
+        newHref: logoUrl,
+        siteLogo: newConfig.siteLogo
+      })
+
+      favicon.setAttribute('href', logoUrl)
     }
   }
   notifySubscribers()

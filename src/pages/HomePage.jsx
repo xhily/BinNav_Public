@@ -116,11 +116,12 @@ function HomePage() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
               <div className="relative">
-                <img 
-                  src={siteConfig.siteLogo} 
-                  alt="Logo" 
-                  className="h-8 w-8 rounded-lg shadow-sm" 
+                <img
+                  src={siteConfig.siteLogo}
+                  alt="Logo"
+                  className="h-8 w-8 rounded-lg shadow-sm"
                   onError={(e) => { e.target.src = logoImg }}
+                  key={siteConfig.siteLogo} // 强制重新渲染
                 />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
               </div>
