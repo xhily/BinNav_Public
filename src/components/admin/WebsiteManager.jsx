@@ -48,7 +48,15 @@ const SortableWebsiteItem = ({
             <GripVertical size={16} />
           </div>
           <img
-            src={website.icon || `https://www.google.com/s2/favicons?domain=${new URL(website.url).hostname}&sz=32`}
+            src={website.icon || (() => {
+              try {
+                const hostname = new URL(website.url).hostname
+                const mainDomain = getMainDomain(hostname)
+                return `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32`
+              } catch {
+                return '/assets/logo.png'
+              }
+            })()}
             alt={website.name}
             className="w-10 h-10 rounded-lg flex-shrink-0 bg-gray-50 p-1"
             onError={(e) => {
@@ -304,11 +312,37 @@ const WebsiteManager = ({
     }
   }
 
-  // 获取网站图标 - 与新网站添加保持一致的逻辑
+  // 提取主域名（去除子域名）
+  const getMainDomain = (hostname) => {
+    const parts = hostname.split('.')
+
+    // 如果是IP地址或localhost，直接返回
+    if (parts.length <= 2 || /^\d+\.\d+\.\d+\.\d+$/.test(hostname) || hostname === 'localhost') {
+      return hostname
+    }
+
+    // 对于常见的二级域名，返回主域名
+    // 例如：space.bilibili.com → bilibili.com
+    //      blog.nbvil.com → nbvil.com
+    //      www.google.com → google.com
+    return parts.slice(-2).join('.')
+  }
+
+  // 获取网站图标 - 使用主域名获取图标
   const getWebsiteIcon = (url, forceRefresh = false) => {
     try {
-      const domain = new URL(url).hostname
-      const baseUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
+      const urlObj = new URL(url)
+      const hostname = urlObj.hostname
+      const mainDomain = getMainDomain(hostname)
+
+      console.log('🎯 图标获取分析:', {
+        originalUrl: url,
+        hostname: hostname,
+        mainDomain: mainDomain,
+        forceRefresh: forceRefresh
+      })
+
+      const baseUrl = `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32`
 
       // 更新时添加时间戳强制刷新，新添加时不添加
       if (forceRefresh) {
