@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/4 11:10:12
+// 网站数据 - 通过管理后台更新于 2025/7/4 11:29:24
 export const websiteData = [
   {
     "id": 40,
@@ -23,7 +23,7 @@ export const websiteData = [
       "知乎专栏",
       "技术文章"
     ],
-    "icon": "/default_icon.png"
+    "icon": "https://www.google.com/s2/favicons?domain=www.zhihu.com&sz=32"
   },
   {
     "id": 1751596898467,
@@ -56,7 +56,7 @@ export const websiteData = [
     "tags": [
       "开源项目"
     ],
-    "icon": "/default_icon.png"
+    "icon": "https://www.google.com/s2/favicons?domain=github.com&sz=32"
   },
   {
     "id": 33,
@@ -69,7 +69,7 @@ export const websiteData = [
       "开发工具",
       "微软"
     ],
-    "icon": "/assets/.png",
+    "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=32",
     "popularity": 93
   },
   {
@@ -83,7 +83,7 @@ export const websiteData = [
       "开源",
       "协作"
     ],
-    "icon": "/assets/dev_tools_icon.png",
+    "icon": "https://www.google.com/s2/favicons?domain=github.com&sz=32",
     "popularity": 95
   }
 ];
