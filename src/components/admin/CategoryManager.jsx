@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Plus, Edit3, Trash2, GripVertical, ChevronUp, ChevronDown, Folder, X, Save, Upload, Image, Eye, EyeOff } from 'lucide-react'
 import { DndContext, closestCenter, useSensor, useSensors, PointerSensor } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
@@ -290,7 +290,7 @@ const InlineEditForm = ({
   parentCategory = null
 }) => {
   // 获取当前分类的父级分类ID（如果是编辑现有分类）
-  const getCurrentParentId = () => {
+  const getCurrentParentId = useCallback(() => {
     console.log('getCurrentParentId 调用:', {
       isEditing,
       category: category?.name,
@@ -322,7 +322,7 @@ const InlineEditForm = ({
 
     console.log('确认是一级分类')
     return '' // 确实是一级分类
-  }
+  }, [isEditing, category, isSubcategory, parentCategory, categories])
 
   const [formData, setFormData] = useState({
     name: category?.name || '',
@@ -334,22 +334,30 @@ const InlineEditForm = ({
   // 监听 props 变化，更新 formData
   useEffect(() => {
     const newParentId = getCurrentParentId()
-    console.log('Props 变化，更新 parentId:', {
+    console.log('🔄 Props 变化，更新 parentId:', {
       oldParentId: formData.parentId,
       newParentId,
       category: category?.name,
+      categoryId: category?.id,
       isSubcategory,
-      parentCategory: parentCategory?.name
+      parentCategory: parentCategory?.name,
+      parentCategoryId: parentCategory?.id,
+      timestamp: new Date().toLocaleTimeString()
     })
 
-    setFormData(prev => ({
-      ...prev,
-      name: category?.name || '',
-      icon: category?.icon || '/assets/tools_icon.png',
-      special: category?.special || false,
-      parentId: newParentId
-    }))
-  }, [category, isSubcategory, parentCategory, categories])
+    setFormData(prev => {
+      const newFormData = {
+        ...prev,
+        name: category?.name || '',
+        icon: category?.icon || '/assets/tools_icon.png',
+        special: category?.special || false,
+        parentId: newParentId
+      }
+
+      console.log('📝 更新后的 formData:', newFormData)
+      return newFormData
+    })
+  }, [category, isSubcategory, parentCategory, categories, getCurrentParentId])
 
   // 添加调试日志
   console.log('InlineEditForm 初始化:', {
@@ -461,14 +469,20 @@ const InlineEditForm = ({
             分类级别
             {isEditing && (
               <span className="ml-2 text-xs text-gray-500">
-                (当前: {formData.parentId ? '子分类' : '一级分类'})
+                (当前: {formData.parentId ? `子分类 (父级: ${availableParents.find(p => p.id === formData.parentId)?.name || formData.parentId})` : '一级分类'})
               </span>
             )}
           </label>
           <select
             value={formData.parentId}
             onChange={(e) => {
-              console.log('分类级别变更:', e.target.value)
+              console.log('🔄 分类级别变更:', {
+                oldValue: formData.parentId,
+                newValue: e.target.value,
+                category: category?.name,
+                isSubcategory,
+                parentCategory: parentCategory?.name
+              })
               setFormData({...formData, parentId: e.target.value})
             }}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"

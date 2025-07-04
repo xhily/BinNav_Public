@@ -247,6 +247,63 @@ console.log('Props 变化，更新 parentId:', {
 - 从编辑一级分类切换到编辑子分类时，表单状态会正确更新
 - 所有分类级别相关的操作都会有正确的默认值
 
+### 问题9：子分类编辑默认级别仍显示异常（第四轮修复）
+
+**问题描述**：即使经过前面的修复，某些子分类（如"灵感采集-发现产品"）在编辑时，分类级别仍然默认显示"升级为一级分类"而不是当前的父分类。
+
+**深层原因分析**：
+1. **闭包问题**：`getCurrentParentId` 函数在 `useEffect` 中被调用，但函数本身没有正确的依赖管理
+2. **状态同步问题**：组件重新渲染时，状态更新可能不及时
+3. **调试信息不足**：难以追踪状态变化的具体时机
+
+**最终修复方案**：
+
+1. **使用 useCallback 优化函数**：
+```javascript
+// 修复前：普通函数，可能有闭包问题
+const getCurrentParentId = () => {
+  // 函数逻辑
+}
+
+// 修复后：使用 useCallback 确保依赖正确
+const getCurrentParentId = useCallback(() => {
+  // 函数逻辑
+}, [isEditing, category, isSubcategory, parentCategory, categories])
+```
+
+2. **增强调试信息**：
+```javascript
+// 添加详细的调试日志
+console.log('🔄 Props 变化，更新 parentId:', {
+  oldParentId: formData.parentId,
+  newParentId,
+  category: category?.name,
+  categoryId: category?.id,
+  isSubcategory,
+  parentCategory: parentCategory?.name,
+  parentCategoryId: parentCategory?.id,
+  timestamp: new Date().toLocaleTimeString()
+})
+```
+
+3. **改进用户界面显示**：
+```javascript
+// 显示更详细的当前状态
+(当前: {formData.parentId ?
+  `子分类 (父级: ${availableParents.find(p => p.id === formData.parentId)?.name || formData.parentId})` :
+  '一级分类'
+})
+```
+
+**调试步骤**：
+1. 打开浏览器开发者工具控制台
+2. 编辑任意子分类（如"灵感采集"下的"发现产品"）
+3. 查看控制台输出的调试信息：
+   - `getCurrentParentId 调用:` - 显示函数调用参数
+   - `🔄 Props 变化，更新 parentId:` - 显示状态更新过程
+   - `📝 更新后的 formData:` - 显示最终的表单数据
+4. 确认分类级别选择器显示正确的父分类名称
+
 ## 最新修复 (第二轮)
 
 ### 问题4：子分类专栏显示不生效
