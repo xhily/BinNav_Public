@@ -311,14 +311,91 @@ const WebsiteManager = ({
     return parts.slice(-2).join('.')
   }
 
-  // 测试图标URL是否有效
+  // 检测是否为默认图标
+  const isDefaultIcon = (img, url) => {
+    const width = img.naturalWidth || img.width
+    const height = img.naturalHeight || img.height
+
+    console.log(`🔍 检查图标: ${url} - 尺寸: ${width}x${height}`)
+
+    // 1. 检查是否是1x1像素的占位符
+    if (width <= 1 || height <= 1) {
+      console.log('❌ 检测到1x1像素占位符')
+      return true
+    }
+
+    // 2. 检查是否是Google Favicon API的默认图标
+    if (url.includes('google.com/s2/favicons')) {
+      // Google的默认图标通常是16x16的灰色图标
+      if (width === 16 && height === 16) {
+        console.log('❌ 检测到Google默认图标 (16x16)')
+        return true
+      }
+    }
+
+    // 3. 检查是否是DuckDuckGo的默认图标
+    if (url.includes('icons.duckduckgo.com')) {
+      // DuckDuckGo可能返回默认的图标
+      if (width === 16 && height === 16) {
+        console.log('❌ 检测到DuckDuckGo默认图标 (16x16)')
+        return true
+      }
+    }
+
+    // 4. 检查文件大小（通过图片数据URL）
+    // 如果能转换为canvas，可以检查图片内容
+    try {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      canvas.width = width
+      canvas.height = height
+      ctx.drawImage(img, 0, 0)
+
+      // 获取图片数据
+      const imageData = ctx.getImageData(0, 0, width, height)
+      const data = imageData.data
+
+      // 检查是否是单色图标（可能是默认图标）
+      let uniqueColors = new Set()
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i]
+        const g = data[i + 1]
+        const b = data[i + 2]
+        const a = data[i + 3]
+        if (a > 0) { // 只检查不透明的像素
+          uniqueColors.add(`${r},${g},${b}`)
+        }
+      }
+
+      // 如果颜色太少（比如只有1-2种颜色），可能是默认图标
+      if (uniqueColors.size <= 2) {
+        console.log(`❌ 检测到单色图标，颜色数量: ${uniqueColors.size}`)
+        return true
+      }
+
+    } catch (error) {
+      // 如果无法分析图片内容，继续其他检查
+      console.log('⚠️ 无法分析图片内容:', error)
+    }
+
+    console.log('✅ 图标看起来是真实的')
+    return false
+  }
+
+  // 测试图标URL是否有效且不是默认图标
   const testIconUrl = (url) => {
     return new Promise((resolve) => {
       const img = new Image()
 
       img.onload = () => {
-        console.log(`✅ 图标加载成功: ${url}`)
-        resolve(true)
+        // 检查是否为默认图标
+        if (isDefaultIcon(img, url)) {
+          console.log(`⚠️ 检测到默认图标: ${url} (${img.naturalWidth}x${img.naturalHeight})`)
+          resolve(false)
+        } else {
+          console.log(`✅ 图标加载成功: ${url} (${img.naturalWidth}x${img.naturalHeight})`)
+          resolve(true)
+        }
       }
 
       img.onerror = (error) => {
