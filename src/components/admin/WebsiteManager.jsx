@@ -315,16 +315,89 @@ const WebsiteManager = ({
   const testIconUrl = (url) => {
     return new Promise((resolve) => {
       const img = new Image()
-      img.onload = () => resolve(true)
-      img.onerror = () => resolve(false)
+
+      img.onload = () => {
+        console.log(`✅ 图标加载成功: ${url}`)
+        resolve(true)
+      }
+
+      img.onerror = (error) => {
+        console.log(`❌ 图标加载失败: ${url}`, error)
+        resolve(false)
+      }
+
+      // 设置crossOrigin以避免CORS问题
+      img.crossOrigin = 'anonymous'
       img.src = url
 
-      // 3秒超时
-      setTimeout(() => resolve(false), 3000)
+      // 5秒超时（增加超时时间）
+      setTimeout(() => {
+        console.log(`⏰ 图标加载超时: ${url}`)
+        resolve(false)
+      }, 5000)
     })
   }
 
-  // 获取网站图标 - 支持多种格式，使用主域名
+  // 从HTML中解析图标链接
+  const parseIconFromHTML = async (url) => {
+    try {
+      console.log('🔍 尝试从HTML解析图标:', url)
+
+      // 使用代理服务避免CORS问题
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
+      const response = await fetch(proxyUrl)
+
+      if (!response.ok) {
+        console.log('❌ HTML获取失败')
+        return []
+      }
+
+      const data = await response.json()
+      const html = data.contents
+
+      // 创建临时DOM来解析HTML
+      const parser = new DOMParser()
+      const doc = parser.parseFromString(html, 'text/html')
+
+      const iconUrls = []
+      const origin = new URL(url).origin
+
+      // 查找各种图标链接
+      const iconSelectors = [
+        'link[rel="icon"]',
+        'link[rel="shortcut icon"]',
+        'link[rel="apple-touch-icon"]',
+        'link[rel="apple-touch-icon-precomposed"]',
+        'link[rel="mask-icon"]',
+        'meta[property="og:image"]'
+      ]
+
+      iconSelectors.forEach(selector => {
+        const elements = doc.querySelectorAll(selector)
+        elements.forEach(element => {
+          let iconUrl = element.getAttribute('href') || element.getAttribute('content')
+          if (iconUrl) {
+            // 处理相对路径
+            if (iconUrl.startsWith('/')) {
+              iconUrl = origin + iconUrl
+            } else if (!iconUrl.startsWith('http')) {
+              iconUrl = origin + '/' + iconUrl
+            }
+            iconUrls.push(iconUrl)
+          }
+        })
+      })
+
+      console.log('🎯 从HTML解析到的图标:', iconUrls)
+      return iconUrls
+
+    } catch (error) {
+      console.log('❌ HTML解析失败:', error)
+      return []
+    }
+  }
+
+  // 获取网站图标 - 智能发现图标
   const getWebsiteIcon = async (url, forceRefresh = false) => {
     try {
       const urlObj = new URL(url)
@@ -340,31 +413,45 @@ const WebsiteManager = ({
         forceRefresh: forceRefresh
       })
 
-      // 构建多个可能的图标URL
-      const iconCandidates = [
-        // 1. Google Favicon API (主域名)
+      // 1. 首先尝试从HTML解析图标
+      const htmlIcons = await parseIconFromHTML(url)
+
+      // 2. 构建常见的图标URL候选列表
+      const commonIconCandidates = [
+        // Google Favicon API (主域名)
         `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32${forceRefresh ? '&t=' + Date.now() : ''}`,
 
-        // 2. 网站自己的favicon.ico
+        // 常见的图标文件名
         `${origin}/favicon.ico`,
-
-        // 3. 网站自己的favicon.png
         `${origin}/favicon.png`,
-
-        // 4. 网站自己的apple-touch-icon.png
         `${origin}/apple-touch-icon.png`,
+        `${origin}/icon.png`,
+        `${origin}/logo.png`,
+        `${origin}/assets/favicon.ico`,
+        `${origin}/assets/favicon.png`,
+        `${origin}/assets/icon.png`,
+        `${origin}/assets/logo.png`,
+        `${origin}/static/favicon.ico`,
+        `${origin}/static/favicon.png`,
+        `${origin}/images/favicon.ico`,
+        `${origin}/images/favicon.png`,
+        `${origin}/images/icon.png`,
+        `${origin}/images/logo.png`,
 
-        // 5. DuckDuckGo图标API (备用)
+        // DuckDuckGo图标API (备用)
         `https://icons.duckduckgo.com/ip3/${mainDomain}.ico`,
 
-        // 6. 默认图标
+        // 默认图标
         '/assets/logo.png'
       ]
 
-      console.log('🧪 测试图标候选列表:', iconCandidates)
+      // 合并HTML解析的图标和常见候选
+      const allCandidates = [...htmlIcons, ...commonIconCandidates]
+
+      console.log('🧪 测试图标候选列表:', allCandidates)
 
       // 依次测试每个图标URL
-      for (const iconUrl of iconCandidates) {
+      for (const iconUrl of allCandidates) {
         console.log(`🔍 测试图标: ${iconUrl}`)
         const isValid = await testIconUrl(iconUrl)
         if (isValid) {
