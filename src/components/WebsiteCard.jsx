@@ -5,7 +5,12 @@ import logoImg from '../assets/logo.png'
 const WebsiteCard = ({ website }) => {
   const [iconError, setIconError] = useState(false)
   const [iconSrc, setIconSrc] = useState(() => {
-    // 首先尝试使用Google favicon服务
+    // 优先使用网站数据中的图标
+    if (website.icon) {
+      return website.icon
+    }
+
+    // 回退：使用Google favicon服务
     try {
       return `https://www.google.com/s2/favicons?domain=${new URL(website.url).hostname}&sz=32`
     } catch {

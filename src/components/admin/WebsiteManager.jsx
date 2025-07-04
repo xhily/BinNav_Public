@@ -311,28 +311,74 @@ const WebsiteManager = ({
     return parts.slice(-2).join('.')
   }
 
-  // 获取网站图标 - 使用主域名获取图标
-  const getWebsiteIcon = (url, forceRefresh = false) => {
+  // 测试图标URL是否有效
+  const testIconUrl = (url) => {
+    return new Promise((resolve) => {
+      const img = new Image()
+      img.onload = () => resolve(true)
+      img.onerror = () => resolve(false)
+      img.src = url
+
+      // 3秒超时
+      setTimeout(() => resolve(false), 3000)
+    })
+  }
+
+  // 获取网站图标 - 支持多种格式，使用主域名
+  const getWebsiteIcon = async (url, forceRefresh = false) => {
     try {
       const urlObj = new URL(url)
       const hostname = urlObj.hostname
       const mainDomain = getMainDomain(hostname)
+      const origin = urlObj.origin
 
       console.log('🎯 图标获取分析:', {
         originalUrl: url,
         hostname: hostname,
         mainDomain: mainDomain,
+        origin: origin,
         forceRefresh: forceRefresh
       })
 
-      const baseUrl = `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32`
+      // 构建多个可能的图标URL
+      const iconCandidates = [
+        // 1. Google Favicon API (主域名)
+        `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32${forceRefresh ? '&t=' + Date.now() : ''}`,
 
-      // 更新时添加时间戳强制刷新，新添加时不添加
-      if (forceRefresh) {
-        return `${baseUrl}&t=${Date.now()}`
+        // 2. 网站自己的favicon.ico
+        `${origin}/favicon.ico`,
+
+        // 3. 网站自己的favicon.png
+        `${origin}/favicon.png`,
+
+        // 4. 网站自己的apple-touch-icon.png
+        `${origin}/apple-touch-icon.png`,
+
+        // 5. DuckDuckGo图标API (备用)
+        `https://icons.duckduckgo.com/ip3/${mainDomain}.ico`,
+
+        // 6. 默认图标
+        '/assets/logo.png'
+      ]
+
+      console.log('🧪 测试图标候选列表:', iconCandidates)
+
+      // 依次测试每个图标URL
+      for (const iconUrl of iconCandidates) {
+        console.log(`🔍 测试图标: ${iconUrl}`)
+        const isValid = await testIconUrl(iconUrl)
+        if (isValid) {
+          console.log(`✅ 找到有效图标: ${iconUrl}`)
+          return iconUrl
+        } else {
+          console.log(`❌ 图标无效: ${iconUrl}`)
+        }
       }
 
-      return baseUrl
+      // 如果所有都失败，返回默认图标
+      console.log('⚠️ 所有图标都无效，使用默认图标')
+      return '/assets/logo.png'
+
     } catch (error) {
       console.warn('无法解析网站URL，使用默认图标:', error)
       return '/assets/logo.png'
@@ -342,16 +388,22 @@ const WebsiteManager = ({
 
 
   // 保存网站
-  const handleSaveWebsite = () => {
-    const newWebsite = {
-      id: editingWebsite === 'new' ? Date.now() : editingWebsite,
-      name: websiteForm.name.trim(),
-      description: websiteForm.description.trim(),
-      url: websiteForm.url.trim(),
-      category: websiteForm.category,
-      tags: websiteForm.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-      icon: getWebsiteIcon(websiteForm.url.trim()) // 自动获取网站图标
-    }
+  const handleSaveWebsite = async () => {
+    try {
+      console.log('💾 开始保存网站...')
+
+      // 异步获取网站图标
+      const websiteIcon = await getWebsiteIcon(websiteForm.url.trim())
+
+      const newWebsite = {
+        id: editingWebsite === 'new' ? Date.now() : editingWebsite,
+        name: websiteForm.name.trim(),
+        description: websiteForm.description.trim(),
+        url: websiteForm.url.trim(),
+        category: websiteForm.category,
+        tags: websiteForm.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+        icon: websiteIcon // 使用异步获取的图标
+      }
 
     console.log('💾 保存网站:', {
       name: newWebsite.name,
@@ -374,6 +426,11 @@ const WebsiteManager = ({
     setEditingWebsite(null)
     resetWebsiteForm()
     showMessage('success', '网站信息已更新')
+
+    } catch (error) {
+      console.error('保存网站失败:', error)
+      showMessage('error', '保存网站失败，请重试')
+    }
   }
 
   // 删除网站
