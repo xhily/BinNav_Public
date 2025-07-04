@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/4 14:06:32
+// 网站数据 - 通过管理后台更新于 2025/7/4 16:26:18
 export const websiteData = [
   {
     "id": 40,
@@ -11,7 +11,7 @@ export const websiteData = [
       "教程分享",
       "开发心得"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=nbvil.com&sz=32"
+    "icon": "https://icons.duckduckgo.com/ip3/nbvil.com.ico"
   },
   {
     "id": 45,
@@ -52,11 +52,33 @@ export const websiteData = [
     "name": "GitHub Projects",
     "description": "作者开源项目",
     "url": "https://github.com/sindricn",
-    "category": "recommended",
+    "category": "author",
     "tags": [
       "开源项目"
     ],
     "icon": "https://www.google.com/s2/favicons?domain=github.com&sz=32"
+  },
+  {
+    "id": 1751617129171,
+    "name": "Cloudflare",
+    "description": "Cloudflare以向客户提供网站安全管理、性能优化及相关的技术支持为主要业务。",
+    "url": "https://www.cloudflare.com/",
+    "category": "recommended",
+    "tags": [
+      "免费，网站，CDN，DDOS"
+    ],
+    "icon": "https://www.google.com/s2/favicons?domain=cloudflare.com&sz=32"
+  },
+  {
+    "id": 1751617399235,
+    "name": "Mitce",
+    "description": "一款专注于提供高速稳定的网络加速服务的平台",
+    "url": "https://mitce.net/aff.php?aff=4751",
+    "category": "friend_links",
+    "tags": [
+      "科学环境"
+    ],
+    "icon": "https://www.google.com/s2/favicons?domain=mitce.net&sz=32"
   },
   {
     "id": 33,
@@ -71,20 +93,6 @@ export const websiteData = [
     ],
     "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=32",
     "popularity": 93
-  },
-  {
-    "id": 47,
-    "name": "GitHub",
-    "description": "全球最大的代码托管平台",
-    "url": "https://github.com",
-    "category": "friend_links",
-    "tags": [
-      "代码托管",
-      "开源",
-      "协作"
-    ],
-    "icon": "https://www.google.com/s2/favicons?domain=github.com&sz=32",
-    "popularity": 95
   }
 ];
 
@@ -100,29 +108,22 @@ export const categories = [
   {
     "id": "recommended",
     "name": "常用推荐",
-    "icon": "/assets/tools_icon.png",
-    "color": "bg-blue-500",
-    "subcategories": []
-  },
-  {
-    "id": "design_resources",
-    "name": "素材资源",
-    "icon": "/assets/tools_icon.png",
-    "color": "bg-pink-500",
+    "icon": "/assets/network_icon.png",
+    "special": false,
     "subcategories": []
   },
   {
     "id": "dev_tools",
     "name": "开发工具",
-    "icon": "/assets/dev_tools_icon.png",
-    "color": "bg-gray-500",
+    "icon": "/assets/innovation_icon.png",
+    "special": false,
     "subcategories": []
   },
   {
     "id": "friend_links",
     "name": "友情链接",
-    "icon": "/assets/network_icon.png",
-    "color": "bg-pink-500",
+    "icon": "/assets/social_icon.png",
+    "special": false,
     "subcategories": []
   }
 ];
