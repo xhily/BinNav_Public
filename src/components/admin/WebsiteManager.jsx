@@ -52,11 +52,27 @@ const SortableWebsiteItem = ({
             alt={website.name}
             className="w-10 h-10 rounded-lg flex-shrink-0 bg-gray-50 p-1"
             onError={(e) => {
-              // 如果存储的图标加载失败，尝试Google Favicon API
-              if (!e.target.src.includes('favicons')) {
-                e.target.src = `https://www.google.com/s2/favicons?domain=${new URL(website.url).hostname}&sz=32`
+              console.log('🚫 图标加载失败:', {
+                websiteName: website.name,
+                failedUrl: e.target.src,
+                websiteUrl: website.url
+              })
+
+              // 如果存储的图标加载失败，尝试不同的回退方案
+              if (e.target.src.includes('gstatic.com') || e.target.src.includes('favicons')) {
+                // 如果Google API失败，尝试网站自己的favicon
+                try {
+                  const domain = new URL(website.url).origin
+                  e.target.src = `${domain}/favicon.ico`
+                  console.log('🔄 尝试网站自己的favicon:', e.target.src)
+                } catch {
+                  e.target.src = '/assets/logo.png'
+                  console.log('🔄 使用默认图标')
+                }
               } else {
+                // 最终回退到默认图标
                 e.target.src = '/assets/logo.png'
+                console.log('🔄 使用默认图标')
               }
             }}
           />
@@ -288,19 +304,25 @@ const WebsiteManager = ({
     }
   }
 
-  // 获取网站图标
-  const getWebsiteIcon = (url) => {
+  // 获取网站图标 - 与新网站添加保持一致的逻辑
+  const getWebsiteIcon = (url, forceRefresh = false) => {
     try {
       const domain = new URL(url).hostname
-      // 添加时间戳确保获取最新图标
-      return `https://www.google.com/s2/favicons?domain=${domain}&sz=32&t=${Date.now()}`
+      const baseUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
+
+      // 更新时添加时间戳强制刷新，新添加时不添加
+      if (forceRefresh) {
+        return `${baseUrl}&t=${Date.now()}`
+      }
+
+      return baseUrl
     } catch (error) {
       console.warn('无法解析网站URL，使用默认图标:', error)
       return '/assets/logo.png'
     }
   }
 
-  // 更新单个网站图标
+  // 更新单个网站图标 - 使用与新网站添加相同的逻辑
   const handleUpdateSingleIcon = (websiteId) => {
     console.log('🔄 开始更新单个图标:', {
       websiteId,
@@ -308,7 +330,7 @@ const WebsiteManager = ({
       websiteIds: config.websiteData.map(w => w.id)
     })
 
-    const website = config.websiteData.find(w => w.id == websiteId) // 使用 == 而不是 === 来处理类型差异
+    const website = config.websiteData.find(w => w.id == websiteId)
     if (!website) {
       console.error('❌ 找不到网站:', websiteId)
       showMessage('error', '找不到要更新的网站')
@@ -321,7 +343,8 @@ const WebsiteManager = ({
       currentIcon: website.icon
     })
 
-    const newIcon = getWebsiteIcon(website.url)
+    // 使用强制刷新获取最新图标
+    const newIcon = getWebsiteIcon(website.url, true)
     console.log('🎯 生成新图标:', newIcon)
 
     const updatedWebsites = config.websiteData.map(w =>
@@ -351,7 +374,7 @@ const WebsiteManager = ({
     })
 
     const updatedWebsites = config.websiteData.map(website => {
-      const newIcon = getWebsiteIcon(website.url)
+      const newIcon = getWebsiteIcon(website.url, true) // 强制刷新
       console.log(`🎯 更新 "${website.name}":`, {
         oldIcon: website.icon,
         newIcon: newIcon
