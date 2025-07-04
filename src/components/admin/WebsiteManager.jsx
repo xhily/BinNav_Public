@@ -100,7 +100,14 @@ const SortableWebsiteItem = ({
             <span>{editingWebsite === website.id ? '收起' : '编辑'}</span>
           </button>
           <button
-            onClick={() => onUpdateIcon(website.id)}
+            onClick={() => {
+              console.log('🖱️ 点击更新图标按钮:', {
+                websiteId: website.id,
+                websiteName: website.name,
+                websiteUrl: website.url
+              })
+              onUpdateIcon(website.id)
+            }}
             className="text-green-600 hover:text-green-800 p-1"
             title="更新图标"
           >
@@ -287,18 +294,41 @@ const WebsiteManager = ({
 
   // 更新单个网站图标
   const handleUpdateSingleIcon = (websiteId) => {
-    const website = config.websiteData.find(w => w.id === websiteId)
-    if (!website) return
+    console.log('🔄 开始更新单个图标:', {
+      websiteId,
+      totalWebsites: config.websiteData.length,
+      websiteIds: config.websiteData.map(w => w.id)
+    })
+
+    const website = config.websiteData.find(w => w.id == websiteId) // 使用 == 而不是 === 来处理类型差异
+    if (!website) {
+      console.error('❌ 找不到网站:', websiteId)
+      showMessage('error', '找不到要更新的网站')
+      return
+    }
+
+    console.log('📍 找到网站:', {
+      name: website.name,
+      url: website.url,
+      currentIcon: website.icon
+    })
 
     const newIcon = getWebsiteIcon(website.url)
+    console.log('🎯 生成新图标:', newIcon)
+
     const updatedWebsites = config.websiteData.map(w =>
-      w.id === websiteId ? { ...w, icon: newIcon } : w
+      w.id == websiteId ? { ...w, icon: newIcon } : w // 使用 == 而不是 === 来处理类型差异
     )
+
+    console.log('📝 更新后的网站列表:', {
+      totalCount: updatedWebsites.length,
+      updatedWebsite: updatedWebsites.find(w => w.id == websiteId)
+    })
 
     onUpdateWebsiteData(updatedWebsites)
     showMessage('success', `已更新 "${website.name}" 的图标`)
 
-    console.log('🔄 更新单个图标:', {
+    console.log('✅ 图标更新完成:', {
       websiteName: website.name,
       oldIcon: website.icon,
       newIcon: newIcon
@@ -307,18 +337,32 @@ const WebsiteManager = ({
 
   // 批量更新所有网站图标
   const handleUpdateAllIcons = () => {
-    const updatedWebsites = config.websiteData.map(website => ({
-      ...website,
-      icon: getWebsiteIcon(website.url)
-    }))
+    console.log('🔄 开始批量更新图标:', {
+      totalWebsites: config.websiteData.length,
+      websites: config.websiteData.map(w => ({ id: w.id, name: w.name, url: w.url, currentIcon: w.icon }))
+    })
+
+    const updatedWebsites = config.websiteData.map(website => {
+      const newIcon = getWebsiteIcon(website.url)
+      console.log(`🎯 更新 "${website.name}":`, {
+        oldIcon: website.icon,
+        newIcon: newIcon
+      })
+      return {
+        ...website,
+        icon: newIcon
+      }
+    })
+
+    console.log('📝 批量更新结果:', {
+      totalCount: updatedWebsites.length,
+      updatedWebsites: updatedWebsites.map(w => ({ name: w.name, icon: w.icon }))
+    })
 
     onUpdateWebsiteData(updatedWebsites)
     showMessage('success', `已更新 ${config.websiteData.length} 个网站的图标`)
 
-    console.log('🔄 批量更新图标完成:', {
-      totalWebsites: config.websiteData.length,
-      updatedWebsites: updatedWebsites.map(w => ({ name: w.name, icon: w.icon }))
-    })
+    console.log('✅ 批量更新完成')
   }
 
   // 保存网站
@@ -396,7 +440,10 @@ const WebsiteManager = ({
         <h3 className="text-lg font-semibold text-gray-900">网站管理</h3>
         <div className="flex items-center gap-3">
           <button
-            onClick={handleUpdateAllIcons}
+            onClick={() => {
+              console.log('🖱️ 点击批量更新图标按钮')
+              handleUpdateAllIcons()
+            }}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
             title="为所有网站重新获取图标"
           >
