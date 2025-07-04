@@ -397,72 +397,52 @@ const WebsiteManager = ({
     }
   }
 
-  // 获取网站图标 - 智能发现图标
+  // 获取网站图标 - 简化逻辑：先用默认API，失败后解析HTML
   const getWebsiteIcon = async (url, forceRefresh = false) => {
     try {
       const urlObj = new URL(url)
       const hostname = urlObj.hostname
       const mainDomain = getMainDomain(hostname)
-      const origin = urlObj.origin
 
       console.log('🎯 图标获取分析:', {
         originalUrl: url,
         hostname: hostname,
         mainDomain: mainDomain,
-        origin: origin,
         forceRefresh: forceRefresh
       })
 
-      // 1. 首先尝试从HTML解析图标
+      // 1. 首先尝试Google Favicon API（原本的默认逻辑）
+      const googleFaviconUrl = `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32${forceRefresh ? '&t=' + Date.now() : ''}`
+      console.log('🔍 测试Google Favicon API:', googleFaviconUrl)
+
+      const isGoogleValid = await testIconUrl(googleFaviconUrl)
+      if (isGoogleValid) {
+        console.log('✅ Google Favicon API成功')
+        return googleFaviconUrl
+      }
+
+      console.log('❌ Google Favicon API失败，尝试解析HTML')
+
+      // 2. 如果Google API失败，解析HTML查找图标
       const htmlIcons = await parseIconFromHTML(url)
 
-      // 2. 构建常见的图标URL候选列表
-      const commonIconCandidates = [
-        // Google Favicon API (主域名)
-        `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32${forceRefresh ? '&t=' + Date.now() : ''}`,
+      if (htmlIcons.length > 0) {
+        console.log('🧪 测试HTML解析的图标:', htmlIcons)
 
-        // 常见的图标文件名
-        `${origin}/favicon.ico`,
-        `${origin}/favicon.png`,
-        `${origin}/apple-touch-icon.png`,
-        `${origin}/icon.png`,
-        `${origin}/logo.png`,
-        `${origin}/assets/favicon.ico`,
-        `${origin}/assets/favicon.png`,
-        `${origin}/assets/icon.png`,
-        `${origin}/assets/logo.png`,
-        `${origin}/static/favicon.ico`,
-        `${origin}/static/favicon.png`,
-        `${origin}/images/favicon.ico`,
-        `${origin}/images/favicon.png`,
-        `${origin}/images/icon.png`,
-        `${origin}/images/logo.png`,
-
-        // DuckDuckGo图标API (备用)
-        `https://icons.duckduckgo.com/ip3/${mainDomain}.ico`,
-
-        // 默认图标
-        '/assets/logo.png'
-      ]
-
-      // 合并HTML解析的图标和常见候选
-      const allCandidates = [...htmlIcons, ...commonIconCandidates]
-
-      console.log('🧪 测试图标候选列表:', allCandidates)
-
-      // 依次测试每个图标URL
-      for (const iconUrl of allCandidates) {
-        console.log(`🔍 测试图标: ${iconUrl}`)
-        const isValid = await testIconUrl(iconUrl)
-        if (isValid) {
-          console.log(`✅ 找到有效图标: ${iconUrl}`)
-          return iconUrl
-        } else {
-          console.log(`❌ 图标无效: ${iconUrl}`)
+        // 测试HTML中找到的图标
+        for (const iconUrl of htmlIcons) {
+          console.log(`🔍 测试HTML图标: ${iconUrl}`)
+          const isValid = await testIconUrl(iconUrl)
+          if (isValid) {
+            console.log(`✅ 找到有效HTML图标: ${iconUrl}`)
+            return iconUrl
+          } else {
+            console.log(`❌ HTML图标无效: ${iconUrl}`)
+          }
         }
       }
 
-      // 如果所有都失败，返回默认图标
+      // 3. 如果都失败，使用默认图标
       console.log('⚠️ 所有图标都无效，使用默认图标')
       return '/assets/logo.png'
 
