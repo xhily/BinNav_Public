@@ -47,11 +47,18 @@ const SortableWebsiteItem = ({
           >
             <GripVertical size={16} />
           </div>
-          <img 
-            src={`https://www.google.com/s2/favicons?domain=${new URL(website.url).hostname}&sz=32`}
+          <img
+            src={website.icon || `https://www.google.com/s2/favicons?domain=${new URL(website.url).hostname}&sz=32`}
             alt={website.name}
             className="w-10 h-10 rounded-lg flex-shrink-0 bg-gray-50 p-1"
-            onError={(e) => { e.target.src = '/assets/logo.png' }}
+            onError={(e) => {
+              // 如果存储的图标加载失败，尝试Google Favicon API
+              if (!e.target.src.includes('favicons')) {
+                e.target.src = `https://www.google.com/s2/favicons?domain=${new URL(website.url).hostname}&sz=32`
+              } else {
+                e.target.src = '/assets/logo.png'
+              }
+            }}
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-1">
@@ -282,17 +289,11 @@ const WebsiteManager = ({
   }
 
   // 获取网站图标
-  const getWebsiteIcon = (url, forceRefresh = false) => {
+  const getWebsiteIcon = (url) => {
     try {
       const domain = new URL(url).hostname
-      const baseUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
-
-      // 如果是强制刷新，添加时间戳防止缓存
-      if (forceRefresh) {
-        return `${baseUrl}&t=${Date.now()}`
-      }
-
-      return baseUrl
+      // 添加时间戳确保获取最新图标
+      return `https://www.google.com/s2/favicons?domain=${domain}&sz=32&t=${Date.now()}`
     } catch (error) {
       console.warn('无法解析网站URL，使用默认图标:', error)
       return '/assets/logo.png'
@@ -320,11 +321,11 @@ const WebsiteManager = ({
       currentIcon: website.icon
     })
 
-    const newIcon = getWebsiteIcon(website.url, true) // 强制刷新图标
+    const newIcon = getWebsiteIcon(website.url)
     console.log('🎯 生成新图标:', newIcon)
 
     const updatedWebsites = config.websiteData.map(w =>
-      w.id == websiteId ? { ...w, icon: newIcon } : w // 使用 == 而不是 === 来处理类型差异
+      w.id == websiteId ? { ...w, icon: newIcon } : w
     )
 
     console.log('📝 更新后的网站列表:', {
@@ -334,16 +335,6 @@ const WebsiteManager = ({
 
     onUpdateWebsiteData(updatedWebsites)
     showMessage('success', `已更新 "${website.name}" 的图标`)
-
-    // 强制刷新页面上的图片缓存
-    setTimeout(() => {
-      const images = document.querySelectorAll(`img[alt="${website.name}"]`)
-      images.forEach(img => {
-        const src = img.src
-        img.src = ''
-        img.src = src
-      })
-    }, 100)
 
     console.log('✅ 图标更新完成:', {
       websiteName: website.name,
@@ -360,7 +351,7 @@ const WebsiteManager = ({
     })
 
     const updatedWebsites = config.websiteData.map(website => {
-      const newIcon = getWebsiteIcon(website.url, true) // 强制刷新图标
+      const newIcon = getWebsiteIcon(website.url)
       console.log(`🎯 更新 "${website.name}":`, {
         oldIcon: website.icon,
         newIcon: newIcon
@@ -378,18 +369,6 @@ const WebsiteManager = ({
 
     onUpdateWebsiteData(updatedWebsites)
     showMessage('success', `已更新 ${config.websiteData.length} 个网站的图标`)
-
-    // 强制刷新页面上所有网站图片的缓存
-    setTimeout(() => {
-      const images = document.querySelectorAll('img[alt]')
-      images.forEach(img => {
-        if (img.src.includes('favicons')) {
-          const src = img.src
-          img.src = ''
-          img.src = src
-        }
-      })
-    }, 100)
 
     console.log('✅ 批量更新完成')
   }
