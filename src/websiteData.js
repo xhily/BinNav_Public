@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/4 12:16:12
+// 网站数据 - 通过管理后台更新于 2025/7/4 12:17:58
 export const websiteData = [
   {
     "id": 40,
@@ -34,7 +34,7 @@ export const websiteData = [
     "tags": [
       "视频"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=bilibili.com&sz=32"
+    "icon": "https://www.google.com/s2/favicons?domain=bilibili.com&sz=32&t=1751602649060"
   },
   {
     "id": 1751598590526,
