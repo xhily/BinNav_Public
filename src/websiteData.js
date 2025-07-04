@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/4 11:29:24
+// 网站数据 - 通过管理后台更新于 2025/7/4 12:16:12
 export const websiteData = [
   {
     "id": 40,
@@ -11,7 +11,7 @@ export const websiteData = [
       "教程分享",
       "开发心得"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=blog.nbvil.com&sz=32"
+    "icon": "https://www.google.com/s2/favicons?domain=nbvil.com&sz=32"
   },
   {
     "id": 45,
@@ -34,7 +34,7 @@ export const websiteData = [
     "tags": [
       "视频"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=space.bilibili.com&sz=32"
+    "icon": "https://www.google.com/s2/favicons?domain=bilibili.com&sz=32"
   },
   {
     "id": 1751598590526,
