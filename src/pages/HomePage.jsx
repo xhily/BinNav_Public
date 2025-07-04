@@ -4,7 +4,7 @@ import { Button } from '../components/ui/button.jsx'
 import { Input } from '../components/ui/input.jsx'
 import WebsiteCard from '../components/WebsiteCard.jsx'
 import SubmitWebsiteForm from '../components/SubmitWebsiteForm.jsx'
-import { websiteData, categories, searchEngines } from '../websiteData.js'
+import { websiteData as staticWebsiteData, categories as staticCategories, searchEngines } from '../websiteData.js'
 import { useSiteConfig } from '../hooks/useSiteConfig.js'
 
 // 导入图片
@@ -17,16 +17,51 @@ function HomePage() {
   const [selectedSearchEngine, setSelectedSearchEngine] = useState('internal')
   const [expandedCategories, setExpandedCategories] = useState({})
   const [showSubmitForm, setShowSubmitForm] = useState(false)
+  const [websiteData, setWebsiteData] = useState(staticWebsiteData)
+  const [categories, setCategories] = useState(staticCategories)
+  const [isLoading, setIsLoading] = useState(false)
   const mainContentRef = useRef(null)
   const sectionRefs = useRef({})
   
   // 使用全局站点配置
   const { siteConfig } = useSiteConfig()
   
+  // 动态获取最新配置数据
+  const loadLatestConfig = async () => {
+    try {
+      setIsLoading(true)
+      console.log('🔄 主页获取最新配置数据...')
+
+      // 尝试从API获取最新配置
+      const response = await fetch('/api/get-config?t=' + Date.now())
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success && data.config) {
+          console.log('✅ 主页获取到最新配置数据')
+          setWebsiteData(data.config.websiteData || staticWebsiteData)
+          setCategories(data.config.categories || staticCategories)
+        } else {
+          console.log('⚠️ API返回数据格式异常，使用静态数据')
+        }
+      } else {
+        console.log('⚠️ API请求失败，使用静态数据')
+      }
+    } catch (error) {
+      console.log('⚠️ 获取配置失败，使用静态数据:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   // 动态设置页面标题
   useEffect(() => {
     document.title = siteConfig.siteTitle
   }, [siteConfig.siteTitle])
+
+  // 页面加载时获取最新配置
+  useEffect(() => {
+    loadLatestConfig()
+  }, [])
 
   // 智能搜索功能
   const smartSearch = (query) => {

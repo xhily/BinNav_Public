@@ -12,7 +12,6 @@ const SortableWebsiteItem = ({
   website,
   onEdit,
   onDelete,
-  onUpdateIcon,
   editingWebsite,
   websiteForm,
   setWebsiteForm,
@@ -129,22 +128,6 @@ const SortableWebsiteItem = ({
           >
             {editingWebsite === website.id ? <ChevronUp size={14} /> : <Edit3 size={14} />}
             <span>{editingWebsite === website.id ? '收起' : '编辑'}</span>
-          </button>
-          <button
-            onClick={() => {
-              console.log('🖱️ 点击更新图标按钮:', {
-                websiteId: website.id,
-                websiteName: website.name,
-                websiteUrl: website.url
-              })
-              onUpdateIcon(website.id)
-            }}
-            className="text-green-600 hover:text-green-800 p-1"
-            title="更新图标"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
           </button>
           <button
             onClick={() => onDelete(website.id)}
@@ -356,79 +339,7 @@ const WebsiteManager = ({
     }
   }
 
-  // 更新单个网站图标 - 使用与新网站添加相同的逻辑
-  const handleUpdateSingleIcon = (websiteId) => {
-    console.log('🔄 开始更新单个图标:', {
-      websiteId,
-      totalWebsites: config.websiteData.length,
-      websiteIds: config.websiteData.map(w => w.id)
-    })
 
-    const website = config.websiteData.find(w => w.id == websiteId)
-    if (!website) {
-      console.error('❌ 找不到网站:', websiteId)
-      showMessage('error', '找不到要更新的网站')
-      return
-    }
-
-    console.log('📍 找到网站:', {
-      name: website.name,
-      url: website.url,
-      currentIcon: website.icon
-    })
-
-    // 使用强制刷新获取最新图标
-    const newIcon = getWebsiteIcon(website.url, true)
-    console.log('🎯 生成新图标:', newIcon)
-
-    const updatedWebsites = config.websiteData.map(w =>
-      w.id == websiteId ? { ...w, icon: newIcon } : w
-    )
-
-    console.log('📝 更新后的网站列表:', {
-      totalCount: updatedWebsites.length,
-      updatedWebsite: updatedWebsites.find(w => w.id == websiteId)
-    })
-
-    onUpdateWebsiteData(updatedWebsites)
-    showMessage('success', `已更新 "${website.name}" 的图标`)
-
-    console.log('✅ 图标更新完成:', {
-      websiteName: website.name,
-      oldIcon: website.icon,
-      newIcon: newIcon
-    })
-  }
-
-  // 批量更新所有网站图标
-  const handleUpdateAllIcons = () => {
-    console.log('🔄 开始批量更新图标:', {
-      totalWebsites: config.websiteData.length,
-      websites: config.websiteData.map(w => ({ id: w.id, name: w.name, url: w.url, currentIcon: w.icon }))
-    })
-
-    const updatedWebsites = config.websiteData.map(website => {
-      const newIcon = getWebsiteIcon(website.url, true) // 强制刷新
-      console.log(`🎯 更新 "${website.name}":`, {
-        oldIcon: website.icon,
-        newIcon: newIcon
-      })
-      return {
-        ...website,
-        icon: newIcon
-      }
-    })
-
-    console.log('📝 批量更新结果:', {
-      totalCount: updatedWebsites.length,
-      updatedWebsites: updatedWebsites.map(w => ({ name: w.name, icon: w.icon }))
-    })
-
-    onUpdateWebsiteData(updatedWebsites)
-    showMessage('success', `已更新 ${config.websiteData.length} 个网站的图标`)
-
-    console.log('✅ 批量更新完成')
-  }
 
   // 保存网站
   const handleSaveWebsite = () => {
@@ -503,28 +414,13 @@ const WebsiteManager = ({
     <div>
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold text-gray-900">网站管理</h3>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => {
-              console.log('🖱️ 点击批量更新图标按钮')
-              handleUpdateAllIcons()
-            }}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-            title="为所有网站重新获取图标"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            更新图标
-          </button>
-          <button
-            onClick={handleAddWebsite}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            添加网站
-          </button>
-        </div>
+        <button
+          onClick={handleAddWebsite}
+          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          添加网站
+        </button>
       </div>
 
       {/* 添加网站表单 */}
@@ -582,7 +478,6 @@ const WebsiteManager = ({
                     website={website}
                     onEdit={handleEditWebsite}
                     onDelete={handleDeleteWebsite}
-                    onUpdateIcon={handleUpdateSingleIcon}
                     editingWebsite={editingWebsite}
                     websiteForm={websiteForm}
                     setWebsiteForm={setWebsiteForm}
