@@ -289,7 +289,7 @@ const InlineEditForm = ({
   isSubcategory = false,
   parentCategory = null
 }) => {
-  // 获取当前分类的父级分类ID（如果是编辑现有分类）
+  // 获取当前分类的父级分类ID
   const getCurrentParentId = useCallback(() => {
     console.log('getCurrentParentId 调用:', {
       isEditing,
@@ -299,6 +299,12 @@ const InlineEditForm = ({
       parentCategory: parentCategory?.name,
       parentCategoryId: parentCategory?.id
     })
+
+    // 如果是添加子分类模式（不是编辑，但有父分类）
+    if (!isEditing && parentCategory) {
+      console.log('添加子分类模式，默认父分类ID:', parentCategory.id)
+      return parentCategory.id
+    }
 
     if (!isEditing || !category) {
       console.log('不是编辑模式或没有分类，返回空字符串')
@@ -931,33 +937,29 @@ const CategoryManager = ({
         subcategories: cat.subcategories?.map(sub => ({ id: sub.id, name: sub.name })) || []
       })))
 
-      // 首先从所有位置移除该分类（包括子分类位置）
-      let updatedCategories = config.categories.map(cat => {
-        if (cat.id === category.id) {
-          // 如果是一级分类，直接移除
-          console.log('移除一级分类:', category.name)
-          return null
-        } else {
-          // 从子分类中移除
-          const filteredSubs = (cat.subcategories || []).filter(sub => sub.id !== category.id)
-          if (filteredSubs.length !== (cat.subcategories || []).length) {
-            console.log('从分类', cat.name, '中移除子分类:', category.name)
-          }
-          return {
-            ...cat,
-            subcategories: filteredSubs
-          }
-        }
-      }).filter(Boolean) // 移除null值
+      // 检查是否需要移动分类层级
+      const currentCategory = config.categories.find(cat => cat.id === category.id)
+      const isCurrentlyTopLevel = !!currentCategory
 
-      console.log('移除后的分类结构:', updatedCategories.map(cat => ({
-        id: cat.id,
-        name: cat.name,
-        subcategories: cat.subcategories?.map(sub => ({ id: sub.id, name: sub.name })) || []
-      })))
-
-      // 如果指定了父级分类，添加为子分类
       if (parentId && parentId !== '') {
+        // 需要移动到子分类
+        console.log('移动到父分类下:', parentId)
+
+        // 从当前位置移除
+        let updatedCategories = config.categories.map(cat => {
+          if (cat.id === category.id) {
+            // 从一级分类中移除
+            return null
+          } else {
+            // 从子分类中移除
+            return {
+              ...cat,
+              subcategories: (cat.subcategories || []).filter(sub => sub.id !== category.id)
+            }
+          }
+        }).filter(Boolean)
+
+        // 添加到新的父分类下
         updatedCategories = updatedCategories.map(cat => {
           if (cat.id === parentId) {
             return {
@@ -972,17 +974,45 @@ const CategoryManager = ({
           }
           return cat
         })
-        console.log('移动到父分类下:', parentId)
+
+        onUpdateCategories(updatedCategories)
+      } else if (isCurrentlyTopLevel && (!parentId || parentId === '')) {
+        // 保持为一级分类，仅更新内容，不移动位置
+        console.log('保持一级分类，仅更新内容')
+
+        const updatedCategories = config.categories.map(cat => {
+          if (cat.id === category.id) {
+            return {
+              ...cat,
+              name: category.name,
+              icon: category.icon,
+              special: category.special,
+              subcategories: cat.subcategories || []
+            }
+          }
+          return cat
+        })
+
+        onUpdateCategories(updatedCategories)
       } else {
+        // 从子分类升级为一级分类
+        console.log('从子分类升级为一级分类')
+
+        // 从子分类中移除
+        let updatedCategories = config.categories.map(cat => ({
+          ...cat,
+          subcategories: (cat.subcategories || []).filter(sub => sub.id !== category.id)
+        }))
+
         // 添加为一级分类
         updatedCategories.push({
           ...category,
           subcategories: category.subcategories || []
         })
-        console.log('升级为一级分类')
+
+        onUpdateCategories(updatedCategories)
       }
 
-      onUpdateCategories(updatedCategories)
       setEditingCategory(null)
       showMessage('success', '分类已更新')
     } else {

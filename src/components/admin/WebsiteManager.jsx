@@ -623,22 +623,36 @@ const WebsiteManager = ({
     }
   }
 
-  // 处理拖拽结束
+  // 处理拖拽结束 - 只允许在同一分类内移动
   const handleDragEnd = (event) => {
     const { active, over } = event
-    
+
     if (!over || active.id === over.id) {
+      return
+    }
+
+    const activeWebsite = config.websiteData.find(site => site.id === active.id)
+    const overWebsite = config.websiteData.find(site => site.id === over.id)
+
+    if (!activeWebsite || !overWebsite) {
+      return
+    }
+
+    // 检查是否在同一分类内
+    if (activeWebsite.category !== overWebsite.category) {
+      showMessage('warning', '只能在同一分类内调整网站顺序')
       return
     }
 
     const oldIndex = config.websiteData.findIndex(item => item.id === active.id)
     const newIndex = config.websiteData.findIndex(item => item.id === over.id)
-    
+
     if (oldIndex !== -1 && newIndex !== -1) {
       const newItems = [...config.websiteData]
       const [reorderedItem] = newItems.splice(oldIndex, 1)
       newItems.splice(newIndex, 0, reorderedItem)
       onUpdateWebsiteData(newItems)
+      showMessage('success', '网站顺序已调整')
     }
   }
 
@@ -686,29 +700,45 @@ const WebsiteManager = ({
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {config.websiteData
                   .sort((a, b) => {
-                    // 获取分类信息
-                    const getCategoryInfo = (categoryId) => {
-                      const topLevel = config.categories.find(cat => cat.id === categoryId)
-                      if (topLevel) return topLevel
-                      
-                      for (const category of config.categories) {
-                        if (category.subcategories) {
-                          const sub = category.subcategories.find(sub => sub.id === categoryId)
-                          if (sub) return category // 返回父级分类信息
+                    // 获取分类信息和排序权重
+                    const getCategoryWeight = (categoryId) => {
+                      // 先在一级分类中查找
+                      const topLevelIndex = config.categories.findIndex(cat => cat.id === categoryId)
+                      if (topLevelIndex !== -1) {
+                        const category = config.categories[topLevelIndex]
+                        return {
+                          weight: topLevelIndex * 1000, // 一级分类权重
+                          special: category.special
                         }
                       }
-                      return null
+
+                      // 再在二级分类中查找
+                      for (let i = 0; i < config.categories.length; i++) {
+                        const category = config.categories[i]
+                        if (category.subcategories) {
+                          const subIndex = category.subcategories.findIndex(sub => sub.id === categoryId)
+                          if (subIndex !== -1) {
+                            const subcategory = category.subcategories[subIndex]
+                            return {
+                              weight: i * 1000 + subIndex + 1, // 父分类权重 + 子分类权重
+                              special: subcategory.special || category.special
+                            }
+                          }
+                        }
+                      }
+
+                      return { weight: 999999, special: false } // 未分类的放最后
                     }
-                    
-                    const aCat = getCategoryInfo(a.category)
-                    const bCat = getCategoryInfo(b.category)
-                    
+
+                    const aInfo = getCategoryWeight(a.category)
+                    const bInfo = getCategoryWeight(b.category)
+
                     // 专栏分类优先显示
-                    if (aCat?.special && !bCat?.special) return -1
-                    if (!aCat?.special && bCat?.special) return 1
-                    
-                    // 其他分类按原顺序
-                    return 0
+                    if (aInfo.special && !bInfo.special) return -1
+                    if (!aInfo.special && bInfo.special) return 1
+
+                    // 按分类顺序排序
+                    return aInfo.weight - bInfo.weight
                   })
                   .map((website) => (
                   <SortableWebsiteItem
