@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/4 16:30:33
+// 网站数据 - 通过管理后台更新于 2025/7/5 13:17:32
 export const websiteData = [
   {
     "id": 40,
@@ -71,17 +71,6 @@ export const websiteData = [
       "DDOS"
     ],
     "icon": "https://www.google.com/s2/favicons?domain=cloudflare.com&sz=32"
-  },
-  {
-    "id": 1751617399235,
-    "name": "Mitce",
-    "description": "一款专注于提供高速稳定的网络加速服务的平台",
-    "url": "https://mitce.net/aff.php?aff=4751",
-    "category": "friend_links",
-    "tags": [
-      "科学环境"
-    ],
-    "icon": "https://www.google.com/s2/favicons?domain=mitce.net&sz=32"
   },
   {
     "id": 33,
@@ -170,5 +159,5 @@ export const siteStats = {
   totalSites: websiteData.length,
   totalCategories: categories.length,
   totalTags: [...new Set(websiteData.flatMap(site => site.tags || []))].length,
-  lastUpdated: "2025-07-04"
+  lastUpdated: "2025-07-05"
 };
