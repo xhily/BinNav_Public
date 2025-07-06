@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/6 23:22:25
+// 网站数据 - 通过管理后台更新于 2025/7/6 23:25:48
 export const websiteData = [
   {
     "id": 1751807882512,
@@ -292,7 +292,7 @@ export const categories = [
       {
         "id": "category_1751811752885",
         "name": "AI Code",
-        "icon": "/assets/a4180217-10e0-4089-b5ea-50a9e1b7519b.png",
+        "icon": "/assets/0ca87c46000902fea2f3a3917db613f4.jpeg",
         "special": false,
         "subcategories": []
       }
