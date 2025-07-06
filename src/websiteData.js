@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/6 23:20:01
+// 网站数据 - 通过管理后台更新于 2025/7/6 23:22:25
 export const websiteData = [
   {
     "id": 1751807882512,
@@ -285,15 +285,16 @@ export const categories = [
       {
         "id": "category_1751811714830",
         "name": "AI Chat",
-        "icon": "/assets/a4180217-10e0-4089-b5ea-50a9e1b7519b.png",
+        "icon": "/assets/Chat-2--Streamline-Kameleon__1_.png",
         "special": false,
         "subcategories": []
       },
       {
         "id": "category_1751811752885",
         "name": "AI Code",
-        "icon": "/assets/tools_icon.png",
-        "special": false
+        "icon": "/assets/a4180217-10e0-4089-b5ea-50a9e1b7519b.png",
+        "special": false,
+        "subcategories": []
       }
     ]
   },
