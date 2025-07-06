@@ -1,5 +1,16 @@
-// 网站数据 - 通过管理后台更新于 2025/7/5 13:17:32
+// 网站数据 - 通过管理后台更新于 2025/7/6 22:18:23
 export const websiteData = [
+  {
+    "id": 1751807882512,
+    "name": "个人站点",
+    "description": "作者个人站点展示",
+    "url": "https://i.bincore.cn/",
+    "category": "author",
+    "tags": [
+      "个人站点"
+    ],
+    "icon": "https://icons.duckduckgo.com/ip3/bincore.cn.ico"
+  },
   {
     "id": 40,
     "name": "Newbie Village",
@@ -85,6 +96,18 @@ export const websiteData = [
     ],
     "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=32",
     "popularity": 93
+  },
+  {
+    "id": 1751807806262,
+    "name": "EdgeOne",
+    "description": "全球首个支持中国访问的免费CDN",
+    "url": "https://edgeone.ai/zh",
+    "category": "friend_links",
+    "tags": [
+      "网站",
+      "CDN"
+    ],
+    "icon": "https://www.google.com/s2/favicons?domain=edgeone.ai&sz=32"
   }
 ];
 
@@ -98,29 +121,42 @@ export const categories = [
     "subcategories": []
   },
   {
+    "id": "category_1751807929795",
+    "name": "AI工具",
+    "icon": "/assets/ai.png",
+    "special": false,
+    "subcategories": []
+  },
+  {
     "id": "recommended",
     "name": "常用推荐",
-    "icon": "/assets/network_icon.png",
+    "icon": "/assets/star.png",
     "special": false,
     "subcategories": []
   },
   {
     "id": "dev_tools",
     "name": "开发工具",
-    "icon": "/assets/innovation_icon.png",
+    "icon": "/assets/Xcode--Streamline-Svg-Logos.png",
     "special": false,
     "subcategories": []
   },
   {
     "id": "friend_links",
     "name": "友情链接",
-    "icon": "/assets/social_icon.png",
+    "icon": "/assets/link.png",
     "special": false,
     "subcategories": []
   }
 ];
 
-
+// 搜索引擎配置
+export const searchEngines = [
+  { id: "bing", name: "必应", url: "https://www.bing.com/search?q=", color: "bg-blue-600" },
+  { id: "baidu", name: "百度", url: "https://www.baidu.com/s?wd=", color: "bg-red-600" },
+  { id: "google", name: "谷歌", url: "https://www.google.com/search?q=", color: "bg-green-600" },
+  { id: "internal", name: "站内搜索", url: "", color: "bg-purple-600" }
+];
 
 // 推荐内容配置
 export const recommendations = [
@@ -153,5 +189,5 @@ export const siteStats = {
   totalSites: websiteData.length,
   totalCategories: categories.length,
   totalTags: [...new Set(websiteData.flatMap(site => site.tags || []))].length,
-  lastUpdated: "2025-07-05"
+  lastUpdated: "2025-07-06"
 };
