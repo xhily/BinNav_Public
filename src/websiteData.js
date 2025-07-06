@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/6 23:48:37
+// 网站数据 - 通过管理后台更新于 2025/7/6 23:51:52
 export const websiteData = [
   {
     "id": 1751807882512,
@@ -292,7 +292,7 @@ export const categories = [
       {
         "id": "category_1751811752885",
         "name": "AI Code",
-        "icon": "/assets/Browser-Code-1--Streamline-Plump.png",
+        "icon": "/assets/Browser-Code.png",
         "special": false,
         "subcategories": []
       }
