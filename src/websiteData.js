@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/6 22:18:23
+// 网站数据 - 通过管理后台更新于 2025/7/6 23:03:48
 export const websiteData = [
   {
     "id": 1751807882512,
@@ -21,6 +21,17 @@ export const websiteData = [
       "个人博客",
       "教程分享",
       "开发心得"
+    ],
+    "icon": "https://icons.duckduckgo.com/ip3/nbvil.com.ico"
+  },
+  {
+    "id": 1751813976438,
+    "name": "博主云盘",
+    "description": "分享教程涉及的工具及相关文档代码",
+    "url": "https://pan.nbvil.com/",
+    "category": "author",
+    "tags": [
+      "云盘"
     ],
     "icon": "https://icons.duckduckgo.com/ip3/nbvil.com.ico"
   },
@@ -84,6 +95,120 @@ export const websiteData = [
     "icon": "https://www.google.com/s2/favicons?domain=cloudflare.com&sz=32"
   },
   {
+    "id": 1751811992820,
+    "name": "ChatGPT",
+    "description": "ChatGPT 是由 OpenAI 开发的先进语言模型，支持自然语言理解与生成。",
+    "url": "https://chatgpt.com/",
+    "category": "category_1751811714830",
+    "tags": [
+      "AI",
+      "对话"
+    ],
+    "icon": "https://www.google.com/s2/favicons?domain=chatgpt.com&sz=32"
+  },
+  {
+    "id": 1751812061558,
+    "name": "DeepSeek",
+    "description": "DeepSeek 结合大规模语言模型与搜索能力，助您快速获取精准答案、洞察信息与生成内容。从复杂问题到创意灵感，一站式高效解决。",
+    "url": "https://www.deepseek.com/",
+    "category": "category_1751811714830",
+    "tags": [
+      "AI",
+      "对话"
+    ],
+    "icon": "https://www.google.com/s2/favicons?domain=deepseek.com&sz=32"
+  },
+  {
+    "id": 1751813180037,
+    "name": "Grok",
+    "description": "xAI 出品的对话式助手，实时理解和生成信息。",
+    "url": "https://grok.com/",
+    "category": "category_1751811714830",
+    "tags": [
+      "AI",
+      "对话"
+    ],
+    "icon": "https://www.google.com/s2/favicons?domain=grok.com&sz=32"
+  },
+  {
+    "id": 1751812924193,
+    "name": "Agentment",
+    "description": "多智能体协作与自动化平台，解锁 AI 生产力。",
+    "url": "https://www.augmentcode.com/",
+    "category": "category_1751811752885",
+    "tags": [
+      "AI",
+      "工具",
+      "开发"
+    ],
+    "icon": "https://www.google.com/s2/favicons?domain=augmentcode.com&sz=32"
+  },
+  {
+    "id": 1751812223718,
+    "name": "Claude",
+    "description": "由 Anthropic 开发的先进AI助手，专为开发者打造，擅长代码生成、调试建议和技术问题解答",
+    "url": "https://claude.ai/login",
+    "category": "category_1751811752885",
+    "tags": [
+      "AI",
+      "工具",
+      "开发"
+    ],
+    "icon": "https://www.google.com/s2/favicons?domain=claude.ai&sz=32"
+  },
+  {
+    "id": 1751812327874,
+    "name": "Claude Code",
+    "description": "专为开发者设计的Claude版本，强化了代码编写、调试和技术文档生成能力",
+    "url": "https://www.anthropic.com/claude-code",
+    "category": "category_1751811752885",
+    "tags": [
+      "AI",
+      "工具",
+      "开发"
+    ],
+    "icon": "https://www.google.com/s2/favicons?domain=anthropic.com&sz=32"
+  },
+  {
+    "id": 1751812429387,
+    "name": "Cursor",
+    "description": "Cursor 是为开发者打造的智能代码编辑器，深度集成大型语言模型，提供即时的代码生成、解释、调试和重构支持，让编程更高效、更流畅。",
+    "url": "https://cursor.com/cn",
+    "category": "category_1751811752885",
+    "tags": [
+      "AI",
+      "工具",
+      "开发"
+    ],
+    "icon": "https://www.google.com/s2/favicons?domain=cursor.com&sz=32"
+  },
+  {
+    "id": 1751812786319,
+    "name": "Gemini Code Assist",
+    "description": "Google 出品的 AI 编程助手，助力高效代码开发。",
+    "url": "https://cloud.google.com/blog/ja/topics/developers-practitioners/gemini-code-assist?hl=ja",
+    "category": "category_1751811752885",
+    "tags": [
+      "AI",
+      "工具",
+      "开发"
+    ],
+    "icon": "https://www.google.com/s2/favicons?domain=google.com&sz=32"
+  },
+  {
+    "id": 1751812826244,
+    "name": "Gemini CLI",
+    "description": "Gemini CLI，命令行中的智能开发与自动化工具。",
+    "url": "https://cloud.google.com/blog/ja/topics/developers-practitioners/introducing-gemini-cli?hl=ja",
+    "category": "category_1751811752885",
+    "tags": [
+      "AI",
+      "工具",
+      "开发"
+    ],
+    "icon": "https://www.google.com/s2/favicons?domain=google.com&sz=32"
+  },
+  {
     "id": 33,
     "name": "VS Code",
     "description": "微软开发的代码编辑器",
@@ -96,6 +221,30 @@ export const websiteData = [
     ],
     "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=32",
     "popularity": 93
+  },
+  {
+    "id": 1751813442742,
+    "name": "Xshell",
+    "description": "功能强大的终端模拟器，安全高效管理远程服务器。",
+    "url": "https://www.xshell.com/",
+    "category": "dev_tools",
+    "tags": [
+      "SSH",
+      "开发"
+    ],
+    "icon": "https://xshell.com/favicon.ico"
+  },
+  {
+    "id": 1751813515058,
+    "name": "Termius",
+    "description": "跨平台SSH客户端，随时随地安全管理服务器。",
+    "url": "https://termius.com/",
+    "category": "dev_tools",
+    "tags": [
+      "SSH",
+      "开发"
+    ],
+    "icon": "https://www.google.com/s2/favicons?domain=termius.com&sz=32"
   },
   {
     "id": 1751807806262,
@@ -121,18 +270,32 @@ export const categories = [
     "subcategories": []
   },
   {
-    "id": "category_1751807929795",
-    "name": "AI工具",
-    "icon": "/assets/ai.png",
-    "special": false,
-    "subcategories": []
-  },
-  {
     "id": "recommended",
     "name": "常用推荐",
     "icon": "/assets/star.png",
     "special": false,
     "subcategories": []
+  },
+  {
+    "id": "category_1751807929795",
+    "name": "AI平台",
+    "icon": "/assets/ai.png",
+    "special": false,
+    "subcategories": [
+      {
+        "id": "category_1751811714830",
+        "name": "AI Chat",
+        "icon": "/assets/tools_icon.png",
+        "special": false,
+        "subcategories": []
+      },
+      {
+        "id": "category_1751811752885",
+        "name": "AI Code",
+        "icon": "/assets/tools_icon.png",
+        "special": false
+      }
+    ]
   },
   {
     "id": "dev_tools",
