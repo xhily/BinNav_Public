@@ -18,6 +18,7 @@ const SortableWebsiteItem = ({
   onSaveWebsite,
   onCancelEdit,
   getCategoryName,
+  getCategoryIcon,
   config
 }) => {
   const {
@@ -97,9 +98,15 @@ const SortableWebsiteItem = ({
         </div>
         
         <div className="mb-2">
-          <span className="text-xs text-gray-600 truncate block" title={getCategoryName(website.category)}>
-            📁 {getCategoryName(website.category)}
-          </span>
+          <div className="flex items-center text-xs text-gray-600 truncate" title={getCategoryName(website.category)}>
+            <img
+              src={getCategoryIcon(website.category)}
+              alt=""
+              className="w-4 h-4 mr-1.5 opacity-80 rounded-sm bg-gray-50 p-0.5"
+              onError={(e) => { e.target.src = '/assets/tools_icon.png' }}
+            />
+            <span>{getCategoryName(website.category)}</span>
+          </div>
         </div>
         
         <div className="mb-3 flex-1">
@@ -233,12 +240,33 @@ const SortableWebsiteItem = ({
 /**
  * 网站管理组件
  */
-const WebsiteManager = ({ 
-  config, 
-  onUpdateWebsiteData, 
+const WebsiteManager = ({
+  config,
+  onUpdateWebsiteData,
   showMessage,
-  getCategoryName 
+  getCategoryName
 }) => {
+  // 获取分类图标
+  const getCategoryIcon = (categoryId) => {
+    // 先在一级分类中查找
+    const topLevelCategory = config.categories.find(cat => cat.id === categoryId)
+    if (topLevelCategory) {
+      return topLevelCategory.icon
+    }
+
+    // 再在二级分类中查找
+    for (const category of config.categories) {
+      if (category.subcategories) {
+        const subcategory = category.subcategories.find(sub => sub.id === categoryId)
+        if (subcategory) {
+          return subcategory.icon
+        }
+      }
+    }
+
+    // 默认图标
+    return '/assets/tools_icon.png'
+  }
   const [editingWebsite, setEditingWebsite] = useState(null)
   const [websiteForm, setWebsiteForm] = useState({
     name: '',
@@ -752,6 +780,7 @@ const WebsiteManager = ({
                     onSaveWebsite={handleSaveWebsite}
                     onCancelEdit={handleCancelEdit}
                     getCategoryName={getCategoryName}
+                    getCategoryIcon={getCategoryIcon}
                     config={config}
                   />
                 ))}

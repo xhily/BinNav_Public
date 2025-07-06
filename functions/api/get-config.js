@@ -52,31 +52,50 @@ function base64Decode(str) {
   }
 }
 
-export async function onRequestGet({ request, env }) {
-  const { GITHUB_TOKEN, GITHUB_REPO } = env;
-  
-  if (!GITHUB_TOKEN) {
+// Cloudflare Pages Functions 格式
+export async function onRequest(context) {
+  const { request, env } = context;
+
+  // 只允许 GET 请求
+  if (request.method !== 'GET') {
     return new Response(JSON.stringify({
       success: false,
-      error: 'GITHUB_TOKEN未配置',
-      message: '请在EdgeOne项目中配置GITHUB_TOKEN环境变量'
+      message: 'Method not allowed'
     }), {
-      status: 500,
-      headers: { 
+      status: 405,
+      headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       }
     });
   }
+
+  // 获取环境变量（支持多平台）
+  const GITHUB_TOKEN = env?.VITE_GITHUB_TOKEN || env?.GITHUB_TOKEN;
+  const GITHUB_REPO = env?.VITE_GITHUB_REPO || env?.GITHUB_REPO;
   
+  if (!GITHUB_TOKEN) {
+    return new Response(JSON.stringify({
+      success: false,
+      error: 'GITHUB_TOKEN未配置',
+      message: '请在部署平台中配置GITHUB_TOKEN环境变量'
+    }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    });
+  }
+
   if (!GITHUB_REPO) {
     return new Response(JSON.stringify({
       success: false,
-      error: 'GITHUB_REPO未配置', 
-      message: '请在EdgeOne项目中配置GITHUB_REPO环境变量'
+      error: 'GITHUB_REPO未配置',
+      message: '请在部署平台中配置GITHUB_REPO环境变量'
     }), {
       status: 500,
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       }
@@ -91,7 +110,7 @@ export async function onRequestGet({ request, env }) {
       headers: {
         'Authorization': `token ${GITHUB_TOKEN}`,
         'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'EdgeOne-Functions/1.0'
+        'User-Agent': 'BinNav-Functions/1.0'
       }
     });
 
@@ -161,4 +180,9 @@ export async function onRequestGet({ request, env }) {
       }
     });
   }
-} 
+}
+
+// EdgeOne Functions 兼容格式
+export async function onRequestGet(context) {
+  return onRequest(context);
+}

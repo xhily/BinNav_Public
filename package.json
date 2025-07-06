@@ -1,18 +1,26 @@
 {
-  "name": "webstack-navigation",
+  "name": "binnav",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "基于 WebStack.cc 风格的现代化导航网站",
+  "description": "BinNav - 精选网站导航，发现优质网站，提升工作效率",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy:vercel": "vercel --prod",
+    "deploy:netlify": "npm run build && netlify deploy --prod --dir=dist",
+    "deploy:cloudflare": "npm run build && wrangler pages deploy dist",
+    "cf:login": "wrangler login",
+    "cf:dev": "wrangler pages dev dist",
+    "clean": "rm -rf dist node_modules",
+    "reinstall": "npm run clean && npm install"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@rollup/rollup-win32-x64-msvc": "^4.44.2",
     "lucide-react": "^0.294.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -27,11 +35,12 @@
   },
   "keywords": [
     "navigation",
-    "webstack",
+    "binnav",
+    "website-directory",
     "react",
     "vite",
     "tailwindcss"
   ],
-  "author": "WebStack Navigator",
+  "author": "Sindri",
   "license": "MIT"
 }

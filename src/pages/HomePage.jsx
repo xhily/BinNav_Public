@@ -4,7 +4,7 @@ import { Button } from '../components/ui/button.jsx'
 import { Input } from '../components/ui/input.jsx'
 import WebsiteCard from '../components/WebsiteCard.jsx'
 import SubmitWebsiteForm from '../components/SubmitWebsiteForm.jsx'
-import { websiteData, categories, searchEngines } from '../websiteData.js'
+import { websiteData, categories } from '../websiteData.js'
 import { useSiteConfig } from '../hooks/useSiteConfig.js'
 
 // 导入图片
@@ -12,9 +12,7 @@ import logoImg from '../assets/logo.png'
 
 function HomePage() {
   const [searchTerm, setSearchTerm] = useState('')
-  // activeCategory 状态已移除 - 不再跟踪滚动选中状态
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [selectedSearchEngine, setSelectedSearchEngine] = useState('internal')
   const [expandedCategories, setExpandedCategories] = useState({})
   const [showSubmitForm, setShowSubmitForm] = useState(false)
   const mainContentRef = useRef(null)
@@ -377,17 +375,60 @@ function HomePage() {
       <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="text-center">
-            <div className="text-sm text-gray-500">
-              <span>© 2025 BinNav Navigator. All rights reserved.</span>
-              <span className="mx-2">•</span>
-              <a
-                href="https://github.com/sindricn/BinNav"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 transition-colors"
-              >
-                GitHub
-              </a>
+            <div className="text-sm text-gray-500 space-y-2">
+              {/* 版权信息 */}
+              <div>
+                <span>© 2025 </span>
+                <a
+                  href="https://i.bincore.cn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 transition-colors"
+                >
+                  Sindri
+                </a>
+                <span className="mx-2">·</span>
+                <a
+                  href="https://github.com/sindricn/BinNav"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 transition-colors"
+                >
+                  MIT License
+                </a>
+              </div>
+
+              {/* 备案信息 */}
+              {(siteConfig.icpRecord || siteConfig.publicSecurityRecord) && (
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+                  {siteConfig.icpRecord && (
+                    <a
+                      href="http://beian.miit.gov.cn"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 transition-colors"
+                    >
+                      {siteConfig.icpRecord}
+                    </a>
+                  )}
+                  {siteConfig.publicSecurityRecord && (
+                    <span>
+                      {siteConfig.publicSecurityRecordUrl ? (
+                        <a
+                          href={siteConfig.publicSecurityRecordUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 transition-colors"
+                        >
+                          {siteConfig.publicSecurityRecord}
+                        </a>
+                      ) : (
+                        siteConfig.publicSecurityRecord
+                      )}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

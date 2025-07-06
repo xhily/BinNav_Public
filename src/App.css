@@ -37,23 +37,23 @@
   }
 }
 
-/* WebStack 特色样式 */
-.webstack-card {
+/* BinNav 特色样式 */
+.binnav-card {
   @apply bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl transition-all duration-300;
   @apply hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1;
 }
 
-.webstack-card.author-card {
+.binnav-card.author-card {
   @apply bg-gradient-to-br from-purple-50/80 to-pink-50/80 border-purple-200/30;
   @apply hover:shadow-xl hover:shadow-purple-500/15 hover:border-purple-300/50;
 }
 
-.webstack-sidebar-item {
+.binnav-sidebar-item {
   @apply flex items-center w-full px-3 py-2 text-sm text-gray-700 rounded-md transition-colors;
   @apply hover:bg-gray-50 hover:text-gray-900;
 }
 
-.webstack-sidebar-item.active {
+.binnav-sidebar-item.active {
   @apply bg-blue-50 text-blue-700 border-r-2 border-blue-700;
 }
 
@@ -67,29 +67,29 @@
 
 /* 响应式布局优化 */
 @media (max-width: 768px) {
-  .webstack-mobile-padding {
+  .binnav-mobile-padding {
     @apply px-3;
   }
-  
-  .webstack-mobile-grid {
+
+  .binnav-mobile-grid {
     @apply grid-cols-1;
   }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
-  .webstack-tablet-grid {
+  .binnav-tablet-grid {
     @apply grid-cols-2;
   }
 }
 
 @media (min-width: 1025px) {
-  .webstack-desktop-grid {
+  .binnav-desktop-grid {
     @apply grid-cols-3;
   }
 }
 
 /* 加载动画 */
-.webstack-fade-in {
+.binnav-fade-in {
   animation: fadeIn 0.3s ease-in-out;
 }
 
@@ -105,35 +105,35 @@
 }
 
 /* 网站图标样式 */
-.webstack-site-icon {
+.binnav-site-icon {
   @apply w-12 h-12 rounded-2xl shadow-lg bg-white/80 backdrop-blur-sm border border-white/20 p-2;
   @apply flex items-center justify-center overflow-hidden transition-all duration-300;
 }
 
-.webstack-site-icon img {
+.binnav-site-icon img {
   @apply w-full h-full object-contain rounded-lg;
 }
 
-.webstack-site-icon:hover {
+.binnav-site-icon:hover {
   @apply shadow-xl scale-105;
 }
 
 /* 分类图标样式 */
-.webstack-category-icon {
+.binnav-category-icon {
   @apply w-5 h-5 opacity-80;
 }
 
 /* 标签样式 */
-.webstack-tag {
+.binnav-tag {
   @apply inline-block px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded;
   @apply hover:bg-gray-200 transition-colors cursor-default;
 }
 
 /* 卡片悬停效果增强 */
-.webstack-card:hover .webstack-site-icon {
+.binnav-card:hover .binnav-site-icon {
   @apply shadow-md border-blue-200;
 }
 
-.webstack-card:hover h3 {
+.binnav-card:hover h3 {
   @apply text-blue-600;
 }

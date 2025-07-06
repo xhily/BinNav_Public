@@ -10,6 +10,7 @@ import WebsiteManager from '../components/admin/WebsiteManager'
 import CategoryManager from '../components/admin/CategoryManager'
 import LogoUploader from '../components/admin/LogoUploader'
 import PendingWebsiteManager from '../components/admin/PendingWebsiteManager.jsx'
+import VersionManager from '../components/admin/VersionManager'
 
 
 function Admin() {
@@ -149,13 +150,7 @@ function Admin() {
     return '未分类'
   }
 
-  // 保存系统设置
-  const handleSaveSettings = () => {
-    // 更新全局配置
-    updateSiteConfig(siteSettings)
-    // 在实际实现中，这里会生成包含系统设置的配置文件
-    showMessage('success', '系统设置已更新')
-  }
+
 
   // 综合保存函数 - 保存所有配置包括站点设置
   const handleSaveAll = async () => {
@@ -360,7 +355,51 @@ function Admin() {
                       <p className="text-xs text-gray-500 mt-1">网站的简介描述，用于SEO和页面介绍，建议控制在100字以内</p>
                     </div>
               </div>
-              
+
+              {/* 备案信息设置 */}
+              <div className="bg-white border border-gray-200 rounded-lg p-6 mt-6">
+                <h4 className="text-base font-medium text-gray-900 mb-4">备案信息</h4>
+                <p className="text-sm text-gray-600 mb-4">配置网站备案信息，留空则不显示在页脚中</p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">ICP备案号</label>
+                    <input
+                      type="text"
+                      value={siteSettings.icpRecord || ''}
+                      onChange={(e) => setSiteSettings({...siteSettings, icpRecord: e.target.value})}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="如：京ICP备12345678号"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">ICP备案号，自动链接到工信部备案查询网站，留空则不显示</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">公安备案号</label>
+                    <input
+                      type="text"
+                      value={siteSettings.publicSecurityRecord || ''}
+                      onChange={(e) => setSiteSettings({...siteSettings, publicSecurityRecord: e.target.value})}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="如：京公网安备11010802012345号"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">公安备案号，留空则不显示</p>
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">公安备案链接</label>
+                    <input
+                      type="url"
+                      value={siteSettings.publicSecurityRecordUrl || ''}
+                      onChange={(e) => setSiteSettings({...siteSettings, publicSecurityRecordUrl: e.target.value})}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="如：http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11010802012345"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">公安备案查询链接，配合公安备案号使用</p>
+                  </div>
+                </div>
+              </div>
+
                   <div className="mt-6">
                     <p className="text-sm text-gray-500">
                       💡 提示：修改后点击右上角的"保存设置"按钮统一保存所有配置
@@ -368,21 +407,9 @@ function Admin() {
                   </div>
                 </div>
                 
-                {/* 版本信息 */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6 mt-6">
-                  <h4 className="text-base font-medium text-gray-900 mb-4">版本信息</h4>
-                  
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <a 
-                      href="https://github.com/navigator-dev/binnav" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium transition-colors"
-                    >
-                      <Github className="w-5 h-5" />
-                      <span>v1.0.0</span>
-                    </a>
-                  </div>
+                {/* 版本管理 */}
+                <div className="mt-6">
+                  <VersionManager />
                 </div>
           </div>
         )}

@@ -131,13 +131,7 @@ export const categories = [
   }
 ];
 
-// 搜索引擎配置
-export const searchEngines = [
-  { id: "bing", name: "必应", url: "https://www.bing.com/search?q=", color: "bg-blue-600" },
-  { id: "baidu", name: "百度", url: "https://www.baidu.com/s?wd=", color: "bg-red-600" },
-  { id: "google", name: "谷歌", url: "https://www.google.com/search?q=", color: "bg-green-600" },
-  { id: "internal", name: "站内搜索", url: "", color: "bg-purple-600" }
-];
+
 
 // 推荐内容配置
 export const recommendations = [
