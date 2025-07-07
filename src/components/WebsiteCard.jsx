@@ -1,25 +1,62 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, CardContent } from './ui/card'
 import logoImg from '../assets/logo.png'
 
 const WebsiteCard = ({ website }) => {
-  // 简化图标处理逻辑，提高移动端兼容性
-  const getIconSrc = () => {
+  const [iconSrc, setIconSrc] = useState('')
+  const [hasError, setHasError] = useState(false)
+
+  // 多重fallback图标源
+  const getIconSources = () => {
+    const sources = []
+
+    // 1. 优先使用网站数据中的图标
     if (website.icon) {
-      return website.icon
+      sources.push(website.icon)
     }
 
     try {
       const hostname = new URL(website.url).hostname
-      return `https://www.google.com/s2/favicons?domain=${hostname}&sz=32`
-    } catch {
-      return logoImg
+      const domain = new URL(website.url).origin
+
+      // 2. Google favicon服务
+      sources.push(`https://www.google.com/s2/favicons?domain=${hostname}&sz=32`)
+
+      // 3. DuckDuckGo图标服务（移动端更稳定）
+      sources.push(`https://icons.duckduckgo.com/ip3/${hostname}.ico`)
+
+      // 4. 网站自己的favicon
+      sources.push(`${domain}/favicon.ico`)
+
+    } catch (error) {
+      console.warn('解析URL失败:', website.url)
     }
+
+    // 5. 默认logo
+    sources.push(logoImg)
+
+    return sources
   }
 
+  // 初始化图标
+  useEffect(() => {
+    const sources = getIconSources()
+    setIconSrc(sources[0] || logoImg)
+  }, [website])
+
   const handleIconError = (e) => {
-    // 简单的错误处理，直接使用默认logo
-    e.target.src = logoImg
+    if (!hasError) {
+      setHasError(true)
+      const sources = getIconSources()
+      const currentIndex = sources.indexOf(iconSrc)
+      const nextSource = sources[currentIndex + 1]
+
+      if (nextSource) {
+        setIconSrc(nextSource)
+      } else {
+        e.target.src = logoImg
+      }
+    }
   }
 
   return (
@@ -31,7 +68,7 @@ const WebsiteCard = ({ website }) => {
         <div className="flex items-center space-x-3 w-full">
           <div className="flex-shrink-0">
             <img
-              src={getIconSrc()}
+              src={iconSrc}
               alt={website.name}
               className="w-8 h-8 rounded-md shadow-sm bg-gray-100 p-0.5"
               onError={handleIconError}
@@ -41,6 +78,7 @@ const WebsiteCard = ({ website }) => {
                 height: '32px',
                 objectFit: 'contain'
               }}
+              loading="lazy"
             />
           </div>
           <div className="flex-1 min-w-0 flex flex-col justify-center">

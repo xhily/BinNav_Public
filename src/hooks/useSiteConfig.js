@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { siteConfig as initialSiteConfig } from '../websiteData.js'
 
 // 默认站点配置
 const defaultSiteConfig = {
@@ -45,13 +46,13 @@ const loadSavedConfig = async () => {
   }
 }
 
-// 全局站点配置管理
-let globalSiteConfig = defaultSiteConfig
+// 全局站点配置管理 - 优先使用websiteData.js中的配置
+let globalSiteConfig = { ...defaultSiteConfig, ...initialSiteConfig }
 const subscribers = new Set()
 
-// 异步初始化配置
+// 异步初始化配置，合并localStorage中的配置
 loadSavedConfig().then(config => {
-  globalSiteConfig = config
+  globalSiteConfig = { ...globalSiteConfig, ...config }
   notifySubscribers()
 })
 
