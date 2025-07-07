@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/7 15:53:34
+// 网站数据 - 通过管理后台更新于 2025/7/7 16:32:04
 
 // 站点配置
 export const siteConfig = {
@@ -21,7 +21,7 @@ export const websiteData = [
     "tags": [
       "个人站点"
     ],
-    "icon": "https://icons.duckduckgo.com/ip3/bincore.cn.ico"
+    "icon": "https://icons.duckduckgo.com/ip3/i.bincore.cn.ico"
   },
   {
     "id": 40,
@@ -34,7 +34,7 @@ export const websiteData = [
       "教程分享",
       "开发心得"
     ],
-    "icon": "https://icons.duckduckgo.com/ip3/nbvil.com.ico"
+    "icon": "https://icons.duckduckgo.com/ip3/blog.nbvil.com.ico"
   },
   {
     "id": 1751813976438,
@@ -45,7 +45,7 @@ export const websiteData = [
     "tags": [
       "云盘"
     ],
-    "icon": "https://icons.duckduckgo.com/ip3/nbvil.com.ico"
+    "icon": "https://pan.nbvil.com/favicon.ico"
   },
   {
     "id": 1751598590526,
@@ -56,7 +56,7 @@ export const websiteData = [
     "tags": [
       "视频"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=youtube.com&sz=32&t=1751874761586"
+    "icon": "https://www.google.com/s2/favicons?domain=www.youtube.com&sz=32&t=1751877042233"
   },
   {
     "id": 41,
@@ -67,7 +67,7 @@ export const websiteData = [
     "tags": [
       "开源项目"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=github.com&sz=32&t=1751874762445"
+    "icon": "https://www.google.com/s2/favicons?domain=github.com&sz=32&t=1751877042885"
   },
   {
     "id": 1751596898467,
@@ -78,7 +78,7 @@ export const websiteData = [
     "tags": [
       "视频"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=bilibili.com&sz=32&t=1751874763062"
+    "icon": "https://icons.duckduckgo.com/ip3/space.bilibili.com.ico"
   },
   {
     "id": 45,
@@ -90,7 +90,7 @@ export const websiteData = [
       "知乎专栏",
       "技术文章"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=zhihu.com&sz=32&t=1751874763696"
+    "icon": "https://www.google.com/s2/favicons?domain=www.zhihu.com&sz=32&t=1751877044286"
   },
   {
     "id": 1751617129171,
@@ -104,7 +104,7 @@ export const websiteData = [
       "CDN",
       "DDOS"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=cloudflare.com&sz=32&t=1751874764323"
+    "icon": "https://www.google.com/s2/favicons?domain=www.cloudflare.com&sz=32&t=1751877045654"
   },
   {
     "id": 1751811992820,
@@ -116,7 +116,7 @@ export const websiteData = [
       "AI",
       "对话"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=chatgpt.com&sz=32&t=1751874765727"
+    "icon": "https://www.google.com/s2/favicons?domain=chatgpt.com&sz=32&t=1751877046371"
   },
   {
     "id": 1751812061558,
@@ -128,7 +128,7 @@ export const websiteData = [
       "AI",
       "对话"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=deepseek.com&sz=32&t=1751874766355"
+    "icon": "https://www.google.com/s2/favicons?domain=www.deepseek.com&sz=32&t=1751877047017"
   },
   {
     "id": 1751813180037,
@@ -140,7 +140,7 @@ export const websiteData = [
       "AI",
       "对话"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=grok.com&sz=32&t=1751874767093"
+    "icon": "https://www.google.com/s2/favicons?domain=grok.com&sz=32&t=1751877047676"
   },
   {
     "id": 1751812924193,
@@ -153,7 +153,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=augmentcode.com&sz=32&t=1751874767721"
+    "icon": "https://www.google.com/s2/favicons?domain=www.augmentcode.com&sz=32&t=1751877048321"
   },
   {
     "id": 1751812223718,
@@ -166,7 +166,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=claude.ai&sz=32&t=1751874768348"
+    "icon": "https://www.google.com/s2/favicons?domain=claude.ai&sz=32&t=1751877049090"
   },
   {
     "id": 1751812327874,
@@ -179,7 +179,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=anthropic.com&sz=32&t=1751874768970"
+    "icon": "https://www.google.com/s2/favicons?domain=www.anthropic.com&sz=32&t=1751877049741"
   },
   {
     "id": 1751812429387,
@@ -192,7 +192,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=cursor.com&sz=32&t=1751874769604"
+    "icon": "https://www.google.com/s2/favicons?domain=cursor.com&sz=32&t=1751877050491"
   },
   {
     "id": 1751812786319,
@@ -205,7 +205,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=google.com&sz=32&t=1751874770237"
+    "icon": "https://www.google.com/s2/favicons?domain=cloud.google.com&sz=32&t=1751877051142"
   },
   {
     "id": 1751812826244,
@@ -218,7 +218,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=google.com&sz=32&t=1751874770862"
+    "icon": "https://www.google.com/s2/favicons?domain=cloud.google.com&sz=32&t=1751877051799"
   },
   {
     "id": 33,
@@ -231,7 +231,7 @@ export const websiteData = [
       "开发工具",
       "微软"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=visualstudio.com&sz=32&t=1751874771489",
+    "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=32&t=1751877052594",
     "popularity": 93
   },
   {
@@ -244,7 +244,7 @@ export const websiteData = [
       "SSH",
       "开发"
     ],
-    "icon": "https://xshell.com/favicon.ico"
+    "icon": "https://www.xshell.com/favicon.ico"
   },
   {
     "id": 1751813515058,
@@ -256,7 +256,7 @@ export const websiteData = [
       "SSH",
       "开发"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=termius.com&sz=32&t=1751874773491"
+    "icon": "https://www.google.com/s2/favicons?domain=termius.com&sz=32&t=1751877054011"
   },
   {
     "id": 1751807806262,
@@ -268,7 +268,7 @@ export const websiteData = [
       "网站",
       "CDN"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=edgeone.ai&sz=32&t=1751874774120"
+    "icon": "https://www.google.com/s2/favicons?domain=edgeone.ai&sz=32&t=1751877054661"
   }
 ];
 
