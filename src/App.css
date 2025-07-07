@@ -33,19 +33,18 @@
   body {
     @apply bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-foreground;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-    background-attachment: fixed;
   }
 }
 
 /* BinNav 特色样式 */
 .binnav-card {
-  @apply bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl transition-all duration-300;
-  @apply hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1;
+  @apply bg-white border border-gray-200 rounded-2xl transition-all duration-300;
+  @apply hover:shadow-xl;
 }
 
 .binnav-card.author-card {
-  @apply bg-gradient-to-br from-purple-50/80 to-pink-50/80 border-purple-200/30;
-  @apply hover:shadow-xl hover:shadow-purple-500/15 hover:border-purple-300/50;
+  @apply bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200;
+  @apply hover:shadow-xl hover:border-purple-300;
 }
 
 .binnav-sidebar-item {
@@ -73,6 +72,26 @@
 
   .binnav-mobile-grid {
     @apply grid-cols-1;
+  }
+
+  /* 移动端兼容性修复 */
+  img {
+    display: block !important;
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* 确保文字在移动端可见 */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* 修复移动端flex布局问题 */
+  .flex {
+    display: -webkit-box !important;
+    display: -ms-flexbox !important;
+    display: flex !important;
   }
 }
 

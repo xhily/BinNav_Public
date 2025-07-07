@@ -400,25 +400,30 @@ function HomePage() {
 
               {/* 备案信息 */}
               {(siteConfig.icpRecord || siteConfig.publicSecurityRecord) && (
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+                <div
+                  className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4"
+                  style={{ display: 'flex', flexDirection: 'column' }}
+                >
                   {siteConfig.icpRecord && (
                     <a
                       href="http://beian.miit.gov.cn"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 transition-colors"
+                      style={{ color: '#2563eb', textDecoration: 'none' }}
                     >
                       {siteConfig.icpRecord}
                     </a>
                   )}
                   {siteConfig.publicSecurityRecord && (
-                    <span>
+                    <span style={{ color: '#374151' }}>
                       {siteConfig.publicSecurityRecordUrl ? (
                         <a
                           href={siteConfig.publicSecurityRecordUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:text-blue-800 transition-colors"
+                          style={{ color: '#2563eb', textDecoration: 'none' }}
                         >
                           {siteConfig.publicSecurityRecord}
                         </a>

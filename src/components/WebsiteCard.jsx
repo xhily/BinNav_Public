@@ -36,7 +36,7 @@ const WebsiteCard = ({ website }) => {
 
   return (
     <Card
-      className="bg-white/80 backdrop-blur-sm border-white/20 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 cursor-pointer group hover:-translate-y-1 overflow-hidden h-24 hover:h-auto w-full"
+      className="bg-white border border-gray-200 hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden h-24 hover:h-auto w-full"
       onClick={() => window.open(website.url, '_blank')}
     >
       <CardContent className="h-full p-4 flex items-center justify-start">
@@ -47,6 +47,13 @@ const WebsiteCard = ({ website }) => {
               alt={website.name}
               className="w-8 h-8 rounded-md shadow-sm bg-gray-100 p-0.5"
               onError={handleIconError}
+              style={{
+                display: 'block',
+                width: '32px',
+                height: '32px',
+                minWidth: '32px',
+                minHeight: '32px'
+              }}
             />
           </div>
           <div className="flex-1 min-w-0 flex flex-col justify-center">
