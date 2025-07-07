@@ -3,27 +3,65 @@ import { Card, CardContent } from './ui/card'
 import logoImg from '../assets/logo.png'
 
 const WebsiteCard = ({ website }) => {
-  // 简化图标逻辑，提高移动端兼容性
+  // 缓存优先的图标获取逻辑
   const getIconUrl = () => {
     // 1. 优先使用网站数据中的图标
     if (website.icon) {
       return website.icon
     }
 
-    // 2. 使用最稳定的图标服务
+    // 2. 使用缓存的图标（最优方案）
     try {
       const hostname = new URL(website.url).hostname
-      // 使用Google Favicon服务，移动端兼容性最好
-      return `https://www.google.com/s2/favicons?domain=${hostname}&sz=32`
+
+      // 优先使用缓存的图标
+      return `/api/cache-icon?domain=${hostname}`
     } catch (error) {
       return logoImg
     }
   }
 
+  // 备用图标服务列表（如果代理服务失败）
+  const getFallbackIconUrls = (hostname) => {
+    return [
+      // 1. 网站自己的favicon
+      `https://${hostname}/favicon.ico`,
+      // 2. 常见的favicon路径
+      `https://${hostname}/favicon.png`,
+      // 3. 使用公共CDN（国内可访问）
+      `https://api.iowen.cn/favicon/${hostname}.png`,
+      // 4. 另一个备用服务
+      `https://favicon.yandex.net/favicon/${hostname}`,
+      // 5. 默认logo
+      logoImg
+    ]
+  }
+
   const handleIconError = (e) => {
-    // 简单的错误处理，直接使用默认logo
-    e.target.src = logoImg
-    e.target.onerror = null // 防止无限循环
+    const img = e.target
+    const currentSrc = img.src
+
+    try {
+      const hostname = new URL(website.url).hostname
+      const fallbackUrls = getFallbackIconUrls(hostname)
+
+      // 找到当前失败的URL在fallback列表中的位置
+      const currentIndex = fallbackUrls.findIndex(url => url === currentSrc)
+      const nextIndex = currentIndex + 1
+
+      // 如果还有下一个备用URL，尝试加载
+      if (nextIndex < fallbackUrls.length) {
+        img.src = fallbackUrls[nextIndex]
+      } else {
+        // 所有备用URL都失败了，使用默认logo
+        img.src = logoImg
+        img.onerror = null // 防止无限循环
+      }
+    } catch (error) {
+      // 如果解析URL失败，直接使用默认logo
+      img.src = logoImg
+      img.onerror = null
+    }
   }
 
   return (

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Plus, Edit3, Trash2, GripVertical, ChevronUp } from 'lucide-react'
+import { Plus, Edit3, Trash2, GripVertical, ChevronUp, RefreshCw } from 'lucide-react'
 import { DndContext, closestCenter, useSensor, useSensors, PointerSensor } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
@@ -19,7 +19,8 @@ const SortableWebsiteItem = ({
   onCancelEdit,
   getCategoryName,
   getCategoryIcon,
-  config
+  config,
+  onUpdateIcon
 }) => {
   const {
     attributes,
@@ -135,6 +136,13 @@ const SortableWebsiteItem = ({
           >
             {editingWebsite === website.id ? <ChevronUp size={14} /> : <Edit3 size={14} />}
             <span>{editingWebsite === website.id ? '收起' : '编辑'}</span>
+          </button>
+          <button
+            onClick={() => onUpdateIcon(website)}
+            className="text-green-600 hover:text-green-800 p-1"
+            title="更新图标缓存"
+          >
+            <RefreshCw size={14} />
           </button>
           <button
             onClick={() => onDelete(website.id)}
@@ -275,6 +283,10 @@ const WebsiteManager = ({
     category: config.categories.length > 0 ? config.categories[0].id : '',
     tags: ''
   })
+
+  // 图标缓存状态
+  const [isUpdatingIcons, setIsUpdatingIcons] = useState(false)
+  const [iconUpdateResults, setIconUpdateResults] = useState(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -651,6 +663,64 @@ const WebsiteManager = ({
     }
   }
 
+  // 更新单个网站图标缓存
+  const handleUpdateSingleIcon = async (website) => {
+    try {
+      const response = await fetch('/api/update-single-icon', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          url: website.url,
+          customIcon: website.icon
+        })
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        showMessage('success', `${website.name} 的图标缓存已更新`)
+      } else {
+        showMessage('error', `更新 ${website.name} 图标缓存失败: ${result.error}`)
+      }
+    } catch (error) {
+      showMessage('error', `更新 ${website.name} 图标缓存失败: ${error.message}`)
+    }
+  }
+
+  // 更新所有网站图标缓存
+  const handleUpdateIconCache = async () => {
+    if (!window.confirm('确定要更新所有网站的图标缓存吗？这可能需要一些时间。')) {
+      return
+    }
+
+    setIsUpdatingIcons(true)
+    setIconUpdateResults(null)
+
+    try {
+      const response = await fetch('/api/batch-cache-icons', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      const result = await response.json()
+      setIconUpdateResults(result)
+
+      if (result.success) {
+        showMessage('success', `图标缓存更新完成！成功: ${result.summary.success}, 失败: ${result.summary.failed}`)
+      } else {
+        showMessage('error', `图标缓存更新失败: ${result.error}`)
+      }
+    } catch (error) {
+      showMessage('error', `图标缓存更新失败: ${error.message}`)
+    } finally {
+      setIsUpdatingIcons(false)
+    }
+  }
+
   // 处理拖拽结束 - 只允许在同一分类内移动
   const handleDragEnd = (event) => {
     const { active, over } = event
@@ -694,13 +764,32 @@ const WebsiteManager = ({
     <div>
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold text-gray-900">网站管理</h3>
-        <button
-          onClick={handleAddWebsite}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          添加网站
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleUpdateIconCache}
+            disabled={isUpdatingIcons}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            {isUpdatingIcons ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                更新中...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="w-4 h-4" />
+                更新图标缓存
+              </>
+            )}
+          </button>
+          <button
+            onClick={handleAddWebsite}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            添加网站
+          </button>
+        </div>
       </div>
 
       {/* 添加网站表单 */}
@@ -774,6 +863,7 @@ const WebsiteManager = ({
                     website={website}
                     onEdit={handleEditWebsite}
                     onDelete={handleDeleteWebsite}
+                    onUpdateIcon={handleUpdateSingleIcon}
                     editingWebsite={editingWebsite}
                     websiteForm={websiteForm}
                     setWebsiteForm={setWebsiteForm}
@@ -787,6 +877,53 @@ const WebsiteManager = ({
               </div>
             </SortableContext>
           </DndContext>
+        )}
+
+        {/* 图标更新结果显示 */}
+        {iconUpdateResults && (
+          <div className="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <h4 className="text-sm font-medium text-gray-900 mb-3">图标缓存更新结果</h4>
+            <div className="flex items-center gap-4 mb-3 text-sm">
+              <span className="text-gray-600">
+                总计: {iconUpdateResults.summary?.total || 0}
+              </span>
+              <span className="text-green-600">
+                成功: {iconUpdateResults.summary?.success || 0}
+              </span>
+              <span className="text-red-600">
+                失败: {iconUpdateResults.summary?.failed || 0}
+              </span>
+              <span className="text-blue-600">
+                已缓存: {iconUpdateResults.summary?.alreadyCached || 0}
+              </span>
+            </div>
+
+            {iconUpdateResults.results && iconUpdateResults.results.length > 0 && (
+              <div className="max-h-40 overflow-y-auto border border-gray-200 rounded bg-white">
+                <div className="divide-y divide-gray-100">
+                  {iconUpdateResults.results.map((result, index) => (
+                    <div key={index} className="px-3 py-2 flex justify-between items-center text-xs">
+                      <span className="font-medium text-gray-900">{result.name}</span>
+                      <span className={`px-2 py-1 rounded text-xs ${
+                        result.status === 'success' ? 'bg-green-100 text-green-700' :
+                        result.status === 'already_cached' ? 'bg-blue-100 text-blue-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {result.message}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <button
+              onClick={() => setIconUpdateResults(null)}
+              className="mt-3 text-xs text-gray-500 hover:text-gray-700"
+            >
+              关闭结果
+            </button>
+          </div>
         )}
       </div>
     </div>

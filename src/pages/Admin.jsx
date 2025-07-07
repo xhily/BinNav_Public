@@ -37,6 +37,10 @@ function Admin() {
   // 图标管理器状态
   const [showLogoManager, setShowLogoManager] = useState(false)
 
+  // 图标缓存状态
+  const [isCachingIcons, setIsCachingIcons] = useState(false)
+  const [cacheResults, setCacheResults] = useState(null)
+
   // 使用自定义hook管理配置
   const {
     config,
@@ -158,6 +162,34 @@ function Admin() {
   }
 
 
+
+  // 批量缓存图标
+  const handleBatchCacheIcons = async () => {
+    setIsCachingIcons(true)
+    setCacheResults(null)
+
+    try {
+      const response = await fetch('/api/batch-cache-icons', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      const result = await response.json()
+      setCacheResults(result)
+
+      if (result.success) {
+        showMessage('success', `图标缓存完成！成功: ${result.summary.success}, 失败: ${result.summary.failed}`)
+      } else {
+        showMessage('error', `图标缓存失败: ${result.error}`)
+      }
+    } catch (error) {
+      showMessage('error', `图标缓存失败: ${error.message}`)
+    } finally {
+      setIsCachingIcons(false)
+    }
+  }
 
   // 综合保存函数 - 保存所有配置包括站点设置
   const handleSaveAll = async () => {
@@ -418,6 +450,57 @@ function Admin() {
                   </div>
                 </div>
                 
+                {/* 图标缓存管理 */}
+                <div className="bg-white border border-gray-200 rounded-lg p-6 mt-6">
+                  <h4 className="text-base font-medium text-gray-900 mb-4">图标缓存管理</h4>
+                  <p className="text-sm text-gray-600 mb-4">
+                    缓存所有网站图标到服务器，提高加载速度并解决网络访问问题
+                  </p>
+
+                  <div className="flex items-center gap-4 mb-4">
+                    <button
+                      onClick={handleBatchCacheIcons}
+                      disabled={isCachingIcons}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                      {isCachingIcons ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          缓存中...
+                        </>
+                      ) : (
+                        '批量缓存图标'
+                      )}
+                    </button>
+
+                    {cacheResults && (
+                      <div className="text-sm text-gray-600">
+                        总计: {cacheResults.summary?.total || 0} |
+                        成功: {cacheResults.summary?.success || 0} |
+                        失败: {cacheResults.summary?.failed || 0} |
+                        已缓存: {cacheResults.summary?.alreadyCached || 0}
+                      </div>
+                    )}
+                  </div>
+
+                  {cacheResults && cacheResults.results && (
+                    <div className="max-h-40 overflow-y-auto border border-gray-200 rounded p-3">
+                      <div className="text-xs space-y-1">
+                        {cacheResults.results.map((result, index) => (
+                          <div key={index} className={`flex justify-between ${
+                            result.status === 'success' ? 'text-green-600' :
+                            result.status === 'already_cached' ? 'text-blue-600' :
+                            'text-red-600'
+                          }`}>
+                            <span>{result.name}</span>
+                            <span>{result.message}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {/* 版本管理 */}
                 <div className="mt-6">
                   <VersionManager />
