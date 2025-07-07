@@ -548,19 +548,20 @@ const WebsiteManager = ({
         forceRefresh: forceRefresh
       })
 
-      // 1. 尝试多个Favicon API服务
+      // 1. 尝试多个Favicon API服务 - 优先使用完整域名，再尝试主域名
       const faviconAPIs = [
-        // Google Favicon API
-        `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32${forceRefresh ? '&t=' + Date.now() : ''}`,
+        // 先尝试完整域名（包括二级域名）
+        `https://www.google.com/s2/favicons?domain=${hostname}&sz=32${forceRefresh ? '&t=' + Date.now() : ''}`,
+        `https://icons.duckduckgo.com/ip3/${hostname}.ico`,
+        `https://${hostname}/favicon.ico`,
 
-        // DuckDuckGo图标API
-        `https://icons.duckduckgo.com/ip3/${mainDomain}.ico`,
-
-        // Favicon.io API
-        `https://favicons.githubusercontent.com/${mainDomain}`,
-
-        // 网站自己的标准favicon
-        `https://${mainDomain}/favicon.ico`
+        // 如果二级域名失败，再尝试主域名
+        ...(hostname !== mainDomain ? [
+          `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32${forceRefresh ? '&t=' + Date.now() : ''}`,
+          `https://icons.duckduckgo.com/ip3/${mainDomain}.ico`,
+          `https://favicons.githubusercontent.com/${mainDomain}`,
+          `https://${mainDomain}/favicon.ico`
+        ] : [])
       ]
 
       console.log('🔍 测试Favicon API服务:', faviconAPIs)
@@ -685,23 +686,71 @@ const WebsiteManager = ({
         try {
           console.log(`🔄 更新图标 ${i + 1}/${config.websiteData.length}: ${website.name}`)
 
-          // 使用与添加站点相同的逻辑获取图标
+          // 1. 获取外网图标URL
           const iconUrl = await getWebsiteIcon(website.url, true)
 
           if (iconUrl && iconUrl !== '/assets/logo.png') {
-            // 更新网站数据中的图标
-            updatedWebsites = updatedWebsites.map(site =>
-              site.id === website.id
-                ? { ...site, icon: iconUrl }
-                : site
-            )
+            // 2. 下载并缓存图标到服务器
+            const hostname = new URL(website.url).hostname
 
-            results.push({
-              name: website.name,
-              status: 'success',
-              message: '图标更新成功',
-              iconUrl: iconUrl
-            })
+            try {
+              const cacheResponse = await fetch('/api/icon-cache', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  domain: hostname,
+                  iconUrl: iconUrl
+                })
+              })
+
+              const cacheResult = await cacheResponse.json()
+
+              if (cacheResult.success) {
+                // 使用本地缓存路径
+                updatedWebsites = updatedWebsites.map(site =>
+                  site.id === website.id
+                    ? { ...site, icon: cacheResult.localPath }
+                    : site
+                )
+
+                results.push({
+                  name: website.name,
+                  status: 'success',
+                  message: '图标已缓存到本地',
+                  iconUrl: cacheResult.localPath
+                })
+              } else {
+                // 缓存失败，使用外网URL
+                updatedWebsites = updatedWebsites.map(site =>
+                  site.id === website.id
+                    ? { ...site, icon: iconUrl }
+                    : site
+                )
+
+                results.push({
+                  name: website.name,
+                  status: 'warning',
+                  message: `缓存失败，使用外网链接: ${cacheResult.error}`,
+                  iconUrl: iconUrl
+                })
+              }
+            } catch (cacheError) {
+              // 缓存API调用失败，使用外网URL
+              updatedWebsites = updatedWebsites.map(site =>
+                site.id === website.id
+                  ? { ...site, icon: iconUrl }
+                  : site
+              )
+
+              results.push({
+                name: website.name,
+                status: 'warning',
+                message: `缓存API失败，使用外网链接: ${cacheError.message}`,
+                iconUrl: iconUrl
+              })
+            }
           } else {
             results.push({
               name: website.name,
@@ -744,19 +793,46 @@ const WebsiteManager = ({
     try {
       showMessage('info', `正在更新 ${website.name} 的图标...`)
 
-      // 使用与添加站点相同的逻辑获取图标
+      // 1. 获取外网图标URL
       const iconUrl = await getWebsiteIcon(website.url, true) // forceRefresh = true
 
       if (iconUrl && iconUrl !== '/assets/logo.png') {
-        // 更新网站数据中的图标
-        const updatedWebsites = config.websiteData.map(site =>
-          site.id === website.id
-            ? { ...site, icon: iconUrl }
-            : site
-        )
+        // 2. 下载并缓存图标到服务器
+        const hostname = new URL(website.url).hostname
+        const cacheResponse = await fetch('/api/icon-cache', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            domain: hostname,
+            iconUrl: iconUrl
+          })
+        })
 
-        onUpdateWebsiteData(updatedWebsites)
-        showMessage('success', `${website.name} 的图标已更新`)
+        const cacheResult = await cacheResponse.json()
+
+        if (cacheResult.success) {
+          // 3. 更新网站数据，使用本地缓存路径
+          const updatedWebsites = config.websiteData.map(site =>
+            site.id === website.id
+              ? { ...site, icon: cacheResult.localPath }
+              : site
+          )
+
+          onUpdateWebsiteData(updatedWebsites)
+          showMessage('success', `${website.name} 的图标已缓存到本地`)
+        } else {
+          // 缓存失败，使用外网URL
+          const updatedWebsites = config.websiteData.map(site =>
+            site.id === website.id
+              ? { ...site, icon: iconUrl }
+              : site
+          )
+
+          onUpdateWebsiteData(updatedWebsites)
+          showMessage('warning', `${website.name} 图标缓存失败，使用外网链接: ${cacheResult.error}`)
+        }
       } else {
         showMessage('warning', `${website.name} 的图标获取失败，保持原状`)
       }

@@ -3,27 +3,17 @@ import { Card, CardContent } from './ui/card'
 import logoImg from '../assets/logo.png'
 
 const WebsiteCard = ({ website }) => {
-  // 使用与添加站点时相同的图标获取逻辑
+  // 优先使用缓存的图标，fallback到外网服务
   const getIconUrl = () => {
-    // 1. 优先使用网站数据中的图标（已缓存的）
+    // 1. 优先使用网站数据中的图标（可能是缓存路径或外网URL）
     if (website.icon) {
       return website.icon
     }
 
-    // 2. 使用与WebsiteManager相同的逻辑
+    // 2. 如果没有缓存，先尝试本地缓存
     try {
       const hostname = new URL(website.url).hostname
-      const getMainDomain = (hostname) => {
-        const parts = hostname.split('.')
-        if (parts.length > 2) {
-          return parts.slice(-2).join('.')
-        }
-        return hostname
-      }
-      const mainDomain = getMainDomain(hostname)
-
-      // 使用Google Favicon API（与添加站点时相同）
-      return `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32`
+      return `/api/icon-cache?domain=${hostname}`
     } catch (error) {
       return logoImg
     }
@@ -36,8 +26,28 @@ const WebsiteCard = ({ website }) => {
       websiteUrl: website.url
     })
 
-    // 使用与WebsiteManager相同的错误处理逻辑
-    if (e.target.src.includes('gstatic.com') || e.target.src.includes('favicons')) {
+    // 如果缓存API失败，尝试外网服务
+    if (e.target.src.includes('/api/icon-cache')) {
+      try {
+        const hostname = new URL(website.url).hostname
+        const getMainDomain = (hostname) => {
+          const parts = hostname.split('.')
+          if (parts.length > 2) {
+            return parts.slice(-2).join('.')
+          }
+          return hostname
+        }
+        const mainDomain = getMainDomain(hostname)
+
+        // 使用Google Favicon API
+        e.target.src = `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32`
+        console.log('🔄 尝试Google API:', e.target.src)
+      } catch {
+        e.target.src = logoImg
+        e.target.onerror = null
+        console.log('🔄 使用默认图标')
+      }
+    } else if (e.target.src.includes('gstatic.com') || e.target.src.includes('favicons')) {
       // 如果Google API失败，尝试网站自己的favicon
       try {
         const domain = new URL(website.url).origin
@@ -45,6 +55,7 @@ const WebsiteCard = ({ website }) => {
         console.log('🔄 尝试网站自己的favicon:', e.target.src)
       } catch {
         e.target.src = logoImg
+        e.target.onerror = null
         console.log('🔄 使用默认图标')
       }
     } else {
