@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-// 网站数据 - 通过管理后台更新于 2025/7/6 23:51:52
+// 网站数据 - 通过管理后台更新于 2025/7/7 09:36:51
 
 // 站点配置
 export const siteConfig = {
@@ -11,10 +10,6 @@ export const siteConfig = {
   publicSecurityRecord: '', // 公安备案号，如：京公网安备11010802012345号
   publicSecurityRecordUrl: '' // 公安备案链接
 };
-
-=======
-// 网站数据 - 通过管理后台更新于 2025/7/7 09:36:51
->>>>>>> 443995936c6d44789c0d0007fcb36582087b833a
 export const websiteData = [
   {
     "id": 1751807882512,
