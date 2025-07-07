@@ -287,6 +287,7 @@ const WebsiteManager = ({
   // 图标缓存状态
   const [isUpdatingIcons, setIsUpdatingIcons] = useState(false)
   const [iconUpdateResults, setIconUpdateResults] = useState(null)
+  const [updateProgress, setUpdateProgress] = useState({ current: 0, total: 0 })
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -663,29 +664,104 @@ const WebsiteManager = ({
     }
   }
 
+  // 批量更新所有网站图标
+  const handleBatchUpdateIcons = async () => {
+    if (!window.confirm('确定要更新所有网站的图标吗？这可能需要一些时间。')) {
+      return
+    }
+
+    setIsUpdatingIcons(true)
+    setIconUpdateResults([])
+    setUpdateProgress({ current: 0, total: config.websiteData.length })
+
+    const results = []
+    let updatedWebsites = [...config.websiteData]
+
+    try {
+      for (let i = 0; i < config.websiteData.length; i++) {
+        const website = config.websiteData[i]
+        setUpdateProgress({ current: i + 1, total: config.websiteData.length })
+
+        try {
+          console.log(`🔄 更新图标 ${i + 1}/${config.websiteData.length}: ${website.name}`)
+
+          // 使用与添加站点相同的逻辑获取图标
+          const iconUrl = await getWebsiteIcon(website.url, true)
+
+          if (iconUrl && iconUrl !== '/assets/logo.png') {
+            // 更新网站数据中的图标
+            updatedWebsites = updatedWebsites.map(site =>
+              site.id === website.id
+                ? { ...site, icon: iconUrl }
+                : site
+            )
+
+            results.push({
+              name: website.name,
+              status: 'success',
+              message: '图标更新成功',
+              iconUrl: iconUrl
+            })
+          } else {
+            results.push({
+              name: website.name,
+              status: 'failed',
+              message: '图标获取失败'
+            })
+          }
+
+          // 添加延迟避免请求过快
+          await new Promise(resolve => setTimeout(resolve, 500))
+
+        } catch (error) {
+          results.push({
+            name: website.name,
+            status: 'error',
+            message: error.message
+          })
+        }
+      }
+
+      // 更新所有网站数据
+      onUpdateWebsiteData(updatedWebsites)
+      setIconUpdateResults(results)
+
+      const successCount = results.filter(r => r.status === 'success').length
+      const failCount = results.filter(r => r.status !== 'success').length
+
+      showMessage('success', `图标更新完成！成功: ${successCount}, 失败: ${failCount}`)
+
+    } catch (error) {
+      showMessage('error', `批量更新失败: ${error.message}`)
+    } finally {
+      setIsUpdatingIcons(false)
+      setUpdateProgress({ current: 0, total: 0 })
+    }
+  }
+
   // 更新单个网站图标缓存
   const handleUpdateSingleIcon = async (website) => {
     try {
-      const response = await fetch('/api/update-single-icon', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          url: website.url,
-          customIcon: website.icon
-        })
-      })
+      showMessage('info', `正在更新 ${website.name} 的图标...`)
 
-      const result = await response.json()
+      // 使用与添加站点相同的逻辑获取图标
+      const iconUrl = await getWebsiteIcon(website.url, true) // forceRefresh = true
 
-      if (result.success) {
-        showMessage('success', `${website.name} 的图标缓存已更新`)
+      if (iconUrl && iconUrl !== '/assets/logo.png') {
+        // 更新网站数据中的图标
+        const updatedWebsites = config.websiteData.map(site =>
+          site.id === website.id
+            ? { ...site, icon: iconUrl }
+            : site
+        )
+
+        onUpdateWebsiteData(updatedWebsites)
+        showMessage('success', `${website.name} 的图标已更新`)
       } else {
-        showMessage('error', `更新 ${website.name} 图标缓存失败: ${result.error}`)
+        showMessage('warning', `${website.name} 的图标获取失败，保持原状`)
       }
     } catch (error) {
-      showMessage('error', `更新 ${website.name} 图标缓存失败: ${error.message}`)
+      showMessage('error', `更新 ${website.name} 图标失败: ${error.message}`)
     }
   }
 
@@ -766,14 +842,14 @@ const WebsiteManager = ({
         <h3 className="text-lg font-semibold text-gray-900">网站管理</h3>
         <div className="flex items-center gap-3">
           <button
-            onClick={handleUpdateIconCache}
+            onClick={handleBatchUpdateIcons}
             disabled={isUpdatingIcons}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors"
           >
             {isUpdatingIcons ? (
               <>
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                更新中...
+                更新中 ({updateProgress.current}/{updateProgress.total})
               </>
             ) : (
               <>
