@@ -40,6 +40,7 @@ function Admin() {
   // 图标缓存状态
   const [isCachingIcons, setIsCachingIcons] = useState(false)
   const [cacheResults, setCacheResults] = useState(null)
+  const [debugResults, setDebugResults] = useState(null)
 
   // 使用自定义hook管理配置
   const {
@@ -164,6 +165,26 @@ function Admin() {
 
 
 
+
+  // 调试图标缓存
+  const handleDebugCache = async () => {
+    const domain = prompt('请输入要调试的域名:', 'github.com')
+    if (!domain) return
+
+    try {
+      const response = await fetch(`/api/debug-cache?domain=${domain}`)
+      const result = await response.json()
+      setDebugResults(result)
+
+      if (result.success) {
+        showMessage('success', `调试完成: ${domain}`)
+      } else {
+        showMessage('error', `调试失败: ${result.error}`)
+      }
+    } catch (error) {
+      showMessage('error', `调试失败: ${error.message}`)
+    }
+  }
 
   // 批量缓存图标
   const handleBatchCacheIcons = async () => {
@@ -461,6 +482,13 @@ function Admin() {
 
                   <div className="flex items-center gap-4 mb-4">
                     <button
+                      onClick={handleDebugCache}
+                      className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"
+                    >
+                      调试缓存
+                    </button>
+
+                    <button
                       onClick={handleBatchCacheIcons}
                       disabled={isCachingIcons}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
@@ -498,6 +526,48 @@ function Admin() {
                             <span>{result.message}</span>
                           </div>
                         ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 调试结果显示 */}
+                  {debugResults && (
+                    <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <h5 className="text-sm font-medium text-gray-900 mb-2">
+                        缓存调试结果 - {debugResults.domain}
+                      </h5>
+                      <div className="text-xs space-y-2">
+                        <div><strong>状态:</strong> {debugResults.success ? '✅ 成功' : '❌ 失败'}</div>
+                        {debugResults.error && <div className="text-red-600"><strong>错误:</strong> {debugResults.error}</div>}
+
+                        <div className="space-y-1">
+                          <strong>执行步骤:</strong>
+                          {debugResults.steps.map((step, index) => (
+                            <div key={index} className="ml-4 p-2 bg-white rounded border">
+                              <div className="font-medium">{step.step}</div>
+                              <pre className="text-xs text-gray-600 mt-1 whitespace-pre-wrap">
+                                {JSON.stringify(step, null, 2)}
+                              </pre>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="flex gap-2 mt-3">
+                          <a
+                            href={`/api/debug-cache?domain=${debugResults.domain}&returnImage=true`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700"
+                          >
+                            查看图标
+                          </a>
+                          <button
+                            onClick={() => setDebugResults(null)}
+                            className="px-3 py-1 bg-gray-600 text-white rounded text-xs hover:bg-gray-700"
+                          >
+                            关闭
+                          </button>
+                        </div>
                       </div>
                     </div>
                   )}

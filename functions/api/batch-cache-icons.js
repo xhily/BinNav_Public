@@ -107,14 +107,15 @@ export async function onRequest(context) {
 
         // 缓存图标
         const cacheResult = await cacheIconForDomain(hostname, website.icon, GITHUB_TOKEN, GITHUB_REPO);
-        
+
         if (cacheResult.success) {
           successCount++;
           results.push({
             name: website.name,
             domain: hostname,
             status: 'success',
-            message: '缓存成功'
+            message: '缓存成功',
+            url: website.url
           });
         } else {
           failCount++;
@@ -122,7 +123,9 @@ export async function onRequest(context) {
             name: website.name,
             domain: hostname,
             status: 'failed',
-            message: cacheResult.error || '缓存失败'
+            message: cacheResult.error || '缓存失败',
+            url: website.url,
+            details: cacheResult.details || null
           });
         }
 
@@ -177,6 +180,7 @@ async function cacheIconForDomain(domain, customIcon, githubToken, githubRepo) {
   ];
 
   let iconData = null;
+  let fetchDetails = [];
 
   // 尝试获取图标
   for (const iconUrl of iconStrategies) {
@@ -185,18 +189,39 @@ async function cacheIconForDomain(domain, customIcon, githubToken, githubRepo) {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         },
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(10000) // 增加超时时间
       });
+
+      const detail = {
+        url: iconUrl,
+        status: response.status,
+        contentType: response.headers.get('content-type')
+      };
 
       if (response.ok) {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.startsWith('image/')) {
           iconData = await response.arrayBuffer();
+          detail.success = true;
+          detail.size = iconData.byteLength;
+          fetchDetails.push(detail);
           break;
+        } else {
+          detail.success = false;
+          detail.reason = '不是图片类型';
         }
+      } else {
+        detail.success = false;
+        detail.reason = `HTTP ${response.status}`;
       }
+
+      fetchDetails.push(detail);
     } catch (error) {
-      continue;
+      fetchDetails.push({
+        url: iconUrl,
+        success: false,
+        reason: error.message
+      });
     }
   }
 
@@ -232,13 +257,24 @@ async function cacheIconForDomain(domain, customIcon, githubToken, githubRepo) {
     });
 
     if (response.ok) {
-      return { success: true };
+      return {
+        success: true,
+        details: fetchDetails
+      };
     } else {
       const errorData = await response.text();
-      return { success: false, error: `GitHub API错误: ${errorData}` };
+      return {
+        success: false,
+        error: `GitHub API错误: ${errorData}`,
+        details: fetchDetails
+      };
     }
   } catch (error) {
-    return { success: false, error: error.message };
+    return {
+      success: false,
+      error: error.message,
+      details: fetchDetails
+    };
   }
 }
 
