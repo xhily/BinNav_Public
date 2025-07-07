@@ -56,7 +56,9 @@ export async function onRequest(context) {
         '/api/process-website-submission',
         '/api/upload-icon',
         '/api/delete-icon',
-        '/api/list-icons'
+        '/api/list-icons',
+        '/api/debug-test',
+        '/api/get-version'
       ]
     }), {
       status: 200,

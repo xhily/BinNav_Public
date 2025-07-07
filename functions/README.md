@@ -18,8 +18,7 @@ functions/
     ├── upload-icon.js  # 上传图标 - POST /api/upload-icon
     ├── delete-icon.js  # 删除图标 - POST /api/delete-icon
     ├── list-icons.js   # 获取图标列表 - GET /api/list-icons
-    ├── debug-test.js   # 调试测试 - GET /api/debug-test
-    └── test-submit.js  # 测试提交 - POST /api/test-submit
+    └── debug-test.js   # 调试测试 - GET /api/debug-test
 ```
 
 ## API端点

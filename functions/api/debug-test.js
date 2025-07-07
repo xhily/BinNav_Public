@@ -87,7 +87,8 @@ export async function onRequestGet({ request, env }) {
           '/api/upload-icon',
           '/api/delete-icon',
           '/api/list-icons',
-          '/api/debug-test'
+          '/api/debug-test',
+          '/api/get-version'
         ]
       };
     }
