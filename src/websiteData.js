@@ -1,4 +1,16 @@
 // 网站数据 - 通过管理后台更新于 2025/7/6 23:51:52
+
+// 站点配置
+export const siteConfig = {
+  siteName: 'BinNav',
+  siteTitle: 'BinNav - 精选网站导航',
+  siteLogo: '/assets/logo.png',
+  siteDescription: '发现优质网站，提升工作效率。汇聚设计、开发、工具等各类精选网站资源。',
+  icpRecord: '', // ICP备案号，如：京ICP备12345678号
+  publicSecurityRecord: '', // 公安备案号，如：京公网安备11010802012345号
+  publicSecurityRecordUrl: '' // 公安备案链接
+};
+
 export const websiteData = [
   {
     "id": 1751807882512,

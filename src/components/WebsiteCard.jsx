@@ -3,35 +3,23 @@ import { Card, CardContent } from './ui/card'
 import logoImg from '../assets/logo.png'
 
 const WebsiteCard = ({ website }) => {
-  const [iconError, setIconError] = useState(false)
-  const [iconSrc, setIconSrc] = useState(() => {
-    // 优先使用网站数据中的图标
+  // 简化图标处理逻辑，提高移动端兼容性
+  const getIconSrc = () => {
     if (website.icon) {
       return website.icon
     }
 
-    // 回退：使用Google favicon服务
     try {
-      return `https://www.google.com/s2/favicons?domain=${new URL(website.url).hostname}&sz=32`
+      const hostname = new URL(website.url).hostname
+      return `https://www.google.com/s2/favicons?domain=${hostname}&sz=32`
     } catch {
       return logoImg
     }
-  })
+  }
 
-  const handleIconError = () => {
-    if (!iconError) {
-      setIconError(true)
-      // 第二次尝试：使用网站自己的favicon
-      try {
-        const domain = new URL(website.url).origin
-        setIconSrc(`${domain}/favicon.ico`)
-      } catch {
-        setIconSrc(logoImg)
-      }
-    } else {
-      // 最终回退：使用默认logo
-      setIconSrc(logoImg)
-    }
+  const handleIconError = (e) => {
+    // 简单的错误处理，直接使用默认logo
+    e.target.src = logoImg
   }
 
   return (
@@ -43,7 +31,7 @@ const WebsiteCard = ({ website }) => {
         <div className="flex items-center space-x-3 w-full">
           <div className="flex-shrink-0">
             <img
-              src={iconSrc}
+              src={getIconSrc()}
               alt={website.name}
               className="w-8 h-8 rounded-md shadow-sm bg-gray-100 p-0.5"
               onError={handleIconError}
@@ -51,8 +39,7 @@ const WebsiteCard = ({ website }) => {
                 display: 'block',
                 width: '32px',
                 height: '32px',
-                minWidth: '32px',
-                minHeight: '32px'
+                objectFit: 'contain'
               }}
             />
           </div>

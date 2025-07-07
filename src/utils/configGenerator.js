@@ -6,11 +6,16 @@
  * 生成新的配置文件内容
  * @param {Array} websiteData - 网站数据
  * @param {Array} categories - 分类数据
+ * @param {Object} siteConfig - 站点配置
  * @returns {string} 配置文件内容
  */
-export const generateConfigFile = (websiteData, categories) => {
+export const generateConfigFile = (websiteData, categories, siteConfig = {}) => {
   const timestamp = new Date().toLocaleString('zh-CN')
   return `// 网站数据 - 通过管理后台更新于 ${timestamp}
+
+// 站点配置
+export const siteConfig = ${JSON.stringify(siteConfig, null, 2)};
+
 export const websiteData = ${JSON.stringify(websiteData, null, 2)};
 
 // 分类定义 - 支持二级分类

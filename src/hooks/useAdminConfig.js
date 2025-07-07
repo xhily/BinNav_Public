@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react'
 import { websiteData as initialWebsiteData, categories as initialCategories } from '../websiteData.js'
 import { generateConfigFile } from '../utils/configGenerator.js'
+import { useSiteConfig } from './useSiteConfig'
 
 /**
  * 管理后台配置管理hook
  */
 export const useAdminConfig = () => {
+  const siteConfig = useSiteConfig()
   const [config, setConfig] = useState({
     websiteData: initialWebsiteData,
     categories: initialCategories
   })
-  
+
   const [isUpdating, setIsUpdating] = useState(false)
   const [message, setMessage] = useState({ type: '', text: '' })
 
@@ -25,8 +27,8 @@ export const useAdminConfig = () => {
     setIsUpdating(true)
     
     try {
-      // 生成配置文件内容
-      const configContent = generateConfigFile(config.websiteData, config.categories)
+      // 生成配置文件内容，包含站点配置
+      const configContent = generateConfigFile(config.websiteData, config.categories, siteConfig)
       
       // 首先获取当前文件的SHA值
       const getResponse = await fetch('/api/get-config')

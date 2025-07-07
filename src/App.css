@@ -73,26 +73,6 @@
   .binnav-mobile-grid {
     @apply grid-cols-1;
   }
-
-  /* 移动端兼容性修复 */
-  img {
-    display: block !important;
-    max-width: 100% !important;
-    height: auto !important;
-  }
-
-  /* 确保文字在移动端可见 */
-  * {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  /* 修复移动端flex布局问题 */
-  .flex {
-    display: -webkit-box !important;
-    display: -ms-flexbox !important;
-    display: flex !important;
-  }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {

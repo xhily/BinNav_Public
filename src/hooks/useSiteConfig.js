@@ -12,11 +12,33 @@ const defaultSiteConfig = {
   publicSecurityRecordUrl: '' // 公安备案链接
 }
 
-// 从localStorage加载保存的配置
-const loadSavedConfig = () => {
+// 从localStorage和API加载保存的配置
+const loadSavedConfig = async () => {
   try {
+    // 首先尝试从localStorage加载
     const saved = localStorage.getItem('siteConfig')
-    return saved ? { ...defaultSiteConfig, ...JSON.parse(saved) } : defaultSiteConfig
+    let localConfig = saved ? JSON.parse(saved) : {}
+
+    // 尝试从API获取最新配置
+    try {
+      const response = await fetch('/api/get-config')
+      if (response.ok) {
+        const result = await response.json()
+        if (result.success && result.content) {
+          // 解析配置文件中的站点配置
+          const configMatch = result.content.match(/\/\/ 站点配置[\s\S]*?export const siteConfig = ({[\s\S]*?});/)
+          if (configMatch) {
+            const apiConfig = JSON.parse(configMatch[1])
+            // API配置优先，但保留localStorage中的其他配置
+            localConfig = { ...localConfig, ...apiConfig }
+          }
+        }
+      }
+    } catch (apiError) {
+      console.warn('从API加载配置失败，使用本地配置:', apiError)
+    }
+
+    return { ...defaultSiteConfig, ...localConfig }
   } catch (error) {
     console.warn('加载站点配置失败，使用默认配置:', error)
     return defaultSiteConfig
@@ -24,8 +46,14 @@ const loadSavedConfig = () => {
 }
 
 // 全局站点配置管理
-let globalSiteConfig = loadSavedConfig()
+let globalSiteConfig = defaultSiteConfig
 const subscribers = new Set()
+
+// 异步初始化配置
+loadSavedConfig().then(config => {
+  globalSiteConfig = config
+  notifySubscribers()
+})
 
 const notifySubscribers = () => {
   subscribers.forEach(callback => callback(globalSiteConfig))
