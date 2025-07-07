@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/7 16:32:04
+// 网站数据 - 通过管理后台更新于 2025/7/7 22:18:34
 
 // 站点配置
 export const siteConfig = {
@@ -21,7 +21,7 @@ export const websiteData = [
     "tags": [
       "个人站点"
     ],
-    "icon": "https://icons.duckduckgo.com/ip3/i.bincore.cn.ico"
+    "icon": "https://icons.duckduckgo.com/ip3/bincore.cn.ico"
   },
   {
     "id": 40,
@@ -34,7 +34,7 @@ export const websiteData = [
       "教程分享",
       "开发心得"
     ],
-    "icon": "https://icons.duckduckgo.com/ip3/blog.nbvil.com.ico"
+    "icon": "https://icons.duckduckgo.com/ip3/nbvil.com.ico"
   },
   {
     "id": 1751813976438,
@@ -45,7 +45,7 @@ export const websiteData = [
     "tags": [
       "云盘"
     ],
-    "icon": "https://pan.nbvil.com/favicon.ico"
+    "icon": "https://icons.duckduckgo.com/ip3/nbvil.com.ico"
   },
   {
     "id": 1751598590526,
@@ -56,7 +56,7 @@ export const websiteData = [
     "tags": [
       "视频"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=www.youtube.com&sz=32&t=1751877042233"
+    "icon": "https://logo.clearbit.com/youtube.com"
   },
   {
     "id": 41,
@@ -67,7 +67,7 @@ export const websiteData = [
     "tags": [
       "开源项目"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=github.com&sz=32&t=1751877042885"
+    "icon": "https://logo.clearbit.com/github.com"
   },
   {
     "id": 1751596898467,
@@ -78,7 +78,7 @@ export const websiteData = [
     "tags": [
       "视频"
     ],
-    "icon": "https://icons.duckduckgo.com/ip3/space.bilibili.com.ico"
+    "icon": "https://logo.clearbit.com/bilibili.com"
   },
   {
     "id": 45,
@@ -90,7 +90,7 @@ export const websiteData = [
       "知乎专栏",
       "技术文章"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=www.zhihu.com&sz=32&t=1751877044286"
+    "icon": "https://logo.clearbit.com/zhihu.com"
   },
   {
     "id": 1751617129171,
@@ -104,7 +104,7 @@ export const websiteData = [
       "CDN",
       "DDOS"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=www.cloudflare.com&sz=32&t=1751877045654"
+    "icon": "https://logo.clearbit.com/cloudflare.com"
   },
   {
     "id": 1751811992820,
@@ -116,7 +116,7 @@ export const websiteData = [
       "AI",
       "对话"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=chatgpt.com&sz=32&t=1751877046371"
+    "icon": "https://icons.duckduckgo.com/ip3/chatgpt.com.ico"
   },
   {
     "id": 1751812061558,
@@ -128,7 +128,7 @@ export const websiteData = [
       "AI",
       "对话"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=www.deepseek.com&sz=32&t=1751877047017"
+    "icon": "https://icons.duckduckgo.com/ip3/deepseek.com.ico"
   },
   {
     "id": 1751813180037,
@@ -140,7 +140,7 @@ export const websiteData = [
       "AI",
       "对话"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=grok.com&sz=32&t=1751877047676"
+    "icon": "https://logo.clearbit.com/grok.com"
   },
   {
     "id": 1751812924193,
@@ -153,7 +153,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=www.augmentcode.com&sz=32&t=1751877048321"
+    "icon": "https://logo.clearbit.com/augmentcode.com"
   },
   {
     "id": 1751812223718,
@@ -166,7 +166,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=claude.ai&sz=32&t=1751877049090"
+    "icon": "https://icons.duckduckgo.com/ip3/claude.ai.ico"
   },
   {
     "id": 1751812327874,
@@ -179,7 +179,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=www.anthropic.com&sz=32&t=1751877049741"
+    "icon": "https://logo.clearbit.com/anthropic.com"
   },
   {
     "id": 1751812429387,
@@ -192,7 +192,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=cursor.com&sz=32&t=1751877050491"
+    "icon": "https://logo.clearbit.com/cursor.com"
   },
   {
     "id": 1751812786319,
@@ -205,7 +205,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=cloud.google.com&sz=32&t=1751877051142"
+    "icon": "https://logo.clearbit.com/google.com"
   },
   {
     "id": 1751812826244,
@@ -218,7 +218,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=cloud.google.com&sz=32&t=1751877051799"
+    "icon": "https://logo.clearbit.com/google.com"
   },
   {
     "id": 33,
@@ -231,7 +231,7 @@ export const websiteData = [
       "开发工具",
       "微软"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=32&t=1751877052594",
+    "icon": "https://logo.clearbit.com/visualstudio.com",
     "popularity": 93
   },
   {
@@ -244,7 +244,7 @@ export const websiteData = [
       "SSH",
       "开发"
     ],
-    "icon": "https://www.xshell.com/favicon.ico"
+    "icon": "https://logo.clearbit.com/xshell.com"
   },
   {
     "id": 1751813515058,
@@ -256,7 +256,7 @@ export const websiteData = [
       "SSH",
       "开发"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=termius.com&sz=32&t=1751877054011"
+    "icon": "https://logo.clearbit.com/termius.com"
   },
   {
     "id": 1751807806262,
@@ -268,7 +268,7 @@ export const websiteData = [
       "网站",
       "CDN"
     ],
-    "icon": "https://www.google.com/s2/favicons?domain=edgeone.ai&sz=32&t=1751877054661"
+    "icon": "https://logo.clearbit.com/edgeone.ai"
   }
 ];
 
