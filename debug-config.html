@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>配置调试</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background: #e8f5e8; }
+        .error { background: #ffe8e8; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        button { padding: 10px 20px; margin: 5px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>BinNav 配置调试工具</h1>
+    
+    <div class="section">
+        <h3>1. 检查websiteData.js导入</h3>
+        <button onclick="testImport()">测试导入</button>
+        <div id="import-result"></div>
+    </div>
+    
+    <div class="section">
+        <h3>2. 检查localStorage</h3>
+        <button onclick="checkLocalStorage()">检查localStorage</button>
+        <button onclick="setTestConfig()">设置测试配置</button>
+        <button onclick="clearLocalStorage()">清除localStorage</button>
+        <div id="localStorage-result"></div>
+    </div>
+    
+    <div class="section">
+        <h3>3. 测试备案信息</h3>
+        <input type="text" id="icpInput" placeholder="输入ICP备案号" style="padding: 5px; margin: 5px;">
+        <input type="text" id="publicInput" placeholder="输入公安备案号" style="padding: 5px; margin: 5px;">
+        <button onclick="saveTestRecord()">保存测试备案信息</button>
+        <div id="record-result"></div>
+    </div>
+
+    <script type="module">
+        window.testImport = async function() {
+            const resultDiv = document.getElementById('import-result');
+            try {
+                const { siteConfig } = await import('./src/websiteData.js');
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ 导入成功</h4>
+                        <pre>${JSON.stringify(siteConfig, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ 导入失败</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        };
+        
+        window.checkLocalStorage = function() {
+            const resultDiv = document.getElementById('localStorage-result');
+            const siteConfig = localStorage.getItem('siteConfig');
+            
+            if (siteConfig) {
+                try {
+                    const config = JSON.parse(siteConfig);
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ localStorage中有配置</h4>
+                            <pre>${JSON.stringify(config, null, 2)}</pre>
+                        </div>
+                    `;
+                } catch (error) {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ localStorage配置解析失败</h4>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                }
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>⚠️ localStorage中没有配置</h4>
+                    </div>
+                `;
+            }
+        };
+        
+        window.setTestConfig = function() {
+            const testConfig = {
+                siteName: "BinNav",
+                siteTitle: "BinNav - 精选网站导航",
+                siteLogo: "/assets/logo.png",
+                siteDescription: "发现优质网站，提升工作效率。汇聚设计、开发、工具等各类精选网站资源。",
+                icpRecord: "测试ICP备案号",
+                publicSecurityRecord: "测试公安备案号",
+                publicSecurityRecordUrl: "http://test.com"
+            };
+            
+            localStorage.setItem('siteConfig', JSON.stringify(testConfig));
+            document.getElementById('localStorage-result').innerHTML = `
+                <div class="success">
+                    <h4>✅ 测试配置已保存</h4>
+                    <pre>${JSON.stringify(testConfig, null, 2)}</pre>
+                </div>
+            `;
+        };
+        
+        window.clearLocalStorage = function() {
+            localStorage.removeItem('siteConfig');
+            document.getElementById('localStorage-result').innerHTML = `
+                <div class="success">
+                    <h4>✅ localStorage已清除</h4>
+                </div>
+            `;
+        };
+        
+        window.saveTestRecord = function() {
+            const icp = document.getElementById('icpInput').value;
+            const publicSec = document.getElementById('publicInput').value;
+            
+            const currentConfig = JSON.parse(localStorage.getItem('siteConfig') || '{}');
+            currentConfig.icpRecord = icp;
+            currentConfig.publicSecurityRecord = publicSec;
+            
+            localStorage.setItem('siteConfig', JSON.stringify(currentConfig));
+            
+            document.getElementById('record-result').innerHTML = `
+                <div class="success">
+                    <h4>✅ 备案信息已保存</h4>
+                    <p>ICP: ${icp}</p>
+                    <p>公安: ${publicSec}</p>
+                    <p>现在刷新主页查看是否显示</p>
+                </div>
+            `;
+        };
+    </script>
+</body>
+</html>

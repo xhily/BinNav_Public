@@ -23,9 +23,17 @@ function Admin() {
 
   // 使用全局站点配置
   const { siteConfig } = useSiteConfig()
-  
+
   // 系统设置相关状态 - 从全局配置初始化
-  const [siteSettings, setSiteSettings] = useState(siteConfig)
+  const [siteSettings, setSiteSettings] = useState({})
+
+  // 当siteConfig变化时，更新siteSettings
+  useEffect(() => {
+    if (siteConfig) {
+      console.log('加载的siteConfig:', siteConfig)
+      setSiteSettings(siteConfig)
+    }
+  }, [siteConfig])
 
   // 图标管理器状态
   const [showLogoManager, setShowLogoManager] = useState(false)

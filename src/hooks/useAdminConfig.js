@@ -28,6 +28,7 @@ export const useAdminConfig = () => {
     try {
       // 动态获取最新的站点配置
       const currentSiteConfig = JSON.parse(localStorage.getItem('siteConfig') || '{}')
+      console.log('保存时的站点配置:', currentSiteConfig)
 
       // 生成配置文件内容，包含站点配置
       const configContent = generateConfigFile(config.websiteData, config.categories, currentSiteConfig)

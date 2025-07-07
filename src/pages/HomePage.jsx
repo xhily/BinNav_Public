@@ -20,6 +20,15 @@ function HomePage() {
   
   // 使用全局站点配置
   const { siteConfig } = useSiteConfig()
+
+  // 调试备案信息
+  useEffect(() => {
+    console.log('HomePage siteConfig:', siteConfig)
+    console.log('备案信息:', {
+      icpRecord: siteConfig?.icpRecord,
+      publicSecurityRecord: siteConfig?.publicSecurityRecord
+    })
+  }, [siteConfig])
   
   // 动态设置页面标题
   useEffect(() => {
