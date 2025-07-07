@@ -22,8 +22,8 @@ const WebsiteCard = ({ website }) => {
       }
       const mainDomain = getMainDomain(hostname)
 
-      // 使用Clearbit Logo API
-      return `https://logo.clearbit.com/${mainDomain}`
+      // 使用favicon.im API
+      return `https://favicon.im/${hostname}`
     } catch (error) {
       return logoImg
     }
@@ -49,13 +49,13 @@ const WebsiteCard = ({ website }) => {
 
       // 智能fallback策略
       if (e.target.src.includes('/cached-icons/')) {
-        // 静态文件失败，尝试Clearbit API
-        e.target.src = `https://logo.clearbit.com/${mainDomain}`
-        console.log('🔄 静态文件失败，尝试Clearbit API:', e.target.src)
-      } else if (e.target.src.includes('clearbit.com')) {
-        // Clearbit失败，尝试DuckDuckGo
+        // 静态文件失败，尝试favicon.im API
+        e.target.src = `https://favicon.im/${hostname}`
+        console.log('🔄 静态文件失败，尝试favicon.im API:', e.target.src)
+      } else if (e.target.src.includes('favicon.im')) {
+        // favicon.im失败，尝试DuckDuckGo
         e.target.src = `https://icons.duckduckgo.com/ip3/${mainDomain}.ico`
-        console.log('🔄 Clearbit失败，尝试DuckDuckGo:', e.target.src)
+        console.log('🔄 favicon.im失败，尝试DuckDuckGo:', e.target.src)
       } else if (e.target.src.includes('duckduckgo.com')) {
         // DuckDuckGo失败，尝试网站自己的favicon
         const domain = new URL(website.url).origin

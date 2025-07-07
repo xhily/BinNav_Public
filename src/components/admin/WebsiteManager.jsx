@@ -284,10 +284,8 @@ const WebsiteManager = ({
     tags: ''
   })
 
-  // 图标缓存状态
+  // 图标更新状态
   const [isUpdatingIcons, setIsUpdatingIcons] = useState(false)
-  const [iconUpdateResults, setIconUpdateResults] = useState(null)
-  const [updateProgress, setUpdateProgress] = useState({ current: 0, total: 0 })
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -548,17 +546,17 @@ const WebsiteManager = ({
         forceRefresh: forceRefresh
       })
 
-      // 1. 使用国内可访问的图标API服务
+      // 1. 使用favicon.im API服务
       const faviconAPIs = [
-        // Clearbit Logo API - 国内可访问，质量高
-        `https://logo.clearbit.com/${mainDomain}`,
+        // favicon.im API - 支持多种域名格式
+        `https://favicon.im/${hostname}`,
 
-        // 备用方案：先尝试完整域名，再尝试主域名
+        // 如果完整域名和主域名不同，也尝试主域名
         ...(hostname !== mainDomain ? [
-          `https://logo.clearbit.com/${hostname}`,
+          `https://favicon.im/${mainDomain}`,
         ] : []),
 
-        // 其他备用服务
+        // 备用服务
         `https://icons.duckduckgo.com/ip3/${mainDomain}.ico`,
         `https://${mainDomain}/favicon.ico`,
 
@@ -670,78 +668,57 @@ const WebsiteManager = ({
     }
   }
 
-  // 批量更新所有网站图标（智能图标方案）
+  // 批量更新所有网站图标
   const handleBatchUpdateIcons = async () => {
     if (!window.confirm('确定要更新所有网站的图标吗？这可能需要一些时间。')) {
       return
     }
 
     setIsUpdatingIcons(true)
-    setIconUpdateResults([])
-    setUpdateProgress({ current: 0, total: config.websiteData.length })
 
-    const results = []
     let updatedWebsites = [...config.websiteData]
+    let successCount = 0
+    let failCount = 0
 
     try {
       for (let i = 0; i < config.websiteData.length; i++) {
         const website = config.websiteData[i]
-        setUpdateProgress({ current: i + 1, total: config.websiteData.length })
 
         try {
           console.log(`🔄 更新图标 ${i + 1}/${config.websiteData.length}: ${website.name}`)
 
-          // 获取最佳图标URL
+          // 获取最新的图标URL
           const iconUrl = await getWebsiteIcon(website.url, true)
 
           if (iconUrl && iconUrl !== '/assets/logo.png') {
-            // 直接使用外网URL
+            // 直接使用新的图标URL
             updatedWebsites = updatedWebsites.map(site =>
               site.id === website.id
                 ? { ...site, icon: iconUrl }
                 : site
             )
-
-            results.push({
-              name: website.name,
-              status: 'success',
-              message: '图标更新成功',
-              iconUrl: iconUrl
-            })
+            successCount++
           } else {
-            results.push({
-              name: website.name,
-              status: 'failed',
-              message: '图标获取失败'
-            })
+            failCount++
           }
 
           // 添加延迟避免请求过快
           await new Promise(resolve => setTimeout(resolve, 300))
 
         } catch (error) {
-          results.push({
-            name: website.name,
-            status: 'error',
-            message: error.message
-          })
+          console.error(`更新 ${website.name} 图标失败:`, error)
+          failCount++
         }
       }
 
       // 更新所有网站数据
       onUpdateWebsiteData(updatedWebsites)
-      setIconUpdateResults(results)
-
-      const successCount = results.filter(r => r.status === 'success').length
-      const failCount = results.filter(r => r.status !== 'success').length
-
       showMessage('success', `图标更新完成！成功: ${successCount}, 失败: ${failCount}`)
 
     } catch (error) {
       showMessage('error', `批量更新失败: ${error.message}`)
     } finally {
       setIsUpdatingIcons(false)
-      setUpdateProgress({ current: 0, total: 0 })
     }
   }
 
@@ -774,37 +751,7 @@ const WebsiteManager = ({
     }
   }
 
-  // 更新所有网站图标缓存
-  const handleUpdateIconCache = async () => {
-    if (!window.confirm('确定要更新所有网站的图标缓存吗？这可能需要一些时间。')) {
-      return
-    }
 
-    setIsUpdatingIcons(true)
-    setIconUpdateResults(null)
-
-    try {
-      const response = await fetch('/api/batch-cache-icons', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-
-      const result = await response.json()
-      setIconUpdateResults(result)
-
-      if (result.success) {
-        showMessage('success', `图标缓存更新完成！成功: ${result.summary.success}, 失败: ${result.summary.failed}`)
-      } else {
-        showMessage('error', `图标缓存更新失败: ${result.error}`)
-      }
-    } catch (error) {
-      showMessage('error', `图标缓存更新失败: ${error.message}`)
-    } finally {
-      setIsUpdatingIcons(false)
-    }
-  }
 
   // 处理拖拽结束 - 只允许在同一分类内移动
   const handleDragEnd = (event) => {
@@ -858,12 +805,12 @@ const WebsiteManager = ({
             {isUpdatingIcons ? (
               <>
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                更新中 ({updateProgress.current}/{updateProgress.total})
+                更新中...
               </>
             ) : (
               <>
                 <RefreshCw className="w-4 h-4" />
-                更新图标缓存
+                更新图标
               </>
             )}
           </button>
@@ -964,52 +911,7 @@ const WebsiteManager = ({
           </DndContext>
         )}
 
-        {/* 图标更新结果显示 */}
-        {iconUpdateResults && (
-          <div className="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <h4 className="text-sm font-medium text-gray-900 mb-3">图标缓存更新结果</h4>
-            <div className="flex items-center gap-4 mb-3 text-sm">
-              <span className="text-gray-600">
-                总计: {iconUpdateResults.summary?.total || 0}
-              </span>
-              <span className="text-green-600">
-                成功: {iconUpdateResults.summary?.success || 0}
-              </span>
-              <span className="text-red-600">
-                失败: {iconUpdateResults.summary?.failed || 0}
-              </span>
-              <span className="text-blue-600">
-                已缓存: {iconUpdateResults.summary?.alreadyCached || 0}
-              </span>
-            </div>
 
-            {iconUpdateResults.results && iconUpdateResults.results.length > 0 && (
-              <div className="max-h-40 overflow-y-auto border border-gray-200 rounded bg-white">
-                <div className="divide-y divide-gray-100">
-                  {iconUpdateResults.results.map((result, index) => (
-                    <div key={index} className="px-3 py-2 flex justify-between items-center text-xs">
-                      <span className="font-medium text-gray-900">{result.name}</span>
-                      <span className={`px-2 py-1 rounded text-xs ${
-                        result.status === 'success' ? 'bg-green-100 text-green-700' :
-                        result.status === 'already_cached' ? 'bg-blue-100 text-blue-700' :
-                        'bg-red-100 text-red-700'
-                      }`}>
-                        {result.message}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <button
-              onClick={() => setIconUpdateResults(null)}
-              className="mt-3 text-xs text-gray-500 hover:text-gray-700"
-            >
-              关闭结果
-            </button>
-          </div>
-        )}
       </div>
     </div>
   )
