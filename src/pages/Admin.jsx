@@ -154,9 +154,13 @@ function Admin() {
 
   // 综合保存函数 - 保存所有配置包括站点设置
   const handleSaveAll = async () => {
-    // 保存站点设置
+    // 先保存站点设置到全局状态
     updateSiteConfig(siteSettings)
-    // 保存其他配置
+
+    // 等待一下确保状态更新
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    // 保存所有配置到GitHub
     await saveConfig()
   }
 

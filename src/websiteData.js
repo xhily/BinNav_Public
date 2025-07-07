@@ -2,15 +2,13 @@
 
 // 站点配置
 export const siteConfig = {
-  "siteConfig": {
-    "siteName": "BinNav",
-    "siteTitle": "BinNav - 精选网站导航",
-    "siteLogo": "/assets/logo.png",
-    "siteDescription": "发现优质网站，提升工作效率。汇聚设计、开发、工具等各类精选网站资源。",
-    "icpRecord": "",
-    "publicSecurityRecord": "",
-    "publicSecurityRecordUrl": ""
-  }
+  "siteName": "BinNav",
+  "siteTitle": "BinNav - 精选网站导航",
+  "siteLogo": "/assets/logo.png",
+  "siteDescription": "发现优质网站，提升工作效率。汇聚设计、开发、工具等各类精选网站资源。",
+  "icpRecord": "",
+  "publicSecurityRecord": "",
+  "publicSecurityRecordUrl": ""
 };
 
 export const websiteData = [

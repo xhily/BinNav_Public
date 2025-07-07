@@ -7,7 +7,6 @@ import { useSiteConfig } from './useSiteConfig'
  * 管理后台配置管理hook
  */
 export const useAdminConfig = () => {
-  const siteConfig = useSiteConfig()
   const [config, setConfig] = useState({
     websiteData: initialWebsiteData,
     categories: initialCategories
@@ -27,8 +26,11 @@ export const useAdminConfig = () => {
     setIsUpdating(true)
     
     try {
+      // 动态获取最新的站点配置
+      const currentSiteConfig = JSON.parse(localStorage.getItem('siteConfig') || '{}')
+
       // 生成配置文件内容，包含站点配置
-      const configContent = generateConfigFile(config.websiteData, config.categories, siteConfig)
+      const configContent = generateConfigFile(config.websiteData, config.categories, currentSiteConfig)
       
       // 首先获取当前文件的SHA值
       const getResponse = await fetch('/api/get-config')
