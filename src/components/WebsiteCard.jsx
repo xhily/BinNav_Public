@@ -5,15 +5,25 @@ import logoImg from '../assets/logo.png'
 const WebsiteCard = ({ website }) => {
   // 优先使用缓存的图标，fallback到外网服务
   const getIconUrl = () => {
-    // 1. 优先使用网站数据中的图标（可能是缓存路径或外网URL）
+    // 1. 优先使用网站数据中的图标（静态文件路径或外网URL）
     if (website.icon) {
       return website.icon
     }
 
-    // 2. 如果没有缓存，先尝试本地缓存
+    // 2. 如果没有缓存，使用Google API作为fallback
     try {
       const hostname = new URL(website.url).hostname
-      return `/api/icon-cache?domain=${hostname}`
+      const getMainDomain = (hostname) => {
+        const parts = hostname.split('.')
+        if (parts.length > 2) {
+          return parts.slice(-2).join('.')
+        }
+        return hostname
+      }
+      const mainDomain = getMainDomain(hostname)
+
+      // 直接使用Google Favicon API
+      return `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32`
     } catch (error) {
       return logoImg
     }
@@ -26,43 +36,42 @@ const WebsiteCard = ({ website }) => {
       websiteUrl: website.url
     })
 
-    // 如果缓存API失败，尝试外网服务
-    if (e.target.src.includes('/api/icon-cache')) {
-      try {
-        const hostname = new URL(website.url).hostname
-        const getMainDomain = (hostname) => {
-          const parts = hostname.split('.')
-          if (parts.length > 2) {
-            return parts.slice(-2).join('.')
-          }
-          return hostname
+    try {
+      const hostname = new URL(website.url).hostname
+      const getMainDomain = (hostname) => {
+        const parts = hostname.split('.')
+        if (parts.length > 2) {
+          return parts.slice(-2).join('.')
         }
-        const mainDomain = getMainDomain(hostname)
-
-        // 使用Google Favicon API
-        e.target.src = `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32`
-        console.log('🔄 尝试Google API:', e.target.src)
-      } catch {
-        e.target.src = logoImg
-        e.target.onerror = null
-        console.log('🔄 使用默认图标')
+        return hostname
       }
-    } else if (e.target.src.includes('gstatic.com') || e.target.src.includes('favicons')) {
-      // 如果Google API失败，尝试网站自己的favicon
-      try {
+      const mainDomain = getMainDomain(hostname)
+
+      // 智能fallback策略
+      if (e.target.src.includes('/cached-icons/')) {
+        // 静态文件失败，尝试Google API
+        e.target.src = `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32`
+        console.log('🔄 静态文件失败，尝试Google API:', e.target.src)
+      } else if (e.target.src.includes('gstatic.com') || e.target.src.includes('favicons')) {
+        // Google API失败，尝试DuckDuckGo
+        e.target.src = `https://icons.duckduckgo.com/ip3/${mainDomain}.ico`
+        console.log('🔄 Google API失败，尝试DuckDuckGo:', e.target.src)
+      } else if (e.target.src.includes('duckduckgo.com')) {
+        // DuckDuckGo失败，尝试网站自己的favicon
         const domain = new URL(website.url).origin
         e.target.src = `${domain}/favicon.ico`
-        console.log('🔄 尝试网站自己的favicon:', e.target.src)
-      } catch {
+        console.log('🔄 DuckDuckGo失败，尝试网站favicon:', e.target.src)
+      } else {
+        // 最终回退到默认图标
         e.target.src = logoImg
-        e.target.onerror = null
+        e.target.onerror = null // 防止无限循环
         console.log('🔄 使用默认图标')
       }
-    } else {
-      // 最终回退到默认图标
+    } catch (error) {
+      // 如果URL解析失败，直接使用默认图标
       e.target.src = logoImg
-      e.target.onerror = null // 防止无限循环
-      console.log('🔄 使用默认图标')
+      e.target.onerror = null
+      console.log('🔄 URL解析失败，使用默认图标')
     }
   }
 

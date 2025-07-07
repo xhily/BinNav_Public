@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图标缓存测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+        button { padding: 10px 20px; margin: 5px; background: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #005a87; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 12px; }
+        .success { background: #e8f5e8; }
+        .error { background: #ffe8e8; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; width: 300px; }
+        .icon-test { display: inline-block; margin: 10px; text-align: center; }
+        .icon-test img { width: 32px; height: 32px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>🔧 图标缓存测试</h1>
+    
+    <div class="section">
+        <h3>1. 测试已知API</h3>
+        <button onclick="testKnownAPI()">测试get-config API</button>
+        <button onclick="testUploadAPI()">测试upload-icon API</button>
+        <div id="known-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>2. 测试缓存API</h3>
+        <button onclick="testAPI()">测试缓存API路由</button>
+        <div id="api-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>3. 测试前端缓存</h3>
+        <div>
+            <input type="text" id="domain" placeholder="域名 (如: github.com)" value="github.com">
+            <input type="text" id="iconUrl" placeholder="图标URL" value="https://www.google.com/s2/favicons?domain=github.com&sz=32">
+        </div>
+        <button onclick="testFrontendCache()">前端缓存图标</button>
+        <div id="result"></div>
+    </div>
+    
+    <div class="section">
+        <h3>测试结果</h3>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+            logEntry.className = type;
+            logDiv.appendChild(logEntry);
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        async function testKnownAPI() {
+            const resultDiv = document.getElementById('known-result');
+            log('测试已知的get-config API');
+
+            try {
+                const response = await fetch('/api/get-config');
+                log(`get-config响应状态: ${response.status}`);
+
+                if (response.ok) {
+                    const text = await response.text();
+                    log(`get-config响应类型: ${response.headers.get('content-type')}`);
+                    log(`get-config响应长度: ${text.length}`);
+
+                    if (text.startsWith('{')) {
+                        const result = JSON.parse(text);
+                        log('get-config返回JSON，API正常', 'success');
+                        resultDiv.innerHTML = `
+                            <div class="success">
+                                <h4>✅ get-config API正常</h4>
+                                <p>返回了有效的JSON数据</p>
+                            </div>
+                        `;
+                    } else {
+                        log('get-config返回HTML，可能有路由问题', 'error');
+                        resultDiv.innerHTML = `
+                            <div class="error">
+                                <h4>❌ get-config返回HTML</h4>
+                                <p>API可能没有正确部署</p>
+                                <details>
+                                    <summary>响应内容</summary>
+                                    <pre>${text.substring(0, 500)}...</pre>
+                                </details>
+                            </div>
+                        `;
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                log(`get-config测试失败: ${error.message}`, 'error');
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ get-config API失败</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testUploadAPI() {
+            const resultDiv = document.getElementById('known-result');
+            log('测试upload-icon API的OPTIONS请求');
+
+            try {
+                const response = await fetch('/api/upload-icon', {
+                    method: 'OPTIONS'
+                });
+                log(`upload-icon OPTIONS响应状态: ${response.status}`);
+
+                if (response.ok || response.status === 204) {
+                    log('upload-icon OPTIONS成功', 'success');
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ upload-icon API存在</h4>
+                            <p>OPTIONS请求成功，状态码: ${response.status}</p>
+                        </div>
+                    `;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                log(`upload-icon测试失败: ${error.message}`, 'error');
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ upload-icon API失败</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testSimpleAPI() {
+            const resultDiv = document.getElementById('simple-result');
+            log('测试简单API');
+
+            try {
+                // 测试GET请求
+                const getResponse = await fetch('/api/test-cache');
+                log(`GET响应状态: ${getResponse.status}`);
+
+                if (getResponse.ok) {
+                    const getResult = await getResponse.json();
+                    log(`GET结果: ${JSON.stringify(getResult)}`, 'success');
+
+                    // 测试POST请求
+                    const postResponse = await fetch('/api/test-cache', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            test: 'data',
+                            domain: 'github.com'
+                        })
+                    });
+
+                    log(`POST响应状态: ${postResponse.status}`);
+
+                    if (postResponse.ok) {
+                        const postResult = await postResponse.json();
+                        log(`POST结果: ${JSON.stringify(postResult)}`, 'success');
+
+                        resultDiv.innerHTML = `
+                            <div class="success">
+                                <h4>✅ 简单API正常工作</h4>
+                                <p>GET和POST请求都成功</p>
+                                <p>GitHub Token: ${postResult.env?.hasGithubToken ? '✅' : '❌'}</p>
+                                <p>GitHub Repo: ${postResult.env?.hasGithubRepo ? '✅' : '❌'}</p>
+                            </div>
+                        `;
+                    } else {
+                        throw new Error(`POST失败: ${postResponse.status}`);
+                    }
+                } else {
+                    throw new Error(`GET失败: ${getResponse.status}`);
+                }
+            } catch (error) {
+                log(`简单API测试失败: ${error.message}`, 'error');
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ 简单API失败</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testAPI() {
+            const resultDiv = document.getElementById('api-result');
+            log('测试API路由是否存在');
+
+            try {
+                // 先测试OPTIONS请求
+                const optionsResponse = await fetch('/api/upload-icon', {
+                    method: 'OPTIONS'
+                });
+
+                log(`OPTIONS响应状态: ${optionsResponse.status}`);
+
+                if (optionsResponse.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ API路由存在</h4>
+                            <p>OPTIONS请求成功，状态码: ${optionsResponse.status}</p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ API路由问题</h4>
+                            <p>OPTIONS请求失败，状态码: ${optionsResponse.status}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                log(`API测试失败: ${error.message}`, 'error');
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ API不可访问</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testFrontendCache() {
+            const domain = document.getElementById('domain').value;
+            const iconUrl = document.getElementById('iconUrl').value;
+            const resultDiv = document.getElementById('result');
+
+            if (!domain || !iconUrl) {
+                log('请填写域名和图标URL', 'error');
+                return;
+            }
+
+            log(`开始前端缓存图标: ${domain}`);
+            resultDiv.innerHTML = '<p>缓存中...</p>';
+
+            try {
+                // 1. 使用图片元素加载图标（绕过CORS限制）
+                log('步骤1: 通过图片元素加载图标');
+                const img = new Image();
+                img.crossOrigin = 'anonymous'; // 尝试启用CORS
+
+                const imageLoaded = new Promise((resolve, reject) => {
+                    img.onload = () => {
+                        log(`图标加载成功: ${img.width}x${img.height}`);
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        reject(new Error('图标加载失败，可能是CORS限制'));
+                    };
+                    img.src = iconUrl;
+                });
+
+                await imageLoaded;
+
+                // 2. 转换为canvas然后base64
+                log('步骤2: 转换为base64');
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+
+                ctx.drawImage(img, 0, 0);
+                const base64 = canvas.toDataURL('image/png');
+                log(`转换成功，base64长度: ${base64.length}`);
+
+                // 3. 调用upload-icon API
+                log('步骤3: 上传到GitHub');
+                const fileName = `${domain.replace(/[^a-zA-Z0-9.-]/g, '_')}.png`;
+
+                const uploadResponse = await fetch('/api/upload-icon', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fileName: fileName,
+                        fileContent: base64,
+                        fileType: 'image/png'
+                    })
+                });
+
+                log(`上传响应状态: ${uploadResponse.status}`);
+
+                if (!uploadResponse.ok) {
+                    const errorText = await uploadResponse.text();
+                    throw new Error(`上传失败: HTTP ${uploadResponse.status} - ${errorText}`);
+                }
+
+                const result = await uploadResponse.json();
+                log(`上传结果: ${JSON.stringify(result)}`, result.success ? 'success' : 'error');
+
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ 前端缓存成功</h4>
+                            <p><strong>文件名:</strong> ${fileName}</p>
+                            <p><strong>静态路径:</strong> ${result.icon?.path || '未知'}</p>
+                            <p><strong>图片尺寸:</strong> ${img.width}x${img.height}</p>
+                            <div class="icon-test">
+                                <img src="${result.icon?.path || iconUrl}" alt="${domain}" onerror="this.style.border='2px solid red'">
+                                <div>缓存图标</div>
+                            </div>
+                            <div class="icon-test">
+                                <img src="${iconUrl}" alt="${domain}" onerror="this.style.border='2px solid red'">
+                                <div>原始图标</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    throw new Error(result.message || '上传失败');
+                }
+
+            } catch (error) {
+                log(`前端缓存失败: ${error.message}`, 'error');
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ 前端缓存失败</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testCache() {
+            const domain = document.getElementById('domain').value;
+            const iconUrl = document.getElementById('iconUrl').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!domain || !iconUrl) {
+                log('请填写域名和图标URL', 'error');
+                return;
+            }
+            
+            log(`开始缓存图标: ${domain}`);
+            resultDiv.innerHTML = '<p>缓存中...</p>';
+            
+            try {
+                const response = await fetch('/api/upload-icon', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        domain: domain,
+                        iconUrl: iconUrl
+                    })
+                });
+                
+                log(`响应状态: ${response.status}`);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
+                const result = await response.json();
+                log(`缓存结果: ${JSON.stringify(result)}`, result.success ? 'success' : 'error');
+                
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ 缓存成功</h4>
+                            <p><strong>静态路径:</strong> ${result.staticPath}</p>
+                            <p><strong>文件大小:</strong> ${result.size} bytes</p>
+                            <div class="icon-test">
+                                <img src="${result.staticPath}" alt="${domain}" onerror="this.style.border='2px solid red'">
+                                <div>缓存图标</div>
+                            </div>
+                            <div class="icon-test">
+                                <img src="${iconUrl}" alt="${domain}" onerror="this.style.border='2px solid red'">
+                                <div>原始图标</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ 缓存失败</h4>
+                            <p>${result.error}</p>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                log(`缓存失败: ${error.message}`, 'error');
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ 缓存失败</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        window.onload = function() {
+            log('图标缓存测试页面已加载');
+            log('逻辑：下载外网图标 → 保存到GitHub → 返回静态文件路径');
+        };
+    </script>
+</body>
+</html>

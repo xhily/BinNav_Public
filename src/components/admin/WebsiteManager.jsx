@@ -665,7 +665,7 @@ const WebsiteManager = ({
     }
   }
 
-  // 批量更新所有网站图标
+  // 批量更新所有网站图标（智能图标方案）
   const handleBatchUpdateIcons = async () => {
     if (!window.confirm('确定要更新所有网站的图标吗？这可能需要一些时间。')) {
       return
@@ -686,71 +686,23 @@ const WebsiteManager = ({
         try {
           console.log(`🔄 更新图标 ${i + 1}/${config.websiteData.length}: ${website.name}`)
 
-          // 1. 获取外网图标URL
+          // 获取最佳图标URL
           const iconUrl = await getWebsiteIcon(website.url, true)
 
           if (iconUrl && iconUrl !== '/assets/logo.png') {
-            // 2. 下载并缓存图标到服务器
-            const hostname = new URL(website.url).hostname
+            // 直接使用外网URL
+            updatedWebsites = updatedWebsites.map(site =>
+              site.id === website.id
+                ? { ...site, icon: iconUrl }
+                : site
+            )
 
-            try {
-              const cacheResponse = await fetch('/api/icon-cache', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  domain: hostname,
-                  iconUrl: iconUrl
-                })
-              })
-
-              const cacheResult = await cacheResponse.json()
-
-              if (cacheResult.success) {
-                // 使用本地缓存路径
-                updatedWebsites = updatedWebsites.map(site =>
-                  site.id === website.id
-                    ? { ...site, icon: cacheResult.localPath }
-                    : site
-                )
-
-                results.push({
-                  name: website.name,
-                  status: 'success',
-                  message: '图标已缓存到本地',
-                  iconUrl: cacheResult.localPath
-                })
-              } else {
-                // 缓存失败，使用外网URL
-                updatedWebsites = updatedWebsites.map(site =>
-                  site.id === website.id
-                    ? { ...site, icon: iconUrl }
-                    : site
-                )
-
-                results.push({
-                  name: website.name,
-                  status: 'warning',
-                  message: `缓存失败，使用外网链接: ${cacheResult.error}`,
-                  iconUrl: iconUrl
-                })
-              }
-            } catch (cacheError) {
-              // 缓存API调用失败，使用外网URL
-              updatedWebsites = updatedWebsites.map(site =>
-                site.id === website.id
-                  ? { ...site, icon: iconUrl }
-                  : site
-              )
-
-              results.push({
-                name: website.name,
-                status: 'warning',
-                message: `缓存API失败，使用外网链接: ${cacheError.message}`,
-                iconUrl: iconUrl
-              })
-            }
+            results.push({
+              name: website.name,
+              status: 'success',
+              message: '图标更新成功',
+              iconUrl: iconUrl
+            })
           } else {
             results.push({
               name: website.name,
@@ -760,7 +712,7 @@ const WebsiteManager = ({
           }
 
           // 添加延迟避免请求过快
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise(resolve => setTimeout(resolve, 300))
 
         } catch (error) {
           results.push({
@@ -788,50 +740,85 @@ const WebsiteManager = ({
     }
   }
 
-  // 更新单个网站图标缓存
+
+
+  // 后端下载图标到本地
+  const downloadIconToLocal = async (domain, iconUrl) => {
+    try {
+      const response = await fetch('/api/upload-icon', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          domain: domain,
+          iconUrl: iconUrl
+        })
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`HTTP ${response.status}: ${errorText}`)
+      }
+
+      const result = await response.json()
+
+      if (result.success) {
+        return {
+          success: true,
+          staticPath: result.staticPath || result.icon?.path,
+          message: result.message
+        }
+      } else {
+        throw new Error(result.message || '下载失败')
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      }
+    }
+  }
+
+  // 更新单个网站图标（两步方案）
   const handleUpdateSingleIcon = async (website) => {
     try {
       showMessage('info', `正在更新 ${website.name} 的图标...`)
 
-      // 1. 获取外网图标URL
-      const iconUrl = await getWebsiteIcon(website.url, true) // forceRefresh = true
+      // 步骤1: 获取图标URL并保存
+      const iconUrl = await getWebsiteIcon(website.url, true)
 
       if (iconUrl && iconUrl !== '/assets/logo.png') {
-        // 2. 下载并缓存图标到服务器
-        const hostname = new URL(website.url).hostname
-        const cacheResponse = await fetch('/api/icon-cache', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            domain: hostname,
-            iconUrl: iconUrl
-          })
-        })
+        // 先保存图标URL
+        const updatedWebsites = config.websiteData.map(site =>
+          site.id === website.id
+            ? { ...site, icon: iconUrl }
+            : site
+        )
 
-        const cacheResult = await cacheResponse.json()
+        onUpdateWebsiteData(updatedWebsites)
+        showMessage('success', `${website.name} 的图标URL已更新`)
 
-        if (cacheResult.success) {
-          // 3. 更新网站数据，使用本地缓存路径
-          const updatedWebsites = config.websiteData.map(site =>
-            site.id === website.id
-              ? { ...site, icon: cacheResult.localPath }
-              : site
-          )
+        // 步骤2: 后端下载图标到本地
+        try {
+          const hostname = new URL(website.url).hostname
+          const downloadResult = await downloadIconToLocal(hostname, iconUrl)
 
-          onUpdateWebsiteData(updatedWebsites)
-          showMessage('success', `${website.name} 的图标已缓存到本地`)
-        } else {
-          // 缓存失败，使用外网URL
-          const updatedWebsites = config.websiteData.map(site =>
-            site.id === website.id
-              ? { ...site, icon: iconUrl }
-              : site
-          )
+          if (downloadResult.success) {
+            // 更新为本地路径
+            const finalUpdatedWebsites = config.websiteData.map(site =>
+              site.id === website.id
+                ? { ...site, icon: downloadResult.staticPath }
+                : site
+            )
 
-          onUpdateWebsiteData(updatedWebsites)
-          showMessage('warning', `${website.name} 图标缓存失败，使用外网链接: ${cacheResult.error}`)
+            onUpdateWebsiteData(finalUpdatedWebsites)
+            showMessage('success', `${website.name} 的图标已缓存到本地`)
+          } else {
+            showMessage('info', `${website.name} 图标下载失败，使用外网链接: ${downloadResult.error}`)
+          }
+        } catch (downloadError) {
+          showMessage('info', `${website.name} 图标下载失败，使用外网链接: ${downloadError.message}`)
         }
       } else {
         showMessage('warning', `${website.name} 的图标获取失败，保持原状`)
