@@ -30,7 +30,6 @@ function Admin() {
   // 当siteConfig变化时，更新siteSettings
   useEffect(() => {
     if (siteConfig) {
-      console.log('加载的siteConfig:', siteConfig)
       setSiteSettings(siteConfig)
     }
   }, [siteConfig])

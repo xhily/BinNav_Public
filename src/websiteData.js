@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/7 10:34:40
+// 网站数据 - 通过管理后台更新于 2025/7/7 10:45:00
 
 // 站点配置
 export const siteConfig = {
@@ -6,7 +6,7 @@ export const siteConfig = {
   "siteTitle": "BinNav - 精选网站导航",
   "siteLogo": "/assets/logo.png",
   "siteDescription": "发现优质网站，提升工作效率。汇聚设计、开发、工具等各类精选网站资源。",
-  "icpRecord": "",
+  "icpRecord": "苏ICP备2025185822号",
   "publicSecurityRecord": "",
   "publicSecurityRecordUrl": ""
 };
