@@ -45,6 +45,7 @@ export async function onRequest(context) {
       headers: {
         'Authorization': `token ${GITHUB_TOKEN}`,
         'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
       }
     });
 
@@ -59,7 +60,7 @@ export async function onRequest(context) {
     try {
       // 清理base64字符串，移除换行符和空格
       const cleanBase64 = configData.content.replace(/\s/g, '');
-      configContent = decodeURIComponent(escape(atob(cleanBase64)));
+      configContent = atob(cleanBase64);
     } catch (decodeError) {
       throw new Error(`Base64解码失败: ${decodeError.message}`);
     }
@@ -90,6 +91,7 @@ export async function onRequest(context) {
           headers: {
             'Authorization': `token ${GITHUB_TOKEN}`,
             'Accept': 'application/vnd.github.v3+json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
           }
         });
 
@@ -220,7 +222,8 @@ async function cacheIconForDomain(domain, customIcon, githubToken, githubRepo) {
       headers: {
         'Authorization': `token ${githubToken}`,
         'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
       },
       body: JSON.stringify({
         message: `Cache icon for ${domain}`,
