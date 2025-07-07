@@ -55,9 +55,15 @@ export async function onRequest(context) {
 
       if (response.ok) {
         const data = await response.json();
-        const imageData = atob(data.content.replace(/\s/g, ''));
-        
-        return new Response(imageData, {
+        // 修复base64解码
+        const cleanBase64 = data.content.replace(/\s/g, '');
+        const binaryString = atob(cleanBase64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+
+        return new Response(bytes, {
           headers: {
             ...corsHeaders,
             'Content-Type': 'image/png',
@@ -159,7 +165,13 @@ async function fetchAndCacheIcon(domain, githubToken, githubRepo, corsHeaders, c
 
   // 缓存到GitHub
   try {
-    const base64Data = btoa(String.fromCharCode(...new Uint8Array(iconData)));
+    // 修复base64编码
+    const uint8Array = new Uint8Array(iconData);
+    let binaryString = '';
+    for (let i = 0; i < uint8Array.length; i++) {
+      binaryString += String.fromCharCode(uint8Array[i]);
+    }
+    const base64Data = btoa(binaryString);
     const iconPath = `public/cached-icons/${domain}.png`;
     
     await fetch(`https://api.github.com/repos/${githubRepo}/contents/${iconPath}`, {

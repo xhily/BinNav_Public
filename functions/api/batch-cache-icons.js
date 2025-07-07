@@ -53,15 +53,29 @@ export async function onRequest(context) {
     }
 
     const configData = await configResponse.json();
-    const configContent = atob(configData.content.replace(/\s/g, ''));
-    
+
+    // 使用更安全的base64解码方式
+    let configContent;
+    try {
+      // 清理base64字符串，移除换行符和空格
+      const cleanBase64 = configData.content.replace(/\s/g, '');
+      configContent = decodeURIComponent(escape(atob(cleanBase64)));
+    } catch (decodeError) {
+      throw new Error(`Base64解码失败: ${decodeError.message}`);
+    }
+
     // 解析网站数据
     const websiteDataMatch = configContent.match(/export const websiteData = (\[[\s\S]*?\]);/);
     if (!websiteDataMatch) {
       throw new Error('无法解析网站数据');
     }
 
-    const websiteData = JSON.parse(websiteDataMatch[1]);
+    let websiteData;
+    try {
+      websiteData = JSON.parse(websiteDataMatch[1]);
+    } catch (parseError) {
+      throw new Error(`网站数据JSON解析失败: ${parseError.message}`);
+    }
     const results = [];
     let successCount = 0;
     let failCount = 0;
@@ -190,7 +204,13 @@ async function cacheIconForDomain(domain, customIcon, githubToken, githubRepo) {
 
   // 缓存到GitHub
   try {
-    const base64Data = btoa(String.fromCharCode(...new Uint8Array(iconData)));
+    // 修复base64编码
+    const uint8Array = new Uint8Array(iconData);
+    let binaryString = '';
+    for (let i = 0; i < uint8Array.length; i++) {
+      binaryString += String.fromCharCode(uint8Array[i]);
+    }
+    const base64Data = btoa(binaryString);
     const iconPath = `public/cached-icons/${domain}.png`;
     
     const response = await fetch(`https://api.github.com/repos/${githubRepo}/contents/${iconPath}`, {

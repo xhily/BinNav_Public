@@ -112,7 +112,13 @@ async function updateIconForDomain(domain, customIcon, githubToken, githubRepo) 
 
   // 更新GitHub中的缓存
   try {
-    const base64Data = btoa(String.fromCharCode(...new Uint8Array(iconData)));
+    // 修复base64编码
+    const uint8Array = new Uint8Array(iconData);
+    let binaryString = '';
+    for (let i = 0; i < uint8Array.length; i++) {
+      binaryString += String.fromCharCode(uint8Array[i]);
+    }
+    const base64Data = btoa(binaryString);
     const iconPath = `public/cached-icons/${domain}.png`;
     
     // 先检查文件是否存在，获取SHA
