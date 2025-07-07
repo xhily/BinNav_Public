@@ -19,7 +19,16 @@ export async function onRequest(context) {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const domain = url.searchParams.get('domain') || 'github.com';
+  let domain = url.searchParams.get('domain') || 'github.com';
+
+  // 如果传入的是URL，提取域名
+  try {
+    if (domain.includes('://')) {
+      domain = new URL(domain).hostname;
+    }
+  } catch (error) {
+    // 如果解析失败，使用原始值
+  }
   const GITHUB_TOKEN = env?.VITE_GITHUB_TOKEN || env?.GITHUB_TOKEN;
   const GITHUB_REPO = env?.VITE_GITHUB_REPO || env?.GITHUB_REPO;
 
@@ -116,12 +125,18 @@ export async function onRequest(context) {
       // 步骤3: 尝试直接获取图标
       const directUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
       try {
+        // 创建超时控制器
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
         const directResponse = await fetch(directUrl, {
           headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
           },
-          signal: AbortSignal.timeout(5000)
+          signal: controller.signal
         });
+
+        clearTimeout(timeoutId);
 
         result.steps.push({
           step: '直接获取图标',

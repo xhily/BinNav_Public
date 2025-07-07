@@ -137,12 +137,18 @@ async function fetchAndCacheIcon(domain, githubToken, githubRepo, corsHeaders, c
   // 尝试获取图标
   for (const iconUrl of iconStrategies) {
     try {
+      // 创建超时控制器
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
       const response = await fetch(iconUrl, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         },
-        signal: AbortSignal.timeout(10000) // 增加到10秒
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
 
       if (response.ok) {
         const responseContentType = response.headers.get('content-type');
