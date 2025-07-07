@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>移动端图标测试</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: #f0f0f0;
+            padding: 2px;
+            object-fit: contain;
+            flex-shrink: 0;
+            display: block;
+        }
+        .info {
+            flex: 1;
+            min-width: 0;
+        }
+        .name {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .url {
+            font-size: 12px;
+            color: #666;
+            word-break: break-all;
+        }
+        .status {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 8px;
+        }
+        .success { background: #e8f5e8; color: #2d5a2d; }
+        .error { background: #ffe8e8; color: #8b0000; }
+        .loading { background: #e8f4ff; color: #1e40af; }
+    </style>
+</head>
+<body>
+    <h1>移动端图标显示测试</h1>
+    <p>测试不同网站的图标在移动端的显示效果</p>
+    
+    <div id="test-results"></div>
+
+    <script>
+        const testSites = [
+            { name: 'GitHub', url: 'https://github.com' },
+            { name: '百度', url: 'https://www.baidu.com' },
+            { name: '谷歌', url: 'https://www.google.com' },
+            { name: 'Stack Overflow', url: 'https://stackoverflow.com' },
+            { name: '知乎', url: 'https://www.zhihu.com' },
+            { name: 'MDN', url: 'https://developer.mozilla.org' }
+        ];
+
+        function getIconUrl(url) {
+            try {
+                const hostname = new URL(url).hostname;
+                return `https://www.google.com/s2/favicons?domain=${hostname}&sz=32`;
+            } catch (error) {
+                return '/assets/logo.png';
+            }
+        }
+
+        function createTestCard(site) {
+            const card = document.createElement('div');
+            card.className = 'test-card';
+            
+            const iconUrl = getIconUrl(site.url);
+            
+            card.innerHTML = `
+                <img 
+                    class="icon" 
+                    src="${iconUrl}" 
+                    alt="${site.name}"
+                    onload="updateStatus(this, 'success', '✓ 加载成功')"
+                    onerror="updateStatus(this, 'error', '✗ 加载失败')"
+                >
+                <div class="info">
+                    <div class="name">${site.name}</div>
+                    <div class="url">${site.url}</div>
+                </div>
+                <span class="status loading">加载中...</span>
+            `;
+            
+            return card;
+        }
+
+        window.updateStatus = function(img, type, text) {
+            const statusEl = img.parentElement.querySelector('.status');
+            statusEl.className = `status ${type}`;
+            statusEl.textContent = text;
+            
+            if (type === 'error') {
+                // 尝试使用默认图标
+                img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNCIgZmlsbD0iIzM3NDE1MSIvPgo8dGV4dCB4PSIxNiIgeT0iMjAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPj88L3RleHQ+Cjwvc3ZnPgo=';
+                statusEl.textContent = '? 使用默认图标';
+                statusEl.className = 'status loading';
+            }
+        };
+
+        // 渲染测试卡片
+        const container = document.getElementById('test-results');
+        testSites.forEach(site => {
+            container.appendChild(createTestCard(site));
+        });
+
+        // 添加设备信息
+        const deviceInfo = document.createElement('div');
+        deviceInfo.style.cssText = 'margin-top: 20px; padding: 15px; background: white; border-radius: 8px; font-size: 12px;';
+        deviceInfo.innerHTML = `
+            <h3>设备信息</h3>
+            <p><strong>User Agent:</strong> ${navigator.userAgent}</p>
+            <p><strong>屏幕尺寸:</strong> ${screen.width} x ${screen.height}</p>
+            <p><strong>视口尺寸:</strong> ${window.innerWidth} x ${window.innerHeight}</p>
+            <p><strong>设备像素比:</strong> ${window.devicePixelRatio}</p>
+        `;
+        container.appendChild(deviceInfo);
+    </script>
+</body>
+</html>

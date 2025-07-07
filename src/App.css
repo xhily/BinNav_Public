@@ -73,6 +73,20 @@
   .binnav-mobile-grid {
     @apply grid-cols-1;
   }
+
+  /* 移动端图标显示优化 */
+  img {
+    image-rendering: auto;
+    -webkit-image-smoothing: true;
+    image-rendering: -webkit-optimize-contrast;
+  }
+
+  /* 确保图标容器在移动端正确显示 */
+  .flex-shrink-0 {
+    flex-shrink: 0 !important;
+    min-width: 32px;
+    min-height: 32px;
+  }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
