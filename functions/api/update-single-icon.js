@@ -73,11 +73,11 @@ export async function onRequest(context) {
 // 为特定域名更新图标
 async function updateIconForDomain(domain, customIcon, githubToken, githubRepo) {
   const iconStrategies = customIcon ? [customIcon] : [
+    `https://www.google.com/s2/favicons?domain=${domain}&sz=32`,
     `https://${domain}/favicon.ico`,
     `https://${domain}/favicon.png`,
     `https://api.iowen.cn/favicon/${domain}.png`,
-    `https://favicon.yandex.net/favicon/${domain}`,
-    `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
+    `https://favicon.yandex.net/favicon/${domain}`
   ];
 
   let iconData = null;

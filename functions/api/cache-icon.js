@@ -71,7 +71,7 @@ export async function onRequest(context) {
           }
         });
       } else {
-        // 缓存中没有，尝试获取并缓存
+        // 缓存中没有，直接获取外部图标并缓存
         return await fetchAndCacheIcon(domain, GITHUB_TOKEN, GITHUB_REPO, corsHeaders);
       }
     } catch (error) {
@@ -121,13 +121,13 @@ export async function onRequest(context) {
 
 // 获取并缓存图标
 async function fetchAndCacheIcon(domain, githubToken, githubRepo, corsHeaders, customIconUrl = null) {
-  // 图标获取策略
+  // 图标获取策略 - 优先使用Google API（您说这个没问题）
   const iconStrategies = customIconUrl ? [customIconUrl] : [
+    `https://www.google.com/s2/favicons?domain=${domain}&sz=32`,
     `https://${domain}/favicon.ico`,
     `https://${domain}/favicon.png`,
     `https://api.iowen.cn/favicon/${domain}.png`,
-    `https://favicon.yandex.net/favicon/${domain}`,
-    `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
+    `https://favicon.yandex.net/favicon/${domain}`
   ];
 
   let iconData = null;
@@ -138,9 +138,9 @@ async function fetchAndCacheIcon(domain, githubToken, githubRepo, corsHeaders, c
     try {
       const response = await fetch(iconUrl, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         },
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(10000) // 增加到10秒
       });
 
       if (response.ok) {

@@ -152,9 +152,11 @@ export async function onRequest(context) {
     });
 
   } catch (error) {
+    console.error('批量缓存图标失败:', error);
     return new Response(JSON.stringify({
       success: false,
-      error: error.message
+      error: error.message,
+      stack: error.stack
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -165,11 +167,11 @@ export async function onRequest(context) {
 // 为特定域名缓存图标
 async function cacheIconForDomain(domain, customIcon, githubToken, githubRepo) {
   const iconStrategies = customIcon ? [customIcon] : [
+    `https://www.google.com/s2/favicons?domain=${domain}&sz=32`,
     `https://${domain}/favicon.ico`,
     `https://${domain}/favicon.png`,
     `https://api.iowen.cn/favicon/${domain}.png`,
-    `https://favicon.yandex.net/favicon/${domain}`,
-    `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
+    `https://favicon.yandex.net/favicon/${domain}`
   ];
 
   let iconData = null;
