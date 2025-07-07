@@ -35,14 +35,14 @@ const WebsiteCard = ({ website }) => {
   }
 
   return (
-    <Card 
+    <Card
       className="bg-white/80 backdrop-blur-sm border-white/20 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 cursor-pointer group hover:-translate-y-1 overflow-hidden h-24 hover:h-auto w-full"
       onClick={() => window.open(website.url, '_blank')}
     >
       <CardContent className="h-full p-4 flex items-center justify-start">
         <div className="flex items-center space-x-3 w-full">
           <div className="flex-shrink-0">
-            <img 
+            <img
               src={iconSrc}
               alt={website.name}
               className="w-8 h-8 rounded-md shadow-sm bg-gray-100 p-0.5"
@@ -66,7 +66,7 @@ const WebsiteCard = ({ website }) => {
             <div className="flex gap-1 overflow-hidden">
               <div className="flex gap-1 group-hover:flex-wrap">
                 {website.tags && website.tags.map((tag, index) => (
-                  <span 
+                  <span
                     key={index}
                     className={`inline-block px-1.5 py-0.5 text-xs bg-gray-100 text-gray-600 rounded whitespace-nowrap ${
                       index >= 2 ? 'hidden group-hover:inline-block' : ''
