@@ -548,19 +548,24 @@ const WebsiteManager = ({
         forceRefresh: forceRefresh
       })
 
-      // 1. 尝试多个Favicon API服务 - 优先使用完整域名，再尝试主域名
+      // 1. 使用国内可访问的图标API服务
       const faviconAPIs = [
-        // 先尝试完整域名（包括二级域名）
-        `https://www.google.com/s2/favicons?domain=${hostname}&sz=32${forceRefresh ? '&t=' + Date.now() : ''}`,
-        `https://icons.duckduckgo.com/ip3/${hostname}.ico`,
-        `https://${hostname}/favicon.ico`,
+        // Clearbit Logo API - 国内可访问，质量高
+        `https://logo.clearbit.com/${mainDomain}`,
 
-        // 如果二级域名失败，再尝试主域名
+        // 备用方案：先尝试完整域名，再尝试主域名
         ...(hostname !== mainDomain ? [
-          `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32${forceRefresh ? '&t=' + Date.now() : ''}`,
-          `https://icons.duckduckgo.com/ip3/${mainDomain}.ico`,
-          `https://favicons.githubusercontent.com/${mainDomain}`,
-          `https://${mainDomain}/favicon.ico`
+          `https://logo.clearbit.com/${hostname}`,
+        ] : []),
+
+        // 其他备用服务
+        `https://icons.duckduckgo.com/ip3/${mainDomain}.ico`,
+        `https://${mainDomain}/favicon.ico`,
+
+        // 如果主域名和完整域名不同，尝试完整域名的其他服务
+        ...(hostname !== mainDomain ? [
+          `https://icons.duckduckgo.com/ip3/${hostname}.ico`,
+          `https://${hostname}/favicon.ico`
         ] : [])
       ]
 
@@ -742,54 +747,16 @@ const WebsiteManager = ({
 
 
 
-  // 后端下载图标到本地
-  const downloadIconToLocal = async (domain, iconUrl) => {
-    try {
-      const response = await fetch('/api/upload-icon', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          domain: domain,
-          iconUrl: iconUrl
-        })
-      })
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`HTTP ${response.status}: ${errorText}`)
-      }
-
-      const result = await response.json()
-
-      if (result.success) {
-        return {
-          success: true,
-          staticPath: result.staticPath || result.icon?.path,
-          message: result.message
-        }
-      } else {
-        throw new Error(result.message || '下载失败')
-      }
-    } catch (error) {
-      return {
-        success: false,
-        error: error.message
-      }
-    }
-  }
-
-  // 更新单个网站图标（两步方案）
+  // 更新单个网站图标（简化方案）
   const handleUpdateSingleIcon = async (website) => {
     try {
       showMessage('info', `正在更新 ${website.name} 的图标...`)
 
-      // 步骤1: 获取图标URL并保存
+      // 获取最新的图标URL
       const iconUrl = await getWebsiteIcon(website.url, true)
 
       if (iconUrl && iconUrl !== '/assets/logo.png') {
-        // 先保存图标URL
+        // 直接保存图标URL
         const updatedWebsites = config.websiteData.map(site =>
           site.id === website.id
             ? { ...site, icon: iconUrl }
@@ -797,29 +764,8 @@ const WebsiteManager = ({
         )
 
         onUpdateWebsiteData(updatedWebsites)
-        showMessage('success', `${website.name} 的图标URL已更新`)
-
-        // 步骤2: 后端下载图标到本地
-        try {
-          const hostname = new URL(website.url).hostname
-          const downloadResult = await downloadIconToLocal(hostname, iconUrl)
-
-          if (downloadResult.success) {
-            // 更新为本地路径
-            const finalUpdatedWebsites = config.websiteData.map(site =>
-              site.id === website.id
-                ? { ...site, icon: downloadResult.staticPath }
-                : site
-            )
-
-            onUpdateWebsiteData(finalUpdatedWebsites)
-            showMessage('success', `${website.name} 的图标已缓存到本地`)
-          } else {
-            showMessage('info', `${website.name} 图标下载失败，使用外网链接: ${downloadResult.error}`)
-          }
-        } catch (downloadError) {
-          showMessage('info', `${website.name} 图标下载失败，使用外网链接: ${downloadError.message}`)
-        }
+        showMessage('success', `${website.name} 的图标已更新`)
+        console.log('图标更新成功:', { name: website.name, iconUrl })
       } else {
         showMessage('warning', `${website.name} 的图标获取失败，保持原状`)
       }

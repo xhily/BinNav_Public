@@ -22,8 +22,8 @@ const WebsiteCard = ({ website }) => {
       }
       const mainDomain = getMainDomain(hostname)
 
-      // 直接使用Google Favicon API
-      return `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32`
+      // 使用Clearbit Logo API
+      return `https://logo.clearbit.com/${mainDomain}`
     } catch (error) {
       return logoImg
     }
@@ -49,13 +49,13 @@ const WebsiteCard = ({ website }) => {
 
       // 智能fallback策略
       if (e.target.src.includes('/cached-icons/')) {
-        // 静态文件失败，尝试Google API
-        e.target.src = `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32`
-        console.log('🔄 静态文件失败，尝试Google API:', e.target.src)
-      } else if (e.target.src.includes('gstatic.com') || e.target.src.includes('favicons')) {
-        // Google API失败，尝试DuckDuckGo
+        // 静态文件失败，尝试Clearbit API
+        e.target.src = `https://logo.clearbit.com/${mainDomain}`
+        console.log('🔄 静态文件失败，尝试Clearbit API:', e.target.src)
+      } else if (e.target.src.includes('clearbit.com')) {
+        // Clearbit失败，尝试DuckDuckGo
         e.target.src = `https://icons.duckduckgo.com/ip3/${mainDomain}.ico`
-        console.log('🔄 Google API失败，尝试DuckDuckGo:', e.target.src)
+        console.log('🔄 Clearbit失败，尝试DuckDuckGo:', e.target.src)
       } else if (e.target.src.includes('duckduckgo.com')) {
         // DuckDuckGo失败，尝试网站自己的favicon
         const domain = new URL(website.url).origin
