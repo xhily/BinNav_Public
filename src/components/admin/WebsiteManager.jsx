@@ -52,8 +52,7 @@ const SortableWebsiteItem = ({
             src={website.icon || (() => {
               try {
                 const hostname = new URL(website.url).hostname
-                const mainDomain = getMainDomain(hostname)
-                return `https://www.google.com/s2/favicons?domain=${mainDomain}&sz=32`
+                return `https://icon.nbvil.com/favicon?url=${hostname}`
               } catch {
                 return '/assets/logo.png'
               }
@@ -68,8 +67,8 @@ const SortableWebsiteItem = ({
               })
 
               // 如果存储的图标加载失败，尝试不同的回退方案
-              if (e.target.src.includes('gstatic.com') || e.target.src.includes('favicons')) {
-                // 如果Google API失败，尝试网站自己的favicon
+              if (e.target.src.includes('icon.nbvil.com')) {
+                // 如果自建API失败，尝试网站自己的favicon
                 try {
                   const domain = new URL(website.url).origin
                   e.target.src = `${domain}/favicon.ico`
@@ -546,14 +545,14 @@ const WebsiteManager = ({
         forceRefresh: forceRefresh
       })
 
-      // 1. 使用favicon.im API服务
+      // 1. 使用自建图标API服务
       const faviconAPIs = [
-        // favicon.im API - 支持多种域名格式
-        `https://favicon.im/${hostname}`,
+        // 自建图标API - 主要服务
+        `https://icon.nbvil.com/favicon?url=${hostname}`,
 
         // 如果完整域名和主域名不同，也尝试主域名
         ...(hostname !== mainDomain ? [
-          `https://favicon.im/${mainDomain}`,
+          `https://icon.nbvil.com/favicon?url=${mainDomain}`,
         ] : []),
 
         // 备用服务

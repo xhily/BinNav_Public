@@ -10,7 +10,7 @@ const WebsiteCard = ({ website }) => {
       return website.icon
     }
 
-    // 2. 如果没有缓存，使用Google API作为fallback
+    // 2. 如果没有缓存，使用自建图标API作为fallback
     try {
       const hostname = new URL(website.url).hostname
       const getMainDomain = (hostname) => {
@@ -22,8 +22,8 @@ const WebsiteCard = ({ website }) => {
       }
       const mainDomain = getMainDomain(hostname)
 
-      // 使用favicon.im API
-      return `https://favicon.im/${hostname}`
+      // 使用自建图标API
+      return `https://icon.nbvil.com/favicon?url=${hostname}`
     } catch (error) {
       return logoImg
     }
@@ -49,13 +49,13 @@ const WebsiteCard = ({ website }) => {
 
       // 智能fallback策略
       if (e.target.src.includes('/cached-icons/')) {
-        // 静态文件失败，尝试favicon.im API
-        e.target.src = `https://favicon.im/${hostname}`
-        console.log('🔄 静态文件失败，尝试favicon.im API:', e.target.src)
-      } else if (e.target.src.includes('favicon.im')) {
-        // favicon.im失败，尝试DuckDuckGo
+        // 静态文件失败，尝试自建图标API
+        e.target.src = `https://icon.nbvil.com/favicon?url=${hostname}`
+        console.log('🔄 静态文件失败，尝试自建图标API:', e.target.src)
+      } else if (e.target.src.includes('icon.nbvil.com')) {
+        // 自建API失败，尝试DuckDuckGo
         e.target.src = `https://icons.duckduckgo.com/ip3/${mainDomain}.ico`
-        console.log('🔄 favicon.im失败，尝试DuckDuckGo:', e.target.src)
+        console.log('🔄 自建API失败，尝试DuckDuckGo:', e.target.src)
       } else if (e.target.src.includes('duckduckgo.com')) {
         // DuckDuckGo失败，尝试网站自己的favicon
         const domain = new URL(website.url).origin
