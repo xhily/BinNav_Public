@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/8 14:33:25
+// 网站数据 - 通过管理后台更新于 2025/7/8 21:11:48
 
 // 站点配置
 export const siteConfig = {
@@ -78,7 +78,7 @@ export const websiteData = [
     "tags": [
       "视频"
     ],
-    "icon": "https://icons.duckduckgo.com/ip3/bilibili.com.ico"
+    "icon": "https://icon.nbvil.com/favicon?url=bilibili.com"
   },
   {
     "id": 45,
@@ -116,7 +116,7 @@ export const websiteData = [
       "AI",
       "对话"
     ],
-    "icon": "https://icons.duckduckgo.com/ip3/chatgpt.com.ico"
+    "icon": "https://icon.nbvil.com/favicon?url=chatgpt.com"
   },
   {
     "id": 1751812061558,
@@ -128,7 +128,7 @@ export const websiteData = [
       "AI",
       "对话"
     ],
-    "icon": "https://icons.duckduckgo.com/ip3/deepseek.com.ico"
+    "icon": "https://icon.nbvil.com/favicon?url=www.deepseek.com"
   },
   {
     "id": 1751813180037,
