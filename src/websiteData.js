@@ -1,4 +1,4 @@
-// 网站数据 - 通过管理后台更新于 2025/7/7 22:18:34
+// 网站数据 - 通过管理后台更新于 2025/7/8 14:33:25
 
 // 站点配置
 export const siteConfig = {
@@ -21,7 +21,7 @@ export const websiteData = [
     "tags": [
       "个人站点"
     ],
-    "icon": "https://icons.duckduckgo.com/ip3/bincore.cn.ico"
+    "icon": "https://icon.nbvil.com/favicon?url=i.bincore.cn"
   },
   {
     "id": 40,
@@ -34,7 +34,7 @@ export const websiteData = [
       "教程分享",
       "开发心得"
     ],
-    "icon": "https://icons.duckduckgo.com/ip3/nbvil.com.ico"
+    "icon": "https://icon.nbvil.com/favicon?url=blog.nbvil.com"
   },
   {
     "id": 1751813976438,
@@ -45,7 +45,7 @@ export const websiteData = [
     "tags": [
       "云盘"
     ],
-    "icon": "https://icons.duckduckgo.com/ip3/nbvil.com.ico"
+    "icon": "https://icon.nbvil.com/favicon?url=pan.nbvil.com"
   },
   {
     "id": 1751598590526,
@@ -56,7 +56,7 @@ export const websiteData = [
     "tags": [
       "视频"
     ],
-    "icon": "https://logo.clearbit.com/youtube.com"
+    "icon": "https://icon.nbvil.com/favicon?url=www.youtube.com"
   },
   {
     "id": 41,
@@ -67,7 +67,7 @@ export const websiteData = [
     "tags": [
       "开源项目"
     ],
-    "icon": "https://logo.clearbit.com/github.com"
+    "icon": "https://icon.nbvil.com/favicon?url=github.com"
   },
   {
     "id": 1751596898467,
@@ -78,7 +78,7 @@ export const websiteData = [
     "tags": [
       "视频"
     ],
-    "icon": "https://logo.clearbit.com/bilibili.com"
+    "icon": "https://icons.duckduckgo.com/ip3/bilibili.com.ico"
   },
   {
     "id": 45,
@@ -90,7 +90,7 @@ export const websiteData = [
       "知乎专栏",
       "技术文章"
     ],
-    "icon": "https://logo.clearbit.com/zhihu.com"
+    "icon": "https://icon.nbvil.com/favicon?url=www.zhihu.com"
   },
   {
     "id": 1751617129171,
@@ -104,7 +104,7 @@ export const websiteData = [
       "CDN",
       "DDOS"
     ],
-    "icon": "https://logo.clearbit.com/cloudflare.com"
+    "icon": "https://icon.nbvil.com/favicon?url=www.cloudflare.com"
   },
   {
     "id": 1751811992820,
@@ -140,7 +140,7 @@ export const websiteData = [
       "AI",
       "对话"
     ],
-    "icon": "https://logo.clearbit.com/grok.com"
+    "icon": "https://icon.nbvil.com/favicon?url=grok.com"
   },
   {
     "id": 1751812924193,
@@ -153,7 +153,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://logo.clearbit.com/augmentcode.com"
+    "icon": "https://icon.nbvil.com/favicon?url=www.augmentcode.com"
   },
   {
     "id": 1751812223718,
@@ -166,7 +166,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://icons.duckduckgo.com/ip3/claude.ai.ico"
+    "icon": "https://icon.nbvil.com/favicon?url=claude.ai"
   },
   {
     "id": 1751812327874,
@@ -179,7 +179,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://logo.clearbit.com/anthropic.com"
+    "icon": "https://icon.nbvil.com/favicon?url=www.anthropic.com"
   },
   {
     "id": 1751812429387,
@@ -192,7 +192,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://logo.clearbit.com/cursor.com"
+    "icon": "https://icon.nbvil.com/favicon?url=cursor.com"
   },
   {
     "id": 1751812786319,
@@ -205,7 +205,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://logo.clearbit.com/google.com"
+    "icon": "https://icon.nbvil.com/favicon?url=cloud.google.com"
   },
   {
     "id": 1751812826244,
@@ -218,7 +218,7 @@ export const websiteData = [
       "工具",
       "开发"
     ],
-    "icon": "https://logo.clearbit.com/google.com"
+    "icon": "https://icon.nbvil.com/favicon?url=cloud.google.com"
   },
   {
     "id": 33,
@@ -231,7 +231,7 @@ export const websiteData = [
       "开发工具",
       "微软"
     ],
-    "icon": "https://logo.clearbit.com/visualstudio.com",
+    "icon": "https://icon.nbvil.com/favicon?url=code.visualstudio.com",
     "popularity": 93
   },
   {
@@ -244,7 +244,7 @@ export const websiteData = [
       "SSH",
       "开发"
     ],
-    "icon": "https://logo.clearbit.com/xshell.com"
+    "icon": "https://icon.nbvil.com/favicon?url=www.xshell.com"
   },
   {
     "id": 1751813515058,
@@ -256,7 +256,7 @@ export const websiteData = [
       "SSH",
       "开发"
     ],
-    "icon": "https://logo.clearbit.com/termius.com"
+    "icon": "https://icon.nbvil.com/favicon?url=termius.com"
   },
   {
     "id": 1751807806262,
@@ -268,7 +268,7 @@ export const websiteData = [
       "网站",
       "CDN"
     ],
-    "icon": "https://logo.clearbit.com/edgeone.ai"
+    "icon": "https://icon.nbvil.com/favicon?url=edgeone.ai"
   }
 ];
 
@@ -365,5 +365,5 @@ export const siteStats = {
   totalSites: websiteData.length,
   totalCategories: categories.length,
   totalTags: [...new Set(websiteData.flatMap(site => site.tags || []))].length,
-  lastUpdated: "2025-07-07"
+  lastUpdated: "2025-07-08"
 };
