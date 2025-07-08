@@ -47,25 +47,16 @@ const WebsiteCard = ({ website }) => {
       }
       const mainDomain = getMainDomain(hostname)
 
-      // 智能fallback策略
+      // 简化fallback策略 - 只使用自建API和默认图标
       if (e.target.src.includes('/cached-icons/')) {
         // 静态文件失败，尝试自建图标API
         e.target.src = `https://icon.nbvil.com/favicon?url=${hostname}`
         console.log('🔄 静态文件失败，尝试自建图标API:', e.target.src)
-      } else if (e.target.src.includes('icon.nbvil.com')) {
-        // 自建API失败，尝试DuckDuckGo
-        e.target.src = `https://icons.duckduckgo.com/ip3/${mainDomain}.ico`
-        console.log('🔄 自建API失败，尝试DuckDuckGo:', e.target.src)
-      } else if (e.target.src.includes('duckduckgo.com')) {
-        // DuckDuckGo失败，尝试网站自己的favicon
-        const domain = new URL(website.url).origin
-        e.target.src = `${domain}/favicon.ico`
-        console.log('🔄 DuckDuckGo失败，尝试网站favicon:', e.target.src)
       } else {
-        // 最终回退到默认图标
+        // 自建API失败，直接使用默认图标
         e.target.src = logoImg
         e.target.onerror = null // 防止无限循环
-        console.log('🔄 使用默认图标')
+        console.log('🔄 自建API失败，使用默认图标')
       }
     } catch (error) {
       // 如果URL解析失败，直接使用默认图标

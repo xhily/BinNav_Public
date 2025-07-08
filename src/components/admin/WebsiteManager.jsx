@@ -423,9 +423,17 @@ const WebsiteManager = ({
   // 测试图标URL是否有效且不是默认图标
   const testIconUrl = (url) => {
     return new Promise((resolve) => {
+      console.log(`🔍 开始测试图标URL: ${url}`)
+
       const img = new Image()
 
       img.onload = () => {
+        console.log(`📥 图标加载完成: ${url}`, {
+          width: img.naturalWidth,
+          height: img.naturalHeight,
+          complete: img.complete
+        })
+
         // 检查是否为默认图标
         if (isDefaultIcon(img, url)) {
           console.log(`⚠️ 检测到默认图标: ${url} (${img.naturalWidth}x${img.naturalHeight})`)
@@ -437,102 +445,51 @@ const WebsiteManager = ({
       }
 
       img.onerror = (error) => {
-        console.log(`❌ 图标加载失败: ${url}`, error)
+        console.log(`❌ 图标加载失败: ${url}`, {
+          error: error,
+          type: error.type,
+          target: error.target
+        })
         resolve(false)
       }
 
-      // 不设置crossOrigin，避免CORS问题
+      // 设置crossOrigin为anonymous，尝试支持CORS
+      img.crossOrigin = 'anonymous'
       img.src = url
 
-      // 3秒超时
+      // 5秒超时（增加超时时间）
       setTimeout(() => {
         console.log(`⏰ 图标加载超时: ${url}`)
         resolve(false)
-      }, 3000)
+      }, 5000)
     })
   }
 
-  // 从HTML中解析图标链接
-  const parseIconFromHTML = async (url) => {
+
+
+  // 测试自建API是否工作
+  const testCustomAPI = async () => {
+    const testUrl = 'https://icon.nbvil.com/favicon?url=github.com'
+    console.log('🧪 测试自建API:', testUrl)
+
     try {
-      console.log('🔍 尝试从HTML解析图标:', url)
-
-      // 尝试多个代理服务
-      const proxyServices = [
-        `https://corsproxy.io/?${encodeURIComponent(url)}`,
-        `https://cors-anywhere.herokuapp.com/${url}`,
-        // 如果代理都失败，尝试直接访问（可能会有CORS问题，但值得一试）
-        url
-      ]
-
-      for (const proxyUrl of proxyServices) {
-        try {
-          console.log(`🔄 尝试代理: ${proxyUrl}`)
-          const response = await fetch(proxyUrl, {
-            headers: {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            }
-          })
-
-          if (!response.ok) {
-            console.log(`❌ 代理失败: ${proxyUrl}`)
-            continue
-          }
-
-          const html = await response.text()
-
-          // 创建临时DOM来解析HTML
-          const parser = new DOMParser()
-          const doc = parser.parseFromString(html, 'text/html')
-
-          const iconUrls = []
-          const origin = new URL(url).origin
-
-          // 查找各种图标链接
-          const iconSelectors = [
-            'link[rel="icon"]',
-            'link[rel="shortcut icon"]',
-            'link[rel="apple-touch-icon"]',
-            'link[rel="apple-touch-icon-precomposed"]',
-            'link[rel="mask-icon"]'
-          ]
-
-          iconSelectors.forEach(selector => {
-            const elements = doc.querySelectorAll(selector)
-            elements.forEach(element => {
-              let iconUrl = element.getAttribute('href')
-              if (iconUrl) {
-                // 处理相对路径
-                if (iconUrl.startsWith('/')) {
-                  iconUrl = origin + iconUrl
-                } else if (!iconUrl.startsWith('http')) {
-                  iconUrl = origin + '/' + iconUrl
-                }
-                iconUrls.push(iconUrl)
-              }
-            })
-          })
-
-          console.log('🎯 从HTML解析到的图标:', iconUrls)
-          return iconUrls
-
-        } catch (error) {
-          console.log(`❌ 代理服务失败: ${proxyUrl}`, error)
-          continue
-        }
-      }
-
-      console.log('❌ 所有代理服务都失败')
-      return []
-
+      const response = await fetch(testUrl, { method: 'HEAD' })
+      console.log('🧪 API响应状态:', response.status, response.statusText)
+      console.log('🧪 API响应头:', Object.fromEntries(response.headers.entries()))
+      return response.ok
     } catch (error) {
-      console.log('❌ HTML解析失败:', error)
-      return []
+      console.log('🧪 API测试失败:', error)
+      return false
     }
   }
 
-  // 获取网站图标 - 简化逻辑：先用默认API，失败后解析HTML
+  // 获取网站图标 - 只使用自建API
   const getWebsiteIcon = async (url, forceRefresh = false) => {
+    // 首次调用时测试API
+    if (forceRefresh) {
+      await testCustomAPI()
+    }
+
     try {
       const urlObj = new URL(url)
       const hostname = urlObj.hostname
@@ -545,63 +502,42 @@ const WebsiteManager = ({
         forceRefresh: forceRefresh
       })
 
-      // 1. 使用自建图标API服务
+      // 1. 使用自建图标API服务（只保留自建API）
       const faviconAPIs = [
-        // 自建图标API - 主要服务
+        // 自建图标API - 使用完整域名
         `https://icon.nbvil.com/favicon?url=${hostname}`,
 
         // 如果完整域名和主域名不同，也尝试主域名
         ...(hostname !== mainDomain ? [
           `https://icon.nbvil.com/favicon?url=${mainDomain}`,
-        ] : []),
-
-        // 备用服务
-        `https://icons.duckduckgo.com/ip3/${mainDomain}.ico`,
-        `https://${mainDomain}/favicon.ico`,
-
-        // 如果主域名和完整域名不同，尝试完整域名的其他服务
-        ...(hostname !== mainDomain ? [
-          `https://icons.duckduckgo.com/ip3/${hostname}.ico`,
-          `https://${hostname}/favicon.ico`
         ] : [])
       ]
 
-      console.log('🔍 测试Favicon API服务:', faviconAPIs)
+      console.log('🔍 开始获取图标:', {
+        originalUrl: url,
+        hostname,
+        mainDomain,
+        forceRefresh,
+        apiList: faviconAPIs
+      })
 
       for (const apiUrl of faviconAPIs) {
-        console.log(`🔍 测试API: ${apiUrl}`)
-        const isValid = await testIconUrl(apiUrl)
-        if (isValid) {
-          console.log(`✅ API成功: ${apiUrl}`)
-          return apiUrl
-        } else {
-          console.log(`❌ API失败: ${apiUrl}`)
-        }
-      }
-
-      console.log('❌ 所有Favicon API都失败，尝试解析HTML')
-
-      // 2. 如果Google API失败，解析HTML查找图标
-      const htmlIcons = await parseIconFromHTML(url)
-
-      if (htmlIcons.length > 0) {
-        console.log('🧪 测试HTML解析的图标:', htmlIcons)
-
-        // 测试HTML中找到的图标
-        for (const iconUrl of htmlIcons) {
-          console.log(`🔍 测试HTML图标: ${iconUrl}`)
-          const isValid = await testIconUrl(iconUrl)
+        console.log(`🔍 测试自建API: ${apiUrl}`)
+        try {
+          const isValid = await testIconUrl(apiUrl)
           if (isValid) {
-            console.log(`✅ 找到有效HTML图标: ${iconUrl}`)
-            return iconUrl
+            console.log(`✅ 自建API成功: ${apiUrl}`)
+            return apiUrl
           } else {
-            console.log(`❌ HTML图标无效: ${iconUrl}`)
+            console.log(`❌ 自建API失败: ${apiUrl}`)
           }
+        } catch (error) {
+          console.log(`❌ 自建API异常: ${apiUrl}`, error)
         }
       }
 
-      // 3. 如果都失败，使用默认图标
-      console.log('⚠️ 所有图标都无效，使用默认图标')
+      // 2. 如果自建API都失败，使用默认图标
+      console.log('⚠️ 自建API都失败，使用默认图标')
       return '/assets/logo.png'
 
     } catch (error) {
