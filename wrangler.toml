@@ -2,15 +2,16 @@ name = "binnav"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
-# Pages configuration for static site
+[env.production]
+name = "binnav"
+
+[env.preview]
+name = "binnav-preview"
+
+# Pages configuration
 pages_build_output_dir = "dist"
 
-# Functions configuration
-[build]
-command = "npm run build"
-
 # Environment variables (set these in Cloudflare dashboard)
-# 移除了VITE_前缀，使用统一的变量名
 # ADMIN_PASSWORD = "your_admin_password"
 # GITHUB_TOKEN = "your_github_token"
 # GITHUB_REPO = "username/repository"

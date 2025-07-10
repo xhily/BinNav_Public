@@ -4,14 +4,14 @@
 
 ### 1. 一键部署
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav&project-name=BinNav)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav_Public&project-name=BinNav_Public)
 
 ### 2. 手动部署
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/sindricn/BinNav.git
-cd BinNav
+git clone https://github.com/sindricn/BinNav_Public.git
+cd BinNav_Public
 
 # 2. 安装 Vercel CLI
 npm install -g vercel
@@ -100,6 +100,12 @@ vercel --prod
 3. 复制API密钥
 
 ## 🚨 常见问题
+
+### Q: 部署时出现Function Runtime错误？
+**A:** 这通常是vercel.json配置问题：
+- 确保使用正确的runtime格式：`nodejs20.x`
+- 检查vercel.json语法是否正确
+- 如果问题持续，可以删除vercel.json让Vercel自动检测
 
 ### Q: 部署后无法访问管理后台？
 **A:** 检查以下几点：
