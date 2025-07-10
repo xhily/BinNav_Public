@@ -24,10 +24,10 @@ export async function onRequest(context) {
   }
 
   try {
-    // 获取环境变量（支持多平台）
-    const GITHUB_TOKEN = env?.VITE_GITHUB_TOKEN || env?.GITHUB_TOKEN;
-    const GITHUB_REPO = env?.VITE_GITHUB_REPO || env?.GITHUB_REPO;
-    const ADMIN_PASSWORD = env?.VITE_ADMIN_PASSWORD || env?.ADMIN_PASSWORD;
+    // 获取环境变量
+    const GITHUB_TOKEN = env?.GITHUB_TOKEN;
+    const GITHUB_REPO = env?.GITHUB_REPO;
+    const ADMIN_PASSWORD = env?.ADMIN_PASSWORD;
     const RESEND_API_KEY = env?.RESEND_API_KEY;
     const ADMIN_EMAIL = env?.ADMIN_EMAIL;
     const RESEND_DOMAIN = env?.RESEND_DOMAIN;

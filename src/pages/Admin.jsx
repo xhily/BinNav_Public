@@ -125,7 +125,7 @@ function Admin() {
   // 本地密码验证备用方案
   const tryLocalPasswordVerification = (inputPassword) => {
     // 这里可以设置本地备用密码，建议使用环境变量
-    const localPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'admin'
+    const localPassword = import.meta.env.ADMIN_PASSWORD || 'admin'
 
     // 简单的密码验证
     return inputPassword === localPassword

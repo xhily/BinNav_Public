@@ -21,16 +21,16 @@
 
 | 变量名 | 描述 | 必需 | 默认值 | 功能影响 |
 |--------|------|------|--------|----------|
-| `VITE_ADMIN_PASSWORD` | 管理后台登录密码 | 否 | `admin` | 未设置时使用默认密码 |
-| `VITE_GITHUB_TOKEN` | GitHub Personal Access Token | 否 | - | 未设置时无法自动保存配置到GitHub |
-| `VITE_GITHUB_REPO` | GitHub仓库名（格式：用户名/仓库名） | 否 | - | 未设置时无法自动保存配置到GitHub |
+| `ADMIN_PASSWORD` | 管理后台登录密码 | 否 | `admin` | 未设置时使用默认密码 |
+| `GITHUB_TOKEN` | GitHub Personal Access Token | 否 | - | 未设置时无法自动保存配置到GitHub |
+| `GITHUB_REPO` | GitHub仓库名（格式：用户名/仓库名） | 否 | - | 未设置时无法自动保存配置到GitHub |
 | `RESEND_API_KEY` | Resend API Key，用于邮件服务 | 否 | - | 未设置时无法发送邮件通知 |
 | `ADMIN_EMAIL` | 管理员邮箱，接收新站点提交通知 | 否 | - | 未设置时无法接收邮件通知 |
 | `RESEND_DOMAIN` | Resend发送域名（仅域名部分） | 否 | - | 未设置时无法发送邮件通知 |
 
 ### 功能说明
 - **基础功能**：无需任何配置即可正常使用导航和管理后台
-- **自动保存**：需要配置 `VITE_GITHUB_TOKEN` 和 `VITE_GITHUB_REPO`
+- **自动保存**：需要配置 `GITHUB_TOKEN` 和 `GITHUB_REPO`
 - **邮件通知**：需要配置 `RESEND_API_KEY`、`ADMIN_EMAIL` 和 `RESEND_DOMAIN`
 
 ### 管理后台登录
@@ -49,10 +49,10 @@
 ### 一键部署（推荐）
 
 #### EdgeOne Pages（国内推荐）
-[![使用 EdgeOne Pages 部署](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav&project-name=BinNav&build-command=npm%20run%20build&install-command=npm%20install&output-directory=dist&env=VITE_ADMIN_PASSWORD,VITE_GITHUB_TOKEN,VITE_GITHUB_REPO,RESEND_API_KEY,ADMIN_EMAIL,RESEND_DOMAIN&env-description=管理后台密码、GitHub令牌、仓库名称、邮件服务配置&env-link=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav%23%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E9%85%8D%E7%BD%AE)
+[![使用 EdgeOne Pages 部署](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav&project-name=BinNav&build-command=npm%20run%20build&install-command=npm%20install&output-directory=dist&env=ADMIN_PASSWORD,GITHUB_TOKEN,GITHUB_REPO,RESEND_API_KEY,ADMIN_EMAIL,RESEND_DOMAIN&env-description=管理后台密码、GitHub令牌、仓库名称、邮件服务配置&env-link=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav%23%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E9%85%8D%E7%BD%AE)
 
 #### Vercel（国外推荐）
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav&project-name=BinNav&env=VITE_ADMIN_PASSWORD,VITE_GITHUB_TOKEN,VITE_GITHUB_REPO,RESEND_API_KEY,ADMIN_EMAIL,RESEND_DOMAIN&envDescription=管理后台密码、GitHub令牌、仓库名称、邮件服务配置&envLink=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav%23%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E9%85%8D%E7%BD%AE)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav&project-name=BinNav&env=ADMIN_PASSWORD,GITHUB_TOKEN,GITHUB_REPO,RESEND_API_KEY,ADMIN_EMAIL,RESEND_DOMAIN&envDescription=管理后台密码、GitHub令牌、仓库名称、邮件服务配置&envLink=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav%23%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E9%85%8D%E7%BD%AE)
 
 #### Cloudflare Pages
 [![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/sindricn/BinNav)
@@ -126,15 +126,15 @@ npm run dev
 - **访问地址**：`/admin`
 - **用户名**：无需用户名
 - **默认密码**：`admin`
-- **修改密码**：设置环境变量 `VITE_ADMIN_PASSWORD`
+- **修改密码**：设置环境变量 `ADMIN_PASSWORD`
 </details>
 
 <details>
 <summary><strong>Q: 为什么无法自动保存配置？</strong></summary>
 
 **A:** 自动保存功能需要配置：
-- `VITE_GITHUB_TOKEN` - GitHub访问令牌
-- `VITE_GITHUB_REPO` - 仓库名称（格式：用户名/仓库名）
+- `GITHUB_TOKEN` - GitHub访问令牌
+- `GITHUB_REPO` - 仓库名称（格式：用户名/仓库名）
 - 未配置时可手动下载配置文件
 </details>
 

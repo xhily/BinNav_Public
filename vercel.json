@@ -35,9 +35,9 @@
     }
   ],
   "env": {
-    "VITE_ADMIN_PASSWORD": "@vite_admin_password",
-    "VITE_GITHUB_TOKEN": "@vite_github_token",
-    "VITE_GITHUB_REPO": "@vite_github_repo",
+    "ADMIN_PASSWORD": "@admin_password",
+    "GITHUB_TOKEN": "@github_token",
+    "GITHUB_REPO": "@github_repo",
     "RESEND_API_KEY": "@resend_api_key",
     "ADMIN_EMAIL": "@admin_email",
     "RESEND_DOMAIN": "@resend_domain"

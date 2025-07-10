@@ -19,9 +19,9 @@ export async function onRequest(context) {
     });
   }
 
-  // 获取环境变量（支持多平台）
-  const GITHUB_TOKEN = env?.VITE_GITHUB_TOKEN || env?.GITHUB_TOKEN;
-  const GITHUB_REPO = env?.VITE_GITHUB_REPO || env?.GITHUB_REPO;
+  // 获取环境变量
+  const GITHUB_TOKEN = env?.GITHUB_TOKEN;
+  const GITHUB_REPO = env?.GITHUB_REPO;
 
   if (!GITHUB_TOKEN) {
     return new Response(JSON.stringify({

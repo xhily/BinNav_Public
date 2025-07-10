@@ -6,16 +6,16 @@
   "framework": "vite",
   "nodeVersion": "20.x",
   "environmentVariables": {
-    "VITE_ADMIN_PASSWORD": {
+    "ADMIN_PASSWORD": {
       "description": "管理后台登录密码",
       "required": false,
       "default": "admin"
     },
-    "VITE_GITHUB_TOKEN": {
+    "GITHUB_TOKEN": {
       "description": "GitHub Personal Access Token，用于自动更新配置文件",
       "required": false
     },
-    "VITE_GITHUB_REPO": {
+    "GITHUB_REPO": {
       "description": "GitHub仓库名称，格式：用户名/仓库名",
       "required": false
     },
