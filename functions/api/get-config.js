@@ -167,11 +167,7 @@ export async function onRequest(context) {
       success: false,
       error: '获取配置失败',
       message: error.message,
-      debug: {
-        timestamp: new Date().toISOString(),
-        errorName: error.name,
-        stack: error.stack
-      }
+      timestamp: new Date().toISOString()
     }), {
       status: 500,
       headers: { 

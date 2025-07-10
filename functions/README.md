@@ -1,8 +1,8 @@
-# EdgeOne Functions 说明
+# EdgeOne Functions 开发说明
 
 ## 概述
 
-本目录包含EdgeOne Functions的代码，用于处理BinNav导航网站的后端API操作。
+本目录包含EdgeOne Functions的代码，用于处理BinNav导航网站的后端API操作。这是开发者文档，详细说明了API的实现和开发相关信息。
 
 ## 文件结构
 
@@ -18,7 +18,7 @@ functions/
     ├── upload-icon.js  # 上传图标 - POST /api/upload-icon
     ├── delete-icon.js  # 删除图标 - POST /api/delete-icon
     ├── list-icons.js   # 获取图标列表 - GET /api/list-icons
-    └── debug-test.js   # 调试测试 - GET /api/debug-test
+    └── get-version.js  # 获取版本信息 - GET /api/get-version
 ```
 
 ## API端点
@@ -137,13 +137,7 @@ functions/
 - ✅ **错误处理**: 完善的错误处理和日志记录
 - ✅ **权限最小化**: GitHub Token只需要`repo`权限
 
-## 部署说明
-
-1. **自动部署**: 代码推送到GitHub后，EdgeOne Pages会自动检测并部署Functions
-2. **路由映射**: Functions会自动映射到对应的URL路径
-3. **全球分布**: Functions在EdgeOne的全球节点上运行，提供低延迟访问
-
-## 调试和监控
+## 开发和调试
 
 ### 本地开发
 ```bash
@@ -157,15 +151,37 @@ edgeone dev
 ### 查看日志
 在EdgeOne控制台可以查看Functions的执行日志和性能监控信息。
 
-## 最佳实践
+### API测试
+可以使用以下工具测试API：
+- **Postman**: 导入API集合进行测试
+- **curl**: 命令行测试
+- **浏览器**: 测试GET请求
 
+### 部署说明
+
+1. **自动部署**: 代码推送到GitHub后，EdgeOne Pages会自动检测并部署Functions
+2. **路由映射**: Functions会自动映射到对应的URL路径
+3. **全球分布**: Functions在EdgeOne的全球节点上运行，提供低延迟访问
+
+## 开发最佳实践
+
+### 代码规范
 1. **错误处理**: 始终包含适当的错误处理逻辑
-2. **日志记录**: 使用`console.log`记录关键操作
-3. **响应格式**: 保持一致的JSON响应格式
-4. **CORS配置**: 确保所有端点都配置了正确的CORS头
-5. **安全验证**: 在需要时添加适当的身份验证逻辑
+2. **响应格式**: 保持一致的JSON响应格式
+3. **CORS配置**: 确保所有端点都配置了正确的CORS头
+4. **安全验证**: 在需要时添加适当的身份验证逻辑
 
-## 与传统方案对比
+### 性能优化
+1. **缓存策略**: 合理使用缓存减少API调用
+2. **错误重试**: 实现适当的重试机制
+3. **超时设置**: 设置合理的请求超时时间
+
+### 安全考虑
+1. **环境变量**: 敏感信息存储在环境变量中
+2. **输入验证**: 验证所有用户输入
+3. **权限最小化**: GitHub Token只需要必要的权限
+
+## 技术架构对比
 
 | 特性 | GitHub Actions | EdgeOne Functions |
 |------|----------------|-------------------|
@@ -173,4 +189,21 @@ edgeone dev
 | 架构复杂度 | 高（需要工作流） | 低（直接API调用） |
 | 安全性 | 中等 | 高（服务端隔离） |
 | 维护成本 | 高 | 低 |
-| 全球性能 | 一般 | 优秀（边缘计算） | 
+| 全球性能 | 一般 | 优秀（边缘计算） |
+
+## 开发贡献
+
+如果你想为项目贡献代码：
+
+1. Fork 项目仓库
+2. 创建功能分支
+3. 编写和测试新功能
+4. 提交 Pull Request
+5. 等待代码审查
+
+### 新增API端点
+1. 在 `functions/api/` 目录创建新文件
+2. 实现API逻辑
+3. 更新本文档
+4. 添加相应的前端调用代码
+5. 测试功能完整性

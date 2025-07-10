@@ -102,11 +102,7 @@ export async function onRequestPost({ request, env }) {
       console.error('解析待审核数据失败:', error);
       return new Response(JSON.stringify({
         success: false,
-        message: '数据格式错误: ' + error.message,
-        debug: {
-          error: error.name,
-          message: error.message
-        }
+        message: '数据格式错误: ' + error.message
       }), {
         status: 500,
         headers: { 
@@ -117,19 +113,11 @@ export async function onRequestPost({ request, env }) {
     }
 
     // 查找目标网站
-    console.log('查找网站ID:', websiteId, '类型:', typeof websiteId);
-    console.log('待审核网站列表:', pendingWebsites.map(site => ({ id: site.id, name: site.name, idType: typeof site.id })));
-    
     const websiteIndex = pendingWebsites.findIndex(site => site.id == websiteId); // 使用宽松比较
     if (websiteIndex === -1) {
       return new Response(JSON.stringify({
         success: false,
-        message: `未找到指定的站点 (ID: ${websiteId})`,
-        debug: {
-          searchId: websiteId,
-          searchIdType: typeof websiteId,
-          availableIds: pendingWebsites.map(site => ({ id: site.id, type: typeof site.id, name: site.name }))
-        }
+        message: `未找到指定的站点 (ID: ${websiteId})`
       }), {
         status: 404,
         headers: { 
@@ -401,10 +389,9 @@ export async function onRequestPost({ request, env }) {
         });
 
         if (!emailResponse.ok) {
-          console.error('发送审核通知邮件失败:', await emailResponse.text());
+          // 发送审核通知邮件失败
         }
       } catch (emailError) {
-        console.error('邮件发送失败:', emailError);
         // 邮件发送失败不影响审核操作
       }
     }

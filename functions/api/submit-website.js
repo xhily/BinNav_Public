@@ -148,7 +148,7 @@ export async function onRequestPost({ request, env }) {
         pendingWebsites = JSON.parse(content);
       }
     } catch (error) {
-      console.log('获取现有待审核列表失败，使用空列表:', error);
+      // 获取现有待审核列表失败，使用空列表
     }
 
     // 检查是否重复提交
@@ -391,17 +391,14 @@ export async function onRequestPost({ request, env }) {
       submissionId: submissionId
     };
     
-    // 只在开发/测试时添加邮件状态信息
+    // 添加邮件状态信息
     try {
       responseData.email_status = {
         admin_email_sent: emailStatus.admin_email_sent,
-        submitter_email_sent: emailStatus.submitter_email_sent,
-        admin_email_error: emailStatus.admin_email_error ? String(emailStatus.admin_email_error).substring(0, 100) : null,
-        submitter_email_error: emailStatus.submitter_email_error ? String(emailStatus.submitter_email_error).substring(0, 100) : null
+        submitter_email_sent: emailStatus.submitter_email_sent
       };
     } catch (e) {
       // 如果邮件状态有问题，忽略它
-      responseData.debug_note = "邮件状态信息序列化失败";
     }
 
     return new Response(JSON.stringify(responseData), {
@@ -413,8 +410,6 @@ export async function onRequestPost({ request, env }) {
     });
 
   } catch (error) {
-    console.error('站点提交失败:', error);
-    
     return new Response(JSON.stringify({
       success: false,
       message: '提交失败: ' + error.message,

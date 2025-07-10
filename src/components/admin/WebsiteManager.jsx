@@ -139,7 +139,7 @@ const SortableWebsiteItem = ({
           <button
             onClick={() => onUpdateIcon(website)}
             className="text-green-600 hover:text-green-800 p-1"
-            title="更新图标缓存"
+            title="更新图标"
           >
             <RefreshCw size={14} />
           </button>
@@ -422,28 +422,10 @@ const WebsiteManager = ({
 
 
 
-  // 测试自建API是否工作
-  const testCustomAPI = async () => {
-    const testUrl = 'https://icon.nbvil.com/favicon?url=github.com'
-    console.log('🧪 测试自建API:', testUrl)
 
-    try {
-      const response = await fetch(testUrl, { method: 'HEAD' })
-      console.log('🧪 API响应状态:', response.status, response.statusText)
-      console.log('🧪 API响应头:', Object.fromEntries(response.headers.entries()))
-      return response.ok
-    } catch (error) {
-      console.log('🧪 API测试失败:', error)
-      return false
-    }
-  }
 
   // 获取网站图标 - 只使用自建API
   const getWebsiteIcon = async (url, forceRefresh = false) => {
-    // 首次调用时测试API
-    if (forceRefresh) {
-      await testCustomAPI()
-    }
 
     try {
       const urlObj = new URL(url)

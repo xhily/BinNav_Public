@@ -70,7 +70,7 @@ export async function onRequest(context) {
         const packageJson = JSON.parse(packageContent);
         currentVersion = packageJson.version || '1.0.0';
       } catch (parseError) {
-        console.warn('解析package.json失败:', parseError);
+        // 解析package.json失败，使用默认版本
       }
     }
 
@@ -123,8 +123,6 @@ export async function onRequest(context) {
     });
 
   } catch (error) {
-    console.error('获取版本信息失败:', error);
-
     return new Response(JSON.stringify({
       success: false,
       error: error.message,

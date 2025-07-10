@@ -7,8 +7,8 @@ import SubmitWebsiteForm from '../components/SubmitWebsiteForm.jsx'
 import { websiteData, categories } from '../websiteData.js'
 import { useSiteConfig } from '../hooks/useSiteConfig.js'
 
-// 导入图片
-import logoImg from '../assets/logo.png'
+// 使用public路径引用logo
+const logoImg = '/assets/logo.png'
 
 function HomePage() {
   const [searchTerm, setSearchTerm] = useState('')

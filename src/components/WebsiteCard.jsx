@@ -1,16 +1,15 @@
 import React from 'react'
 import { Card, CardContent } from './ui/card'
-import logoImg from '../assets/logo.png'
 
 const WebsiteCard = ({ website }) => {
-  // 优先使用缓存的图标，fallback到外网服务
+  // 优先使用网站数据中的图标，fallback到自建API
   const getIconUrl = () => {
     // 1. 优先使用网站数据中的图标（静态文件路径或外网URL）
     if (website.icon) {
       return website.icon
     }
 
-    // 2. 如果没有缓存，使用自建图标API作为fallback
+    // 2. 如果没有图标，使用自建图标API作为fallback
     try {
       const hostname = new URL(website.url).hostname
       const getMainDomain = (hostname) => {
@@ -25,7 +24,7 @@ const WebsiteCard = ({ website }) => {
       // 使用自建图标API
       return `https://icon.nbvil.com/favicon?url=${hostname}`
     } catch (error) {
-      return logoImg
+      return '/assets/logo.png'
     }
   }
 
@@ -47,20 +46,13 @@ const WebsiteCard = ({ website }) => {
       }
       const mainDomain = getMainDomain(hostname)
 
-      // 简化fallback策略 - 只使用自建API和默认图标
-      if (e.target.src.includes('/cached-icons/')) {
-        // 静态文件失败，尝试自建图标API
-        e.target.src = `https://icon.nbvil.com/favicon?url=${hostname}`
-        console.log('🔄 静态文件失败，尝试自建图标API:', e.target.src)
-      } else {
-        // 自建API失败，直接使用默认图标
-        e.target.src = logoImg
-        e.target.onerror = null // 防止无限循环
-        console.log('🔄 自建API失败，使用默认图标')
-      }
+      // 简化fallback策略 - 自建API失败直接使用默认图标
+      e.target.src = '/assets/logo.png'
+      e.target.onerror = null // 防止无限循环
+      console.log('🔄 自建API失败，使用默认图标')
     } catch (error) {
       // 如果URL解析失败，直接使用默认图标
-      e.target.src = logoImg
+      e.target.src = '/assets/logo.png'
       e.target.onerror = null
       console.log('🔄 URL解析失败，使用默认图标')
     }
