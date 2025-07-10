@@ -111,11 +111,24 @@ wrangler pages deploy dist
 - 尝试手动在Cloudflare Dashboard中连接仓库
 - 清除浏览器缓存后重试
 
+### Q: 部署时出现"Multiple environments"警告？
+**A:** 这是wrangler.toml多环境配置问题：
+- 删除 `[env.production]` 和 `[env.preview]` 配置块
+- 或者在部署时指定环境：`wrangler pages deploy dist --env=""`
+
+### Q: 部署时出现"Missing entry-point"错误？
+**A:** 这是Cloudflare Pages配置问题：
+- 确保 `pages_build_output_dir = "dist"` 配置正确
+- **不要使用** `_routes.json` 文件（会导致一键部署失败）
+- 检查 `functions` 目录结构是否正确
+- 如果问题持续，尝试删除 `wrangler.toml` 让Cloudflare自动检测
+
 ### Q: 部署后Functions不工作？
 **A:** 检查以下几点：
 - 确保 `functions` 目录存在且包含API文件
-- 检查 `wrangler.toml` 配置是否正确
-- 确认没有 `_routes.json` 文件冲突
+- Cloudflare Pages会自动检测 `functions` 目录中的API
+- 确认环境变量配置正确
+- Functions路径应该是 `/api/function-name`
 
 ### Q: 环境变量不生效？
 **A:** 

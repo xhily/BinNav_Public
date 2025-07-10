@@ -102,10 +102,31 @@ vercel --prod
 ## 🚨 常见问题
 
 ### Q: 部署时出现Function Runtime错误？
-**A:** 这通常是vercel.json配置问题：
-- 确保使用正确的runtime格式：`nodejs20.x`
-- 检查vercel.json语法是否正确
-- 如果问题持续，可以删除vercel.json让Vercel自动检测
+**A:** 这是vercel.json中runtime配置问题，尝试以下解决方案：
+
+**方案1**: 使用@vercel/node格式
+```json
+{
+  "functions": {
+    "functions/api/*.js": {
+      "runtime": "@vercel/node@3.0.7"
+    }
+  }
+}
+```
+
+**方案2**: 使用简化配置（推荐）
+删除当前的vercel.json，重命名vercel-simple.json为vercel.json：
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install"
+}
+```
+
+**方案3**: 完全删除vercel.json
+让Vercel自动检测项目配置
 
 ### Q: 部署后无法访问管理后台？
 **A:** 检查以下几点：
