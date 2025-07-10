@@ -2,7 +2,49 @@
 
 一个现代化的网站导航页面，发现优质网站，提升工作效率。支持可视化管理后台、智能图标获取、拖拽排序和自动部署更新。
 
-## 🚀 快速部署
+## 🌐 在线预览
+
+**[🔗 查看演示站点](https://bincore.cn/)**
+
+## 📸 项目预览
+
+### 首页展示
+![首页](https://via.placeholder.com/800x400/f8fafc/64748b?text=BinNav+首页展示)
+
+### 管理后台
+![管理后台](https://via.placeholder.com/800x400/f8fafc/64748b?text=管理后台界面)
+
+## ⚙️ 环境变量配置
+
+### 基础配置
+项目可以零配置运行，但为了完整功能体验，建议配置以下环境变量：
+
+| 变量名 | 描述 | 必需 | 默认值 | 功能影响 |
+|--------|------|------|--------|----------|
+| `VITE_ADMIN_PASSWORD` | 管理后台登录密码 | 否 | `admin` | 未设置时使用默认密码 |
+| `VITE_GITHUB_TOKEN` | GitHub Personal Access Token | 否 | - | 未设置时无法自动保存配置到GitHub |
+| `VITE_GITHUB_REPO` | GitHub仓库名（格式：用户名/仓库名） | 否 | - | 未设置时无法自动保存配置到GitHub |
+| `RESEND_API_KEY` | Resend API Key，用于邮件服务 | 否 | - | 未设置时无法发送邮件通知 |
+| `ADMIN_EMAIL` | 管理员邮箱，接收新站点提交通知 | 否 | - | 未设置时无法接收邮件通知 |
+| `RESEND_DOMAIN` | Resend发送域名（仅域名部分） | 否 | - | 未设置时无法发送邮件通知 |
+
+### 功能说明
+- **基础功能**：无需任何配置即可正常使用导航和管理后台
+- **自动保存**：需要配置 `VITE_GITHUB_TOKEN` 和 `VITE_GITHUB_REPO`
+- **邮件通知**：需要配置 `RESEND_API_KEY`、`ADMIN_EMAIL` 和 `RESEND_DOMAIN`
+
+### 管理后台登录
+- **用户名**：无需用户名，仅需密码
+- **默认密码**：`admin`（建议生产环境修改）
+- **访问地址**：`/admin`
+
+### GitHub Token 创建步骤
+1. 访问 [GitHub Settings > Tokens](https://github.com/settings/tokens)
+2. 点击 "Generate new token (classic)"
+3. 选择 `repo` 权限
+4. 复制生成的 token
+
+##  快速部署
 
 ### 一键部署（推荐）
 
@@ -33,31 +75,31 @@ npm run build
 
 ## ✨ 核心特性
 
-### 🎨 **现代化设计**
+###  **现代化设计**
 - 响应式布局，完美适配桌面端和移动端
 - 毛玻璃效果和流畅动画
 - 支持分类图标和网站图标自动获取
 - 优雅的卡片式布局
 
-### �️ **强大的管理后台**
-- 📝 **网站管理** - 添加、编辑、删除网站，支持拖拽排序
-- � **分类管理** - 创建多级分类，自定义图标和排序
-- 🎯 **智能图标** - 自动获取网站图标，支持多种回退方案
-- � **待审核管理** - 用户提交的网站统一审核
-- ⚙️ **系统设置** - 站点信息、Logo、备案信息配置
+###  **强大的管理后台**
+-  **网站管理** - 添加、编辑、删除网站，支持拖拽排序
+-  **分类管理** - 创建多级分类，自定义图标和排序
+-  **智能图标** - 自动获取网站图标，支持多种回退方案
+-  **待审核管理** - 用户提交的网站统一审核
+-  **系统设置** - 站点信息、Logo、备案信息配置
 
-### 🔄 **自动化部署**
+###  **自动化部署**
 - 一键保存到GitHub，触发自动部署
 - EdgeOne Functions API，响应速度快80%
 - 支持配置文件本地备份下载
 - 无需手动操作，保存即生效
 
-### 🔍 **智能搜索**
+###  **智能搜索**
 - 站内搜索，快速定位网站
 - 支持按分类筛选浏览
 - 响应式侧边栏导航
 
-## 🚀 本地开发
+##  本地开发
 
 ```bash
 # 1. 克隆项目
@@ -75,32 +117,36 @@ npm run dev
 - 🏠 **首页**: http://localhost:5173
 - ⚙️ **管理后台**: http://localhost:5173/admin（默认密码：admin）
 
-## 📸 项目预览
+## 🚨 常见问题
 
-### 首页展示
-![首页](https://via.placeholder.com/800x400/f8fafc/64748b?text=BinNav+首页展示)
+<details>
+<summary><strong>Q: 如何登录管理后台？</strong></summary>
 
-### 管理后台
-![管理后台](https://via.placeholder.com/800x400/f8fafc/64748b?text=管理后台界面)
+**A:** 管理后台登录信息：
+- **访问地址**：`/admin`
+- **用户名**：无需用户名
+- **默认密码**：`admin`
+- **修改密码**：设置环境变量 `VITE_ADMIN_PASSWORD`
+</details>
 
-## ⚙️ 环境变量配置
+<details>
+<summary><strong>Q: 为什么无法自动保存配置？</strong></summary>
 
-部署时可配置以下环境变量：
+**A:** 自动保存功能需要配置：
+- `VITE_GITHUB_TOKEN` - GitHub访问令牌
+- `VITE_GITHUB_REPO` - 仓库名称（格式：用户名/仓库名）
+- 未配置时可手动下载配置文件
+</details>
 
-| 变量名 | 描述 | 必需 | 默认值 |
-|--------|------|------|--------|
-| `VITE_ADMIN_PASSWORD` | 管理后台登录密码 | 否 | `admin` |
-| `VITE_GITHUB_TOKEN` | GitHub Personal Access Token | 否 | - |
-| `VITE_GITHUB_REPO` | GitHub仓库名（格式：用户名/仓库名） | 否 | - |
-| `RESEND_API_KEY` | Resend API Key，用于邮件服务 | 否 | - |
-| `ADMIN_EMAIL` | 管理员邮箱，接收新站点提交通知 | 否 | - |
-| `RESEND_DOMAIN` | Resend发送域名（仅域名部分） | 否 | - |
+<details>
+<summary><strong>Q: 邮件通知功能如何配置？</strong></summary>
 
-**GitHub Token 创建步骤**：
-1. 访问 [GitHub Settings > Tokens](https://github.com/settings/tokens)
-2. 点击 "Generate new token (classic)"
-3. 选择 `repo` 权限
-4. 复制生成的 token
+**A:** 邮件通知需要配置：
+- `RESEND_API_KEY` - Resend API密钥
+- `ADMIN_EMAIL` - 管理员邮箱
+- `RESEND_DOMAIN` - 发送域名
+- 未配置时用户提交不会发送邮件通知
+</details>
 
 ## 🤝 贡献指南
 
