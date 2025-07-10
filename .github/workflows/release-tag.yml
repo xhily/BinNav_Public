@@ -1,0 +1,142 @@
+name: Release on Tag
+
+on:
+  push:
+    tags:
+      - 'v*.*.*' # 匹配语义化版本标签，如v1.0.0, v2.1.3
+      - 'v*.*.*-*' # 匹配预发布版本，如v1.0.0-beta.1
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    # softprops/action-gh-release 会自动处理权限，但明确声明更好
+    permissions:
+      contents: write
+      pull-requests: read
+    
+    steps:
+      # 检出代码
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 设置Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # 安装依赖
+      - name: Install dependencies
+        run: npm ci
+
+      # 运行测试（如果有）
+      - name: Run tests
+        run: npm test --if-present
+
+      # 构建项目
+      - name: Build
+        run: npm run build
+
+      # 创建构建产物压缩包
+      - name: Create build archive
+        run: |
+          cd dist
+          zip -r ../binnav-${{ github.ref_name }}.zip .
+          cd ..
+          tar -czf binnav-${{ github.ref_name }}.tar.gz -C dist .
+
+      # 检查是否为预发布版本
+      - name: Check if prerelease
+        id: prerelease
+        run: |
+          if [[ "${{ github.ref_name }}" =~ -[a-zA-Z] ]]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+            echo "这是预发布版本"
+          else
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+            echo "这是正式发布版本"
+          fi
+
+      # 生成更新日志
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # 获取上一个标签
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "No previous tag found, generating changelog from all commits"
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --reverse)
+          else
+            echo "Generating changelog from $PREVIOUS_TAG to ${{ github.ref_name }}"
+            CHANGELOG=$(git log ${PREVIOUS_TAG}..${{ github.ref_name }} --pretty=format:"- %s (%h)" --reverse)
+          fi
+
+          # 保存到文件
+          echo "$CHANGELOG" > CHANGELOG.md
+
+          # 输出到GitHub Actions（处理多行字符串）
+          {
+            echo 'changelog<<EOF'
+            echo "$CHANGELOG"
+            echo EOF
+          } >> $GITHUB_OUTPUT
+
+      # 创建Release
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: BinNav ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          prerelease: ${{ steps.prerelease.outputs.is_prerelease }}
+          generate_release_notes: true
+          body: |
+            ## 🚀 BinNav ${{ github.ref_name }}
+
+            ### 📋 更新内容
+            ${{ steps.changelog.outputs.changelog }}
+
+            ---
+
+            ### 🌐 在线预览
+            **[🔗 查看演示站点](https://bincore.cn/)**
+
+            ### 🚀 快速部署
+
+            #### 一键部署
+            [![EdgeOne Pages](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav)
+            [![Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav)
+            [![Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/sindricn/BinNav)
+
+            #### 手动部署
+            ```bash
+            # 方式1: 下载源码构建
+            git clone https://github.com/sindricn/BinNav.git
+            cd BinNav
+            git checkout ${{ github.ref_name }}
+            npm install && npm run build
+
+            # 方式2: 直接下载构建产物
+            # 下载下方的 zip 或 tar.gz 文件，解压后直接部署
+            ```
+
+            ### 🔒 管理后台
+            - **访问地址**: `/admin`
+            - **默认密码**: `admin`
+            - **配置说明**: [查看文档](https://github.com/sindricn/BinNav#%EF%B8%8F-环境变量配置)
+          draft: false
+          files: |
+            binnav-${{ github.ref_name }}.zip
+            binnav-${{ github.ref_name }}.tar.gz
+            CHANGELOG.md
+          # softprops/action-gh-release 会自动使用 GITHUB_TOKEN
+
+      # 通知发布成功
+      - name: Release notification
+        run: |
+          echo "✅ Release ${{ github.ref_name }} created successfully!"
+          echo "📦 Download URL: https://github.com/sindricn/BinNav/releases/tag/${{ github.ref_name }}"
