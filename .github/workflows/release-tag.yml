@@ -37,17 +37,9 @@ jobs:
       - name: Run tests
         run: npm test --if-present
 
-      # 构建项目
+      # 构建项目（仅用于验证构建是否成功）
       - name: Build
         run: npm run build
-
-      # 创建构建产物压缩包
-      - name: Create build archive
-        run: |
-          cd dist
-          zip -r ../binnav-${{ github.ref_name }}.zip .
-          cd ..
-          tar -czf binnav-${{ github.ref_name }}.tar.gz -C dist .
 
       # 检查是否为预发布版本
       - name: Check if prerelease
@@ -61,28 +53,20 @@ jobs:
             echo "这是正式发布版本"
           fi
 
-      # 生成更新日志
-      - name: Generate changelog
-        id: changelog
+      # 获取标签描述
+      - name: Get tag message
+        id: tag_message
         run: |
-          # 获取上一个标签
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-
-          if [ -z "$PREVIOUS_TAG" ]; then
-            echo "No previous tag found, generating changelog from all commits"
-            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --reverse)
-          else
-            echo "Generating changelog from $PREVIOUS_TAG to ${{ github.ref_name }}"
-            CHANGELOG=$(git log ${PREVIOUS_TAG}..${{ github.ref_name }} --pretty=format:"- %s (%h)" --reverse)
+          # 获取标签的注释信息
+          TAG_MESSAGE=$(git tag -l --format='%(contents)' ${{ github.ref_name }})
+          if [ -z "$TAG_MESSAGE" ]; then
+            TAG_MESSAGE="Release ${{ github.ref_name }}"
           fi
-
-          # 保存到文件
-          echo "$CHANGELOG" > CHANGELOG.md
 
           # 输出到GitHub Actions（处理多行字符串）
           {
-            echo 'changelog<<EOF'
-            echo "$CHANGELOG"
+            echo 'message<<EOF'
+            echo "$TAG_MESSAGE"
             echo EOF
           } >> $GITHUB_OUTPUT
 
@@ -93,50 +77,12 @@ jobs:
           name: BinNav ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
           prerelease: ${{ steps.prerelease.outputs.is_prerelease }}
-          generate_release_notes: true
-          body: |
-            ## 🚀 BinNav ${{ github.ref_name }}
-
-            ### 📋 更新内容
-            ${{ steps.changelog.outputs.changelog }}
-
-            ---
-
-            ### 🌐 在线预览
-            **[🔗 查看演示站点](https://bincore.cn/)**
-
-            ### 🚀 快速部署
-
-            #### 一键部署
-            [![EdgeOne Pages](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav)
-            [![Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav)
-            [![Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/sindricn/BinNav)
-
-            #### 手动部署
-            ```bash
-            # 方式1: 下载源码构建
-            git clone https://github.com/sindricn/BinNav.git
-            cd BinNav
-            git checkout ${{ github.ref_name }}
-            npm install && npm run build
-
-            # 方式2: 直接下载构建产物
-            # 下载下方的 zip 或 tar.gz 文件，解压后直接部署
-            ```
-
-            ### 🔒 管理后台
-            - **访问地址**: `/admin`
-            - **默认密码**: `admin`
-            - **配置说明**: [查看文档](https://github.com/sindricn/BinNav#%EF%B8%8F-环境变量配置)
+          body: ${{ steps.tag_message.outputs.message }}
           draft: false
-          files: |
-            binnav-${{ github.ref_name }}.zip
-            binnav-${{ github.ref_name }}.tar.gz
-            CHANGELOG.md
           # softprops/action-gh-release 会自动使用 GITHUB_TOKEN
 
       # 通知发布成功
       - name: Release notification
         run: |
           echo "✅ Release ${{ github.ref_name }} created successfully!"
-          echo "📦 Download URL: https://github.com/sindricn/BinNav/releases/tag/${{ github.ref_name }}"
+          echo "� Release URL: https://github.com/sindricn/BinNav/releases/tag/${{ github.ref_name }}"
