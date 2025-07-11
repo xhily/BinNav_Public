@@ -112,9 +112,15 @@ wrangler pages deploy dist
 - 清除浏览器缓存后重试
 
 ### Q: 部署时出现"Multiple environments"警告？
-**A:** 这是wrangler.toml多环境配置问题：
-- 删除 `[env.production]` 和 `[env.preview]` 配置块
-- 或者在部署时指定环境：`wrangler pages deploy dist --env=""`
+**A:** 现在使用的是单环境配置，不应该出现此问题：
+```toml
+name = "bin-nav"
+compatibility_date = "2024-07-01"
+pages_build_output_dir = "./dist"
+
+[build]
+command = "npm install && npm run build"
+```
 
 ### Q: 部署时出现"Missing entry-point"错误？
 **A:** 这是Cloudflare Pages配置问题：

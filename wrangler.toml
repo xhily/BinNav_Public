@@ -1,10 +1,9 @@
-name = "binnav"
-compatibility_date = "2024-01-01"
-compatibility_flags = ["nodejs_compat"]
+name = "bin-nav"
+compatibility_date = "2024-07-01"
+pages_build_output_dir = "./dist"
 
-# This is a Pages project, not a Worker
-# Pages configuration
-pages_build_output_dir = "dist"
+[build]
+command = "npm install && npm run build"
 
 # Environment variables (set these in Cloudflare dashboard)
 # ADMIN_PASSWORD = "your_admin_password"

@@ -104,24 +104,33 @@ vercel --prod
 ### Q: 部署时出现Function Runtime错误？
 **A:** 这是vercel.json中runtime配置问题，尝试以下解决方案：
 
-**方案1**: 使用@vercel/node格式
+**方案1**: 使用Edge Runtime格式（推荐）
 ```json
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
   "functions": {
     "functions/api/*.js": {
-      "runtime": "@vercel/node@3.0.7"
+      "runtime": "edge",
+      "maxDuration": 10,
+      "memory": 128
     }
-  }
+  },
+  "buildCommand": "vite build",
+  "outputDirectory": "dist",
+  "cleanUrls": true
 }
 ```
 
-**方案2**: 使用简化配置（推荐）
+**方案2**: 使用简化配置
 删除当前的vercel.json，重命名vercel-simple.json为vercel.json：
 ```json
 {
-  "buildCommand": "npm run build",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "vite build",
   "outputDirectory": "dist",
-  "installCommand": "npm install"
+  "cleanUrls": true
 }
 ```
 
