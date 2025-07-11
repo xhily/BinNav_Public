@@ -4,6 +4,10 @@
  * 用途: 管理员审核和处理用户提交的网站
  */
 
+export const config = {
+  runtime: 'edge',
+}
+
 export default async function handler(request, response) {
   // 处理CORS
   response.setHeader('Access-Control-Allow-Origin', '*');

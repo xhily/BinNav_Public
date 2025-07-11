@@ -105,24 +105,33 @@ vercel --prod
 **A:** 这是vercel.json中runtime配置问题，尝试以下解决方案：
 
 **方案1**: 使用Edge Runtime格式（推荐）
+
+每个API文件都已经配置了Edge Runtime：
+```javascript
+export const config = {
+  runtime: 'edge',
+}
+
+export default async function handler(request, response) {
+  // API逻辑
+}
+```
+
+对应的vercel.json配置：
 ```json
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
-  "functions": {
-    "api/*.js": {
-      "runtime": "edge",
-      "maxDuration": 10,
-      "memory": 128
-    }
-  },
   "buildCommand": "vite build",
   "outputDirectory": "dist",
   "cleanUrls": true
 }
 ```
 
-> **注意**: Vercel要求API函数必须放在项目根目录的 `/api/` 文件夹中，不能是 `/functions/api/`
+> **注意**:
+> - Vercel要求API函数必须放在项目根目录的 `/api/` 文件夹中
+> - 每个API文件都需要导出 `config` 对象来指定runtime
+> - Edge Runtime具有更快的冷启动和更低的延迟
 
 **方案2**: 使用简化配置
 删除当前的vercel.json，重命名vercel-simple.json为vercel.json：

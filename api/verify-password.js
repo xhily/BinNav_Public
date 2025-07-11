@@ -4,6 +4,10 @@
  * 用途: 验证管理后台登录密码
  */
 
+export const config = {
+  runtime: 'edge',
+}
+
 export default async function handler(request, response) {
   // 处理CORS
   response.setHeader('Access-Control-Allow-Origin', '*');

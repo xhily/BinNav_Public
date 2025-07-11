@@ -4,6 +4,10 @@
  * 用途: 从GitHub仓库删除指定的图标文件
  */
 
+export const config = {
+  runtime: 'edge',
+}
+
 export default async function handler(request, response) {
   // 处理CORS
   response.setHeader('Access-Control-Allow-Origin', '*');

@@ -4,6 +4,10 @@
  * 用途: 更新websiteData.js文件内容，触发重新部署
  */
 
+export const config = {
+  runtime: 'edge',
+}
+
 // Base64 编码函数（纯JavaScript实现，兼容所有环境）
 function base64Encode(str) {
   try {

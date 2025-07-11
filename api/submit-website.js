@@ -4,6 +4,10 @@
  * 用途: 用户提交新网站到待审核列表
  */
 
+export const config = {
+  runtime: 'edge',
+}
+
 export default async function handler(request, response) {
   // 处理CORS
   response.setHeader('Access-Control-Allow-Origin', '*');

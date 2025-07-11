@@ -4,6 +4,10 @@
  * 用途: 获取当前项目版本和GitHub最新版本信息
  */
 
+export const config = {
+  runtime: 'edge',
+}
+
 export default async function handler(request, response) {
   // 处理CORS
   response.setHeader('Access-Control-Allow-Origin', '*');

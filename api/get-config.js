@@ -4,6 +4,10 @@
  * 用途: 获取当前websiteData.js文件内容，用于管理后台编辑
  */
 
+export const config = {
+  runtime: 'edge',
+}
+
 // 简化的Base64解码函数
 function base64Decode(str) {
   try {

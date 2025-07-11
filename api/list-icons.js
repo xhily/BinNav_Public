@@ -4,6 +4,10 @@
  * 用途: 获取public/assets目录中的图标文件列表
  */
 
+export const config = {
+  runtime: 'edge',
+}
+
 export default async function handler(request, response) {
   // 处理CORS
   response.setHeader('Access-Control-Allow-Origin', '*');

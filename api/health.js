@@ -4,6 +4,10 @@
  * 用途: 检查服务状态和环境变量配置
  */
 
+export const config = {
+  runtime: 'edge',
+}
+
 export default async function handler(request, response) {
   // 处理CORS
   response.setHeader('Access-Control-Allow-Origin', '*');
