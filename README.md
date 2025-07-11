@@ -9,10 +9,10 @@
 ## 📸 项目预览
 
 ### 首页展示
-![首页](https://via.placeholder.com/800x400/f8fafc/64748b?text=BinNav+首页展示)
+![首页](/public/index.png)
 
 ### 管理后台
-![管理后台](https://via.placeholder.com/800x400/f8fafc/64748b?text=管理后台界面)
+![管理后台](/public/admin.png)
 
 ## ⚙️ 环境变量配置
 
@@ -52,15 +52,14 @@
 
 [![使用 EdgeOne Pages 部署](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav_Public&project-name=BinNav_Public&build-command=npm%20run%20build&install-command=npm%20install&output-directory=dist&env=ADMIN_PASSWORD,GITHUB_TOKEN,GITHUB_REPO,RESEND_API_KEY,ADMIN_EMAIL,RESEND_DOMAIN&env-description=管理后台密码、GitHub令牌、仓库名称、邮件服务配置&env-link=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav_Public%23%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E9%85%8D%E7%BD%AE)
 
-#### Vercel（国外推荐）
+#### Vercel（暂未开发完成）
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav_Public&project-name=BinNav_Public)
 
-> **注意**: Vercel部署完成后，需要手动在Dashboard中配置环境变量。详细步骤请查看 [Vercel部署指南](docs/VERCEL_DEPLOYMENT.md)
 
-#### Cloudflare Pages
+
+#### Cloudflare Pages（暂未开发完成）
 [![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/sindricn/BinNav_Public)
 
-> **注意**: 如果一键部署遇到问题，请查看 [Cloudflare部署指南](docs/CLOUDFLARE_DEPLOYMENT.md)
 
 
 ### 手动部署
@@ -155,11 +154,10 @@ npm run dev
 
 ## 🤝 贡献指南
 
-1. Fork 项目
-2. 创建特性分支 (`git checkout -b feature/amazing-feature`)
-3. 提交更改 (`git commit -m 'Add amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 创建 Pull Request
+欢迎参与 BinNav 的开发！
+
+- 公开仓库开发主分支为 `dev`，请基于 `dev` 分支进行开发。
+- 新功能或修复请创建自己的功能分支，例如 `feature/xxx`。
 
 ## 📄 许可证
 
