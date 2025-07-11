@@ -3,7 +3,7 @@
   "version": 2,
   "framework": "vite",
   "functions": {
-    "functions/api/*.js": {
+    "api/*.js": {
       "runtime": "edge",
       "maxDuration": 10,
       "memory": 128

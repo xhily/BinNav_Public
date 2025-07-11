@@ -110,7 +110,7 @@ vercel --prod
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
   "functions": {
-    "functions/api/*.js": {
+    "api/*.js": {
       "runtime": "edge",
       "maxDuration": 10,
       "memory": 128
@@ -121,6 +121,8 @@ vercel --prod
   "cleanUrls": true
 }
 ```
+
+> **注意**: Vercel要求API函数必须放在项目根目录的 `/api/` 文件夹中，不能是 `/functions/api/`
 
 **方案2**: 使用简化配置
 删除当前的vercel.json，重命名vercel-simple.json为vercel.json：
