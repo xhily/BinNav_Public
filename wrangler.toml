@@ -2,13 +2,5 @@ name = "bin-nav"
 compatibility_date = "2024-07-01"
 pages_build_output_dir = "./dist"
 
-[build]
-command = "npm install && npm run build"
-
-# Environment variables (set these in Cloudflare dashboard)
-# ADMIN_PASSWORD = "your_admin_password"
-# GITHUB_TOKEN = "your_github_token"
-# GITHUB_REPO = "username/repository"
-# RESEND_API_KEY = "your_resend_api_key"
-# ADMIN_EMAIL = "admin@yourdomain.com"
-# RESEND_DOMAIN = "yourdomain.com"
+[[pages_functions]]
+directory = "functions"
