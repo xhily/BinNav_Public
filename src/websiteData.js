@@ -6,7 +6,7 @@ export const siteConfig = {
   "siteTitle": "BinNav - 导航",
   "siteLogo": "/assets/logo.png",
   "siteDescription": "二进制导航页面，精选优质站点",
-  "icpRecord": "苏ICP备2025185822号",
+  "icpRecord": "",
   "publicSecurityRecord": "",
   "publicSecurityRecordUrl": ""
 };
