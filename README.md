@@ -48,29 +48,14 @@
 
 ### 一键部署
 
-👉 先 [Fork 本项目](https://github.com/sindricn/BinNav_Public/fork) 到你自己的账号下
-
-🧩 若你 Fork 本项目后希望使用一键部署功能，请将部署链接中的 `repository-url` 改为你自己的仓库地址。
-
 #### EdgeOne Pages（国内推荐）
 
 [![使用 EdgeOne Pages 部署](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav_Public&project-name=BinNav_Public&build-command=npm%20run%20build&install-command=npm%20install&output-directory=dist&env=ADMIN_PASSWORD,GITHUB_TOKEN,GITHUB_REPO,RESEND_API_KEY,ADMIN_EMAIL,RESEND_DOMAIN&env-description=管理后台密码、GitHub令牌、仓库名称、邮件服务配置&env-link=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav_Public%23%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E9%85%8D%E7%BD%AE)
 
 
-原始链接（请勿直接使用）：
-https://edgeone.ai/pages/new?repository-url=https%3A%2F%2Fgithub.com%2F**sindricn**%2FBinNav_Public&...
-
-修改方法：
-将其中的
-  repository-url=https%3A%2F%2Fgithub.com%2F**sindricn**%2FBinNav_Public
-
-替换为你自己的仓库地址，例如：
-  repository-url=https%3A%2F%2Fgithub.com%2F**your-username**%2FBinNav_Public
-
-
 ### 手动部署：
-1. 前往部署平台
-2. 选择你 Fork 后的仓库
+1. 👉  [Fork 本项目](https://github.com/sindricn/BinNav_Public/fork) 到你自己的账号下
+2. 登录EdgeOne，创建项目选择你 Fork 后的仓库
 3. 添加环境变量并部署
 
 
