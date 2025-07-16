@@ -14,6 +14,28 @@
 ### 管理后台
 ![管理后台](/public/img/admin.png)
 
+
+##  快速部署
+
+### 一键部署
+
+#### EdgeOne Pages（国内推荐）
+
+[![使用 EdgeOne Pages 部署](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav_Public&project-name=BinNav_Public&build-command=npm%20run%20build&install-command=npm%20install&output-directory=dist&env=ADMIN_PASSWORD,GITHUB_TOKEN,GITHUB_REPO,RESEND_API_KEY,ADMIN_EMAIL,RESEND_DOMAIN&env-description=管理后台密码、GitHub令牌、仓库名称、邮件服务配置&env-link=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav_Public%23%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E9%85%8D%E7%BD%AE)
+
+
+### 手动部署：
+1. 👉  [Fork 本项目](https://github.com/sindricn/BinNav_Public/fork) 到你自己的账号下
+2. 登录EdgeOne，创建项目选择你 Fork 后的仓库
+3. 添加环境变量并部署
+
+
+#### Vercel（暂未开发完成）
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav_Public&project-name=BinNav_Public)
+
+#### Cloudflare Pages（暂未开发完成）
+[![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/sindricn/BinNav_Public)
+
 ## ⚙️ 环境变量配置
 
 ### 基础配置
@@ -44,41 +66,6 @@
 3. 选择 `repo` 权限
 4. 复制生成的 token
 
-##  快速部署
-
-### 一键部署
-
-#### EdgeOne Pages（国内推荐）
-
-[![使用 EdgeOne Pages 部署](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav_Public&project-name=BinNav_Public&build-command=npm%20run%20build&install-command=npm%20install&output-directory=dist&env=ADMIN_PASSWORD,GITHUB_TOKEN,GITHUB_REPO,RESEND_API_KEY,ADMIN_EMAIL,RESEND_DOMAIN&env-description=管理后台密码、GitHub令牌、仓库名称、邮件服务配置&env-link=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav_Public%23%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E9%85%8D%E7%BD%AE)
-
-
-### 手动部署：
-1. 👉  [Fork 本项目](https://github.com/sindricn/BinNav_Public/fork) 到你自己的账号下
-2. 登录EdgeOne，创建项目选择你 Fork 后的仓库
-3. 添加环境变量并部署
-
-
-#### Vercel（暂未开发完成）
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav_Public&project-name=BinNav_Public)
-
-#### Cloudflare Pages（暂未开发完成）
-[![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/sindricn/BinNav_Public)
-
-### 本地部署
-```bash
-# 1. 克隆项目
-git clone https://github.com/sindricn/BinNav_Public.git
-cd BinNav_Public
-
-# 2. 安装依赖
-npm install
-
-# 3. 构建项目
-npm run build
-
-# 4. 部署 dist 目录到任何静态托管服务
-```
 
 ## ✨ 核心特性
 
