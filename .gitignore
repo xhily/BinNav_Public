@@ -55,6 +55,10 @@ coverage/
 # Optional REPL history
 .node_repl_history
 
+# Ignore backend data file
+src/websiteData.js
+
+
 # Output of 'npm pack'
 *.tgz
 
