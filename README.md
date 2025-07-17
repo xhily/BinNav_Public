@@ -49,6 +49,11 @@
 
 [![使用 EdgeOne Pages 部署](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?repository-url=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav_Public&project-name=BinNav_Public&build-command=npm%20run%20build&install-command=npm%20install&output-directory=dist&env=ADMIN_PASSWORD,GITHUB_TOKEN,GITHUB_REPO,RESEND_API_KEY,ADMIN_EMAIL,RESEND_DOMAIN&env-description=管理后台密码、GitHub令牌、仓库名称、邮件服务配置&env-link=https%3A%2F%2Fgithub.com%2Fsindricn%2FBinNav_Public%23%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E9%85%8D%E7%BD%AE)
 
+## 🎬 视频教程
+
+- **YouTube**：[BinNav - 自定义导航页（可视化后台管理） ](https://youtu.be/wy8hi84svGY)
+<iframe src="https://www.youtube.com/embed/wy8hi84svGY" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+
 
 ### 手动部署：
 1. 👉  [Fork 本项目](https://github.com/sindricn/BinNav_Public/fork) 到你自己的账号下
