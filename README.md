@@ -85,10 +85,8 @@ BinNav 集成了 [Resend](https://resend.com) 的邮件发送能力，用户可�
 #### 🌐 步骤三：添加并验证发件域名（可使用免费二级域名）
 
 1. 左侧菜单进入 `Domains` → 点击 `Add Domain`
-2. 输入你的域名（如 `yourdomain.com`），或使用 Resend 提供的免费二级域名（如 `binnav.resend.dev`）
+2. 输入你的域名（如 `yourdomain.com`），或使用 Resend 提供的免费二级域名
 3. 按照提示添加 DNS 记录以完成验证
-
-> ✅ 使用 Resend 提供的免费子域名也能正常发送邮件，适合没有自有域名的用户。
 
 
 ## ✨ 核心特性
