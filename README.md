@@ -66,6 +66,30 @@
 3. 选择 `repo` 权限
 4. 复制生成的 token
 
+### ✉️ Resend 邮件功能配置指南
+
+BinNav 集成了 [Resend](https://resend.com) 的邮件发送能力，用户可在前端页面填写反馈，自动发送邮件至指定邮箱。你只需完成以下三步，即可启用该功能：
+
+#### ✅ 步骤一：注册 Resend 账号
+
+1. 访问官网 [https://resend.com](https://resend.com)
+2. 使用邮箱或 GitHub 账户注册并登录
+
+#### 🔑 步骤二：创建 API Key
+
+1. 登录后，点击左侧菜单栏 `API Keys`
+2. 点击右上角 `Create API Key`
+3. 输入名称（如 `BinNav Key`），点击生成
+4. 复制生成的 key（如 `re_xxxxxxxxxxxxxxxxx`）并保存备用
+
+#### 🌐 步骤三：添加并验证发件域名（可使用免费二级域名）
+
+1. 左侧菜单进入 `Domains` → 点击 `Add Domain`
+2. 输入你的域名（如 `yourdomain.com`），或使用 Resend 提供的免费二级域名（如 `binnav.resend.dev`）
+3. 按照提示添加 DNS 记录以完成验证
+
+> ✅ 使用 Resend 提供的免费子域名也能正常发送邮件，适合没有自有域名的用户。
+
 
 ## ✨ 核心特性
 
