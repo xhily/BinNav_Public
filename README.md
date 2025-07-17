@@ -52,8 +52,6 @@
 ## 🎬 视频教程
 
 - **YouTube**：[BinNav - 自定义导航页（可视化后台管理） ](https://youtu.be/wy8hi84svGY)
-<iframe src="https://www.youtube.com/embed/wy8hi84svGY" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
-
 
 ### 手动部署：
 1. 👉  [Fork 本项目](https://github.com/sindricn/BinNav_Public/fork) 到你自己的账号下
