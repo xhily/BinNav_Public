@@ -1,75 +1,17 @@
-// 网站数据 - 通过管理后台更新于 2025/7/27 01:16:40
+// 网站数据 - 通过管理后台更新于 2025/7/29 19:17:26
 
 // 站点配置
 export const siteConfig = {
-  "siteName": "BinNav",
-  "siteTitle": "BinNav - 导航",
+  "siteName": "XYNav",
+  "siteTitle": "XY导航",
   "siteLogo": "/assets/logo.png",
-  "siteDescription": "二进制导航页面，精选优质站点",
+  "siteDescription": "XY导航页面，精选优质站点",
   "icpRecord": "",
   "publicSecurityRecord": "",
   "publicSecurityRecordUrl": ""
 };
 
 export const websiteData = [
-  {
-    "id": 40,
-    "name": "Newbie Village",
-    "description": "二进制博客",
-    "url": "https://blog.nbvil.com/",
-    "category": "author",
-    "tags": [
-      "个人博客",
-      "教程分享",
-      "开发心得"
-    ],
-    "icon": "https://icon.nbvil.com/favicon?url=blog.nbvil.com"
-  },
-  {
-    "id": 1751813976438,
-    "name": "博主云盘",
-    "description": "分享教程涉及的工具及相关文档代码",
-    "url": "https://pan.nbvil.com/",
-    "category": "author",
-    "tags": [
-      "云盘"
-    ],
-    "icon": "https://icon.nbvil.com/favicon?url=pan.nbvil.com"
-  },
-  {
-    "id": 41,
-    "name": "GitHub Projects",
-    "description": "作者开源项目",
-    "url": "https://github.com/sindricn",
-    "category": "author",
-    "tags": [
-      "开源项目"
-    ],
-    "icon": "https://icon.nbvil.com/favicon?url=github.com"
-  },
-  {
-    "id": 1751596898467,
-    "name": "B站",
-    "description": "作者B站频道，不定期上传视频教程",
-    "url": "https://space.bilibili.com/3546865807133625",
-    "category": "author",
-    "tags": [
-      "视频"
-    ],
-    "icon": "https://icon.nbvil.com/favicon?url=bilibili.com"
-  },
-  {
-    "id": 45,
-    "name": "知乎专栏",
-    "description": "二进制-知乎",
-    "url": "https://www.zhihu.com/people/mrblack-41-9",
-    "category": "author",
-    "tags": [
-      "知乎专栏",
-      "技术文章"
-    ],
-    "icon": "https://icon.nbvil.com/favicon?url=www.zhihu.com"
-  },
   {
     "id": 1751617129171,
     "name": "Cloudflare",
@@ -119,6 +61,19 @@ export const websiteData = [
       "对话"
     ],
     "icon": "https://icon.nbvil.com/favicon?url=grok.com"
+  },
+  {
+    "id": 1753787837513,
+    "name": "硅基流动",
+    "description": "硅基流动的技术核心是提供一个推理引擎，主要向企业提供高性能LLM推理和训练解决方案，帮助企业高效地部署AI应用。",
+    "url": "https://cloud.siliconflow.cn/i/pLtshdzF",
+    "category": "category_1751811714830",
+    "tags": [
+      "AI",
+      "对话",
+      "免费"
+    ],
+    "icon": "https://icon.nbvil.com/favicon?url=siliconflow.cn"
   },
   {
     "id": 1751812924193,
@@ -343,5 +298,5 @@ export const siteStats = {
   totalSites: websiteData.length,
   totalCategories: categories.length,
   totalTags: [...new Set(websiteData.flatMap(site => site.tags || []))].length,
-  lastUpdated: "2025-07-26"
+  lastUpdated: "2025-07-29"
 };
